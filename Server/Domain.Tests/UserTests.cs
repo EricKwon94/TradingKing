@@ -22,6 +22,6 @@ public class UserTests
     {
         User sut = new User();
         bool expectedResult = sut.Register(email);
-        expectedResult.Should().BeTrue();
+        expectedResult.Should().BeTrue(); 2
     }
 }
