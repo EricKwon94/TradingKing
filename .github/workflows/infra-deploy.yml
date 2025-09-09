@@ -25,7 +25,7 @@ jobs:
         with:
           type: deployment
           operation: create
-          name: dp-github-actions
+          name: dp-github-tradingking
           location: koreacentral
           scope: subscription
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
