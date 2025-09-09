@@ -30,7 +30,7 @@ jobs:
       with:
         registry: tradingkingsharedkoreacentral.azurecr.io
         username: tradingkingsharedkoreacentral
-        password: MFlLN18sxdjNJLk5EcJsZi16BQ3+e9P8Q4xPupAjm++ACRC6R0/r
+        password: ${{ secrets.ACR_PASSWORD }}
 
     - name: Build and Push Docker image
       uses: docker/build-push-action@v6
