@@ -11,6 +11,9 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
 
+    env:
+      DOCKER_REGISTRY: tradingking.azurecr.io
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
@@ -28,7 +31,7 @@ jobs:
     - name: Log in to Docker Hub
       uses: docker/login-action@v3
       with:
-        registry: tradingking.azurecr.io
+        registry: ${{ env.DOCKER_REGISTRY }}
         username: tradingking
         password: ${{ secrets.ACR_PASSWORD }}
 
@@ -37,5 +40,5 @@ jobs:
       with:
         context: ./Server
         file: ./Server/Host/Dockerfile
-        tags: tradingkingdev:latest
+        tags: ${{ env.DOCKER_REGISTRY }}/tradingkingdev:latest
         push: true
