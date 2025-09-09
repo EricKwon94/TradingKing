@@ -2,14 +2,15 @@ name: Server CI
 
 on:
   push:
-    branches:
-      - "**"
+    branches-ignore:
+      - master
+      - dev
     paths:
       - "Server/**"
 
 jobs:
   job1:
-    name: Deploy Server
+    name: CI
     runs-on: ubuntu-latest
 
     steps:
