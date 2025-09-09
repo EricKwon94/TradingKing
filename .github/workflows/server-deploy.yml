@@ -37,5 +37,5 @@ jobs:
       with:
         context: ./Server
         file: ./Server/Host/Dockerfile
-        tags: eric/tradingKingDev:latest
+        tags: eric/tradingkingDev:latest
         push: true
