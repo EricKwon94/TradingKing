@@ -21,7 +21,7 @@
 		<Nullable>enable</Nullable>
 
 		<!-- Display name -->
-		<ApplicationTitle>StockGame</ApplicationTitle>
+		<ApplicationTitle>오늘애단타왕</ApplicationTitle>
 
 		<!-- App Identifier -->
 		<ApplicationId>com.companyname.host</ApplicationId>
