@@ -24,10 +24,3 @@ jobs:
       run: |
         dotnet build ./Server --configuration Release
         dotnet test ./Server --configuration Release
-
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        registry: ${{ secrets.DOCKER_REGISTRY }}
-        username: ${{ secrets.DOCKER_REGISTRY_ID }}
-        password: ${{ secrets.ACR_PASSWORD }}
