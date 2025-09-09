@@ -1,0 +1,40 @@
+name: Infra Deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  job1:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    env:
+      a: a
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy Bicep to Azure
+        uses: azure/bicep-deploy@v2
+        with:
+          type: deployment
+          operation: create
+          name: dp-github-actions
+          location: koreacentral
+          scope: subscription
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          template-file: ./Infrastructure/main.bicep
+          parameters: >
+              {
+                "env": "dev",
+                "location": "koreacentral",
+                "serverNumber": "01"
+              }
