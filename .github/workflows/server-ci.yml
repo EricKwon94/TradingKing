@@ -1,0 +1,27 @@
+name: Server CI
+
+on:
+  push:
+    branches:
+      - "**"
+    paths:
+      - "Server/**"
+
+jobs:
+  job1:
+    name: Deploy Server
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+    
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: '9.0'
+
+    - name: Build and Test
+      run: |
+        dotnet build ./Server --configuration Release
+        dotnet test ./Server --configuration Release
