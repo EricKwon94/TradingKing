@@ -3,6 +3,13 @@ targetScope = 'subscription'
 param env string
 param location string
 param serverNumber string
+param registryUrl string
+param registryUserName string
+
+@secure()
+param issKey string
+@secure()
+param registryPassword string
 
 /*
 resource rgShared 'Microsoft.Resources/resourceGroups@2025-04-01' = {
@@ -27,5 +34,9 @@ module app 'services/_main.bicep' = {
   params: {
     env: env
     serverNumber: serverNumber
+    issKey: issKey
+    registryUrl: registryUrl
+    registryUserName: registryUserName
+    registryPassword: registryPassword
   }
 }

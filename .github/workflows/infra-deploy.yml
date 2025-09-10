@@ -40,5 +40,9 @@ jobs:
               {
                 "env": "dev",
                 "location": "koreacentral",
-                "serverNumber": "01"
+                "serverNumber": "01",
+                "issKey": ${{ secrets.ISS_KEY }},
+                "registryUrl": "tradingking.azurecr.io",
+                "registryUserName": "tradingking",
+                "registryPassword": ${{ secrets.ACR_PASSWORD }}
               }
