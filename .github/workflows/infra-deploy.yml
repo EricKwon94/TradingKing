@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      a: a
+      env: dev
       
     steps:
       - name: Checkout code
@@ -38,11 +38,11 @@ jobs:
           template-file: ./Infrastructure/main.bicep
           parameters: >
               {
-                "env": "dev",
+                "env": ${{ env.env }},
                 "location": "koreacentral",
                 "serverNumber": "01",
                 "issKey": ${{ secrets.ISS_KEY }},
-                "registryUrl": "tradingking.azurecr.io",
+                "registryUrl": "tradingking.azurecr.io/tradingking${{ env.env }}:latest",
                 "registryUserName": "tradingking",
                 "registryPassword": ${{ secrets.ACR_PASSWORD }}
               }
