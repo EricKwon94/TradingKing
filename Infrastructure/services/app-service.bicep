@@ -31,10 +31,10 @@ resource appService 'Microsoft.Web/sites@2024-11-01' = {
       minTlsVersion: '1.3'
       linuxFxVersion: 'sitecontainers'
       appSettings: [
-        {
+        //{
           //name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
           //value: insightsConnectionString
-        }
+        //}
         {
           name: 'ISS_KEY'
           value: issKey
