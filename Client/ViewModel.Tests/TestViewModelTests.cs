@@ -6,5 +6,6 @@ public class TestViewModelTests
     public void Test1()
     {
         TestViewModel viewModel = new TestViewModel();
+        TestViewModel viewModel = new TestViewModel();
     }
 }
