@@ -43,6 +43,10 @@ resource appService 'Microsoft.Web/sites@2024-11-01' = {
           name: 'ASPNETCORE_ENVIRONMENT'
           value: env == 'dev' ? 'Development' : 'Production'
         }
+        {
+          name: 'DOCKER_ENABLE_CI'
+          value: 'true'
+        }
       ]
     }
   }
