@@ -61,4 +61,8 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.5" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\ViewModel\3-ViewModel.csproj" />
+	</ItemGroup>
+
 </Project>
