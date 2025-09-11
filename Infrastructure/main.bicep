@@ -10,6 +10,10 @@ param registryUserName string
 param issKey string
 @secure()
 param registryPassword string
+@secure()
+param sqlsrvId string
+@secure()
+param sqlsrvPwd string
 
 /*
 resource rgShared 'Microsoft.Resources/resourceGroups@2025-04-01' = {
@@ -38,5 +42,7 @@ module app 'services/_main.bicep' = {
     registryUrl: registryUrl
     registryUserName: registryUserName
     registryPassword: registryPassword
+    sqlsrvId: sqlsrvId
+    sqlsrvPwd: sqlsrvPwd
   }
 }
