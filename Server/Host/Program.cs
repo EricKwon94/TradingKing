@@ -1,5 +1,7 @@
+using Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
@@ -60,9 +62,9 @@ public class Program
                 opt.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
-                    ValidIssuer = "https://tradingking.com",
+                    ValidIssuer = Constant.ISSUER,
                     ValidateAudience = true,
-                    ValidAudience = "tradingking-api",
+                    ValidAudience = Constant.AUD,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["ISS_KEY"]!)),
@@ -85,6 +87,8 @@ public class Program
                 });
             });
         });
+
+        builder.Services.AddInfrastructure(builder.Environment.IsDevelopment(), builder.Configuration.GetConnectionString("TradingKing")!);
 
         var app = builder.Build();
 

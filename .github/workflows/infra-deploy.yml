@@ -44,5 +44,7 @@ jobs:
                 "issKey": ${{ secrets.ISS_KEY }},
                 "registryUrl": "tradingking.azurecr.io/tradingking${{ env.env }}:latest",
                 "registryUserName": "tradingking",
-                "registryPassword": ${{ secrets.ACR_PASSWORD }}
+                "registryPassword": ${{ secrets.ACR_PASSWORD }},
+                "sqlsrvId": "${{ secrets.SQLSRV_ID }}",
+                "sqlsrvPwd": "${{ secrets.SQLSRV_PWD }}"
               }
