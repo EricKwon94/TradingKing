@@ -62,6 +62,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\Infrastructure\2-Infrastructure.csproj" />
 	  <ProjectReference Include="..\ViewModel\3-ViewModel.csproj" />
 	</ItemGroup>
 

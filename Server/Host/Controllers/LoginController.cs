@@ -33,7 +33,7 @@ public class LoginController : ControllerBase
     [HttpGet("version")]
     public int Version()
     {
-        int version = 0;
+        int version = 1;
         _logger.LogInformation("{version} ฟไรป", version);
         return version;
     }
@@ -68,8 +68,8 @@ public class LoginController : ControllerBase
 
         var header = new JwtHeader(credentials);
         var payload = new JwtPayload(
-            issuer: Constant.ISSUER,
-            audience: Constant.AUD,
+            issuer: Env.ISSUER,
+            audience: Env.AUD,
             claims: claims,
             notBefore: null,
             expires: expires,
