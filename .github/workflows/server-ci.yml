@@ -24,5 +24,5 @@ jobs:
 
     - name: Build and Test
       run: |
-        dotnet build ./Server --configuration Release
-        dotnet test ./Server --configuration Release
+        dotnet build ./Server -c Release
+        dotnet test ./Server -c Release

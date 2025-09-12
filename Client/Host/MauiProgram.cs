@@ -1,6 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Application;
+using Infrastructure;
+using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Controls.Hosting;
 using Microsoft.Maui.Hosting;
+using ViewModel;
 
 namespace Host
 {
@@ -20,6 +23,9 @@ namespace Host
 #if DEBUG
             builder.Logging.AddDebug();
 #endif
+            builder.Services.AddApplication();
+            builder.Services.AddInfrastructure();
+            builder.Services.AddViewModel();
 
             return builder.Build();
         }
