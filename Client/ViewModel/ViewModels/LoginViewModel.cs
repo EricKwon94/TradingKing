@@ -5,17 +5,26 @@ using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using static Application.Api.IAccountService;
 
 namespace ViewModel.ViewModels;
 
-public partial class LoginViewModel : ObservableObject
+public partial class LoginViewModel : BaseViewModel
 {
     private readonly IAccountService _accountService;
     private readonly IPreferences _preferences;
     private readonly IAlertService _alert;
 
     [ObservableProperty]
-    private int count;
+    private int _minIdLength;
+    [ObservableProperty]
+    private int _maxIdLength;
+    [ObservableProperty]
+    private int _minNicknameLength;
+    [ObservableProperty]
+    private int _maxNicknameLength;
+    [ObservableProperty]
+    private int _minPasswordLength;
 
     public LoginViewModel(IAccountService accountService, IPreferences preferences, IAlertService alert)
     {
@@ -25,28 +34,40 @@ public partial class LoginViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public async Task Click(CancellationToken ct)
+    public async Task LoginAsync(CancellationToken ct)
     {
-        Count++;
-        string token = _preferences.Get("token", "");
-        if (string.IsNullOrEmpty(token))
-        {
-            token = await _accountService.Login();
-            _preferences.Set("token", token);
-        }
+
     }
 
     [RelayCommand]
-    public async Task User(CancellationToken ct)
+    public async Task GoToRegisterAsync(CancellationToken ct)
     {
-        _preferences.Clear();
+
+    }
+
+    public override async void OnAppearing()
+    {
+        IsBusy = true;
+
+        FormRes? res = null;
         try
         {
-            string s = await _accountService.User();
+            res = await _accountService.GetFormAsync(default);
         }
         catch (Exception e)
         {
             await _alert.DisplayAlert("Error", e.Message, "ok");
         }
+
+        if (res != null)
+        {
+            MinIdLength = res.MinIdLength;
+            MaxIdLength = res.MaxIdLength;
+            MinNicknameLength = res.MinNicknameLength;
+            MaxNicknameLength = res.MaxNicknameLength;
+            MinPasswordLength = res.MinPasswordLength;
+        }
+
+        IsBusy = false;
     }
 }
