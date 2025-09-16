@@ -1,3 +1,5 @@
+using Application;
+using Domain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -8,34 +10,60 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Host.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class LoginController : ControllerBase
+public class AccountController : ControllerBase
 {
-    private readonly ILogger<LoginController> _logger;
+    private readonly ILogger<AccountController> _logger;
     private readonly IConfiguration _configuration;
+    private readonly AccountService _accountService;
 
-    public LoginController(ILogger<LoginController> logger, IConfiguration configuration)
+    public AccountController(ILogger<AccountController> logger, IConfiguration configuration, AccountService accountService)
     {
         _logger = logger;
         _configuration = configuration;
+        _accountService = accountService;
     }
 
     [HttpGet]
-    public string Login()
+    public object GetForm()
     {
-        return CreateAuthToken();
+        return new
+        {
+            MinIdLength = Domain.User.MIN_ID_LENGTH,
+            MaxIdLength = Domain.User.MAX_ID_LENGTH,
+            MinNicknameLength = Domain.User.MIN_NICKNAME_LENGTH,
+            MaxNicknameLength = Domain.User.MAX_NICKNAME_LENGTH,
+            MinPasswordLength = Domain.User.MIN_PASSWORD_LENGTH,
+        };
     }
 
-    [HttpGet("version")]
-    public int Version()
+    [HttpPost]
+    public async Task<ActionResult> RegisterAsync([FromBody] AccountService.RegisterReq body, CancellationToken ct)
     {
-        int version = 1;
-        _logger.LogInformation("{version} ¿äÃ»", version);
-        return version;
+        AccountService.RegisterResult result;
+        try
+        {
+            result = await _accountService.RegisterAsync(body.Id, body.Nickname, body.Password, ct);
+        }
+        catch (DomainException e)
+        {
+            return BadRequest(e.Code);
+        }
+
+        return result switch
+        {
+            AccountService.RegisterResult.Ok => Ok(),
+            AccountService.RegisterResult.DuplicateId => Conflict(-1),
+            AccountService.RegisterResult.DuplicateNickname => Conflict(-2),
+            AccountService.RegisterResult.DuplicateAccount => Conflict(-3),
+            _ => throw new NotImplementedException(),
+        };
     }
 
     [Authorize("User")]
