@@ -9,6 +9,8 @@ public static class InfrastructureExtensions
     public static IServiceCollection AddInfrastructure(this IServiceCollection builder)
     {
         return builder.AddTransient<IPreferences, Preferences>()
-            .AddTransient<IAlertService, AlertService>();
+            .AddTransient<IAlertService, AlertService>()
+            .AddTransient<INavigationService, NavigationService>()
+            ;
     }
 }

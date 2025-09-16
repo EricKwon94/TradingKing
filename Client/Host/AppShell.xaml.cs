@@ -1,4 +1,5 @@
-﻿using Microsoft.Maui.Controls;
+﻿using Host.Pages;
+using Microsoft.Maui.Controls;
 
 namespace Host
 {
@@ -7,6 +8,7 @@ namespace Host
         public AppShell()
         {
             InitializeComponent();
+            Routing.RegisterRoute("login/register", typeof(RegisterPage));
         }
     }
 }
