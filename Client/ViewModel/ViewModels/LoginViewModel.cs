@@ -14,6 +14,7 @@ public partial class LoginViewModel : BaseViewModel
     private readonly IAccountService _accountService;
     private readonly IPreferences _preferences;
     private readonly IAlertService _alert;
+    private readonly INavigationService _navigationService;
 
     [ObservableProperty]
     private int _minIdLength;
@@ -26,11 +27,14 @@ public partial class LoginViewModel : BaseViewModel
     [ObservableProperty]
     private int _minPasswordLength;
 
-    public LoginViewModel(IAccountService accountService, IPreferences preferences, IAlertService alert)
+    public LoginViewModel(
+        IAccountService accountService, IPreferences preferences,
+        IAlertService alert, INavigationService navigationService)
     {
         _accountService = accountService;
         _preferences = preferences;
         _alert = alert;
+        _navigationService = navigationService;
     }
 
     [RelayCommand]
@@ -40,9 +44,9 @@ public partial class LoginViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    public async Task GoToRegisterAsync(CancellationToken ct)
+    public Task GoToRegisterAsync(CancellationToken ct)
     {
-
+        return _navigationService.GoToAsync("login/register", ct);
     }
 
     public override async void OnAppearing()
