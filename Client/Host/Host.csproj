@@ -21,7 +21,7 @@
 		<Nullable>enable</Nullable>
 
 		<!-- Display name -->
-		<ApplicationTitle>오늘애단타왕</ApplicationTitle>
+		<ApplicationTitle>오늘애 단타 왕</ApplicationTitle>
 
 		<!-- App Identifier -->
 		<ApplicationId>com.companyname.host</ApplicationId>

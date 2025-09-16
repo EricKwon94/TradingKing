@@ -1,14 +1,12 @@
-﻿using Microsoft.Maui.Controls;
-using ViewModel.ViewModels;
+﻿using ViewModel.ViewModels;
 
 namespace Host.Pages
 {
-    public partial class LoginPage : ContentPage
+    public partial class LoginPage : BasePage
     {
-        public LoginPage(LoginViewModel vm)
+        public LoginPage(LoginViewModel vm) : base(vm)
         {
             InitializeComponent();
-            BindingContext = vm;
         }
     }
 }

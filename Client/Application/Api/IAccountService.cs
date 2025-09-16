@@ -1,19 +1,17 @@
 ﻿using Refit;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Application.Api;
 
 public interface IAccountService
 {
-    [Get("/login")]
-    Task<string> Login();
+    [Get("/account")]
+    Task<FormRes> GetFormAsync(CancellationToken ct);
 
-    [Get("/login/version")]
-    Task<int> Version();
+    [Post("/account")]
+    Task RegisterAsync([Body] RegisterReq body, CancellationToken ct);
 
-    [Get("/login/user")]
-    Task<string> User();
-
-    [Get("/login/admin")]
-    Task<string> Admin();
+    public record RegisterReq(string Id, string Nickname, string Password);
+    public record FormRes(int MinIdLength, int MaxIdLength, int MinNicknameLength, int MaxNicknameLength, int MinPasswordLength);
 }
