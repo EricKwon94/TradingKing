@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 
-namespace Infrastructure;
+namespace Infrastructure.EFCore;
 
 internal class TradingKingContext : DbContext, IEntityTypeConfiguration<User>
 {
-    public DbSet<User> Accounts { get; set; }
+    public DbSet<User> Users { get; set; }
 
     public TradingKingContext(DbContextOptions<TradingKingContext> options)
         : base(options)
@@ -21,12 +21,21 @@ internal class TradingKingContext : DbContext, IEntityTypeConfiguration<User>
 
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        builder.HasKey(e => e.No);
+        builder.HasKey(e => e.Seq);
+
         builder.HasIndex(e => e.Id).IsUnique();
+        builder.HasIndex(e => e.Nickname).IsUnique();
 
         builder.Property(e => e.Id)
-            .HasMaxLength(100)
+            .HasMaxLength(User.MAX_ID_LENGTH)
+            .IsRequired()
             .IsUnicode(false);
+
+        builder.Property(e => e.Nickname)
+            .HasMaxLength(User.MAX_NICKNAME_LENGTH);
+
+        builder.Property(e => e.Password)
+            .HasMaxLength(100);
 
         builder.Property<DateTime>("CreatedAt")
             .HasDefaultValueSql("getutcdate()");

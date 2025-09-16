@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Domain.Persistences;
+using Infrastructure.EFCore;
+using Infrastructure.Persistences;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure;
@@ -10,6 +13,8 @@ public static class InfrastructureExtensions
         return builder
             .AddDbContext<TradingKingContext>(opt =>
             {
+                /*opt.UseInMemoryDatabase("TradingKing");
+                return;*/
                 if (isDevelopment)
                 {
                     opt.EnableSensitiveDataLogging();
@@ -21,6 +26,7 @@ public static class InfrastructureExtensions
                 opt.UseAzureSql(connectionString);
 #endif
             })
-            ;
+            .AddTransient<IUserRepository, UserRepository>()
+        ;
     }
 }

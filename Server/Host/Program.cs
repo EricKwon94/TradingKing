@@ -1,3 +1,4 @@
+using Application;
 using Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -88,7 +89,8 @@ public class Program
             });
         });
 
-        builder.Services.AddInfrastructure(builder.Environment.IsDevelopment(), builder.Configuration.GetConnectionString("TradingKing")!);
+        builder.Services.AddApplication()
+            .AddInfrastructure(builder.Environment.IsDevelopment(), builder.Configuration.GetConnectionString("TradingKing")!);
 
         var app = builder.Build();
 
