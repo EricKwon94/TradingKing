@@ -30,6 +30,7 @@ public static class InfrastructureExtensions
             })
             .AddTransient<IUserRepository, UserRepository>()
             .AddTransient<IAuthService, AuthService>()
+            .AddTransient<IEncryptService, EncryptService>()
         ;
     }
 }
