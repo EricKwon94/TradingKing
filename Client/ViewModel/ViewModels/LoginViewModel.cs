@@ -2,7 +2,9 @@
 using Application.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Refit;
 using System;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using static Application.Api.IAccountService;
@@ -44,7 +46,24 @@ public partial class LoginViewModel : BaseViewModel
     [RelayCommand(CanExecute = nameof(CanLogin))]
     public async Task LoginAsync(CancellationToken ct)
     {
-
+        var body = new LoginReq(UserId, UserPassword);
+        string? jwt = null;
+        try
+        {
+            jwt = await _accountService.LoginAsync(body, ct);
+        }
+        catch (ApiException e) when (e.StatusCode == HttpStatusCode.NotFound)
+        {
+            await _alert.DisplayAlertAsync("Error", "계정을 찾을 수 없어", "ok", ct);
+            return;
+        }
+        catch (Exception e)
+        {
+            await _alert.DisplayAlertAsync("Error", e.Message, "ok", ct);
+            return;
+        }
+        _preferences.Set("jwt", jwt);
+        await _navigationService.GoToAsync("//main", ct);
     }
 
     [RelayCommand]

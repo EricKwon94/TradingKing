@@ -29,7 +29,7 @@
                 <Label Grid.Row="1" Grid.Column="0" Text="PASSWORD" VerticalOptions="Center"/>
                 
                 <Entry Grid.Row="1" Grid.Column="1" ReturnCommand="{Binding LoginCommand}"
-                       Placeholder="asdasd" IsPassword="True" Text="{Binding UserPassword}"/>
+                       IsPassword="True" Text="{Binding UserPassword}"/>
             </Grid>
 
             <Button Text="로그인" Command="{Binding LoginCommand}"/>
