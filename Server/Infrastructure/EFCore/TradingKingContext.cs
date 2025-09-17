@@ -35,7 +35,12 @@ internal class TradingKingContext : DbContext, IEntityTypeConfiguration<User>
             .HasMaxLength(User.MAX_NICKNAME_LENGTH);
 
         builder.Property(e => e.Password)
-            .HasMaxLength(100);
+            .HasMaxLength(100)
+            .IsUnicode(false);
+
+        builder.Property(e => e.Jwt)
+            .HasMaxLength(1000)
+            .IsUnicode(false);
 
         builder.Property<DateTime>("CreatedAt")
             .HasDefaultValueSql("getutcdate()");

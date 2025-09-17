@@ -1,15 +1,10 @@
-using Application;
+using Application.Orchestrations;
 using Domain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -36,7 +31,7 @@ public class AccountController : ControllerBase
         return _accountService.GetForm();
     }
 
-    [HttpPost]
+    [HttpPost("register")]
     public async Task<ActionResult> RegisterAsync([FromBody] AccountService.RegisterReq body, CancellationToken ct)
     {
         AccountService.RegisterResult result;
@@ -57,6 +52,18 @@ public class AccountController : ControllerBase
             AccountService.RegisterResult.DuplicateAccount => Conflict(-3),
             _ => throw new NotImplementedException(),
         };
+    }
+
+    [HttpPost("login")]
+    public async Task<ActionResult<string>> LoginAsync([FromBody] AccountService.LoginReq body, CancellationToken ct)
+    {
+        string issKey = _configuration["ISS_KEY"]!;
+
+        string? jwt = await _accountService.LoginAsync(body.Id, body.EncryptedPassword, issKey, Env.ISSUER, Env.AUD, ct);
+        if (string.IsNullOrEmpty(jwt))
+            return NotFound();
+
+        return jwt;
     }
 
     [Authorize("User")]

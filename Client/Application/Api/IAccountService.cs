@@ -9,8 +9,11 @@ public interface IAccountService
     [Get("/account")]
     Task<FormRes> GetFormAsync(CancellationToken ct);
 
-    [Post("/account")]
+    [Post("/account/register")]
     Task RegisterAsync([Body] RegisterReq body, CancellationToken ct);
+
+    [Post("/account/login")]
+    Task LoginAsync([Body] RegisterReq body, CancellationToken ct);
 
     public record RegisterReq(string Id, string Nickname, string Password);
     public record FormRes(int MinIdLength, int MaxIdLength, int MinNicknameLength, int MaxNicknameLength, int MinPasswordLength);

@@ -1,19 +1,22 @@
-﻿using Domain;
+﻿using Application.Services;
+using Domain;
 using Domain.Exceptions;
 using Domain.Persistences;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Application;
+namespace Application.Orchestrations;
 
 public class AccountService
 {
     private readonly IUserRepository _userRepository;
+    private readonly IAuthService _authService;
 
-    public AccountService(IUserRepository userRepository)
+    public AccountService(IUserRepository userRepository, IAuthService authService)
     {
         _userRepository = userRepository;
+        _authService = authService;
     }
 
     public FormRes GetForm()
@@ -45,12 +48,30 @@ public class AccountService
         return RegisterResult.Ok;
     }
 
+    public async Task<string?> LoginAsync(
+        string id, string encryptedPassword,
+        string issKey, string iss, string aud,
+        CancellationToken ct)
+    {
+        var user = await _userRepository.GetAsync(id, encryptedPassword, ct);
+        if (user == null)
+            return null;
+
+        string jwt = _authService.CreateToken(user.Seq.ToString(), issKey, iss, aud);
+        await _userRepository.UpdateTokenAsync(user, jwt, ct);
+        return jwt;
+    }
+
     public record FormRes(int MinIdLength, int MaxIdLength, int MinNicknameLength, int MaxNicknameLength, int MinPasswordLength);
 
     public record RegisterReq(
         [MinLength(User.MIN_ID_LENGTH)][MaxLength(User.MAX_ID_LENGTH)] string Id,
         [MinLength(User.MIN_NICKNAME_LENGTH)][MaxLength(User.MAX_NICKNAME_LENGTH)] string Nickname,
         [MinLength(User.MIN_PASSWORD_LENGTH)] string Password);
+
+    public record LoginReq(
+        [MinLength(User.MIN_ID_LENGTH)][MaxLength(User.MAX_ID_LENGTH)] string Id,
+        string EncryptedPassword);
 
     public enum RegisterResult { Ok, DuplicateId, DuplicateNickname, DuplicateAccount }
 }
