@@ -1,11 +1,12 @@
 ﻿using Application.Services;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Infrastructure.Services;
 
 internal class AlertService : IAlertService
 {
-    public Task DisplayAlert(string title, string message, string cancel)
+    public Task DisplayAlertAsync(string title, string message, string cancel, CancellationToken ct)
     {
         var windows = Microsoft.Maui.Controls.Application.Current!.Windows;
         int lastIndex = windows.Count - 1;

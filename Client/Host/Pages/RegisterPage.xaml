@@ -2,11 +2,63 @@
 <local:BasePage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:Host.Pages"
+                xmlns:vm="clr-namespace:ViewModel.ViewModels;assembly=ViewModel"
+                Title="↑뒤로 가기"
+                x:DataType="vm:RegisterViewModel"
              x:Class="Host.Pages.RegisterPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+    <ScrollView>
+        <VerticalStackLayout HorizontalOptions="Center" WidthRequest="300" Spacing="8">
+
+            <ActivityIndicator IsVisible="{Binding IsBusy}" IsRunning="{Binding IsBusy}"/>
+
+            <Label Text="회원가입" Style="{StaticResource Headline}" />
+
+            <Grid RowDefinitions="*, *, *" ColumnDefinitions="auto, *" RowSpacing="8" ColumnSpacing="8">
+                <!-- ID -->
+                <Label Grid.Row="0" Grid.Column="0"
+                       Text="ID" VerticalOptions="Center"/>
+
+                <Entry Grid.Row="0" Grid.Column="1" ReturnType="Next" MaxLength="{Binding MaxIdLength}"
+                       Text="{Binding UserId}">
+                    <Entry.Placeholder>
+                        <MultiBinding StringFormat="{}{0} - {1} 글자">
+                            <Binding Path="MinIdLength"/>
+                            <Binding Path="MaxIdLength"/>
+                        </MultiBinding>
+                    </Entry.Placeholder>
+                </Entry>
+                
+                <!-- Nickname -->
+                <Label Grid.Row="1" Grid.Column="0"
+                       Text="Nickname" VerticalOptions="Center"/>
+
+                <Entry Grid.Row="1" Grid.Column="1" ReturnType="Next" MaxLength="{Binding MaxNicknameLength}"
+                       Text="{Binding UserNickname}">
+                    <Entry.Placeholder>
+                        <MultiBinding StringFormat="{}{0} - {1} 글자">
+                            <Binding Path="MinNicknameLength"/>
+                            <Binding Path="MaxNicknameLength"/>
+                        </MultiBinding>
+                    </Entry.Placeholder>
+                </Entry>
+
+                <!-- Password -->
+                <Label Grid.Row="2" Grid.Column="0" 
+                       Text="PASSWORD" VerticalOptions="Center"/>
+
+                <Entry Grid.Row="2" Grid.Column="1" 
+                       ReturnCommand="{Binding RegisterCommand}" IsPassword="True"
+                       Text="{Binding UserPassword}">
+                    <Entry.Placeholder>
+                        <MultiBinding StringFormat="{}최소 {0}글자">
+                            <Binding Path="MinPasswordLength"/>
+                        </MultiBinding>
+                    </Entry.Placeholder>
+                </Entry>
+            </Grid>
+
+            <Button Text="회원가입" Command="{Binding RegisterCommand}"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
 </local:BasePage>

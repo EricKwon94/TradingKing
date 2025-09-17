@@ -17,15 +17,19 @@ public partial class LoginViewModel : BaseViewModel
     private readonly INavigationService _navigationService;
 
     [ObservableProperty]
-    private int _minIdLength;
+    [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
+    private string _userId = string.Empty;
+
     [ObservableProperty]
-    private int _maxIdLength;
+    [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
+    private string _userPassword = string.Empty;
+
     [ObservableProperty]
-    private int _minNicknameLength;
+    private int? _minIdLength;
     [ObservableProperty]
-    private int _maxNicknameLength;
+    private int? _maxIdLength;
     [ObservableProperty]
-    private int _minPasswordLength;
+    private int? _minPasswordLength;
 
     public LoginViewModel(
         IAccountService accountService, IPreferences preferences,
@@ -37,7 +41,7 @@ public partial class LoginViewModel : BaseViewModel
         _navigationService = navigationService;
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanLogin))]
     public async Task LoginAsync(CancellationToken ct)
     {
 
@@ -60,18 +64,24 @@ public partial class LoginViewModel : BaseViewModel
         }
         catch (Exception e)
         {
-            await _alert.DisplayAlert("Error", e.Message, "ok");
+            await _alert.DisplayAlertAsync("Error", e.Message, "ok", default);
         }
 
         if (res != null)
         {
             MinIdLength = res.MinIdLength;
             MaxIdLength = res.MaxIdLength;
-            MinNicknameLength = res.MinNicknameLength;
-            MaxNicknameLength = res.MaxNicknameLength;
             MinPasswordLength = res.MinPasswordLength;
         }
 
         IsBusy = false;
+    }
+
+    private bool CanLogin()
+    {
+        if (UserId.Length >= MinIdLength && UserId.Length <= MaxIdLength &&
+            UserPassword.Length >= MinPasswordLength)
+            return true;
+        return false;
     }
 }

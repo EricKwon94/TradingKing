@@ -1,8 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace Application.Services;
 
 public interface IAlertService
 {
-    Task DisplayAlert(string a, string b, string c);
+    Task DisplayAlertAsync(string a, string b, string c, CancellationToken ct);
 }
