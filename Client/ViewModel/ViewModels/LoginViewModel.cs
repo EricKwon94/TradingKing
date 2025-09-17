@@ -72,7 +72,7 @@ public partial class LoginViewModel : BaseViewModel
         return _navigationService.GoToAsync("login/register", ct);
     }
 
-    public override async void OnAppearing()
+    public override async void Initialize()
     {
         IsBusy = true;
 

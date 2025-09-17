@@ -10,6 +10,15 @@ public partial class BasePage : ContentPage
         BindingContext = vm;
     }
 
+    protected override void OnBindingContextChanged()
+    {
+        base.OnBindingContextChanged();
+        if (BindingContext is BaseViewModel vm)
+        {
+            vm.Initialize();
+        }
+    }
+
     protected override void OnAppearing()
     {
         base.OnAppearing();

@@ -69,7 +69,7 @@ public partial class RegisterViewModel : BaseViewModel
         await _navigationService.GoToAsync("..", ct);
     }
 
-    public override async void OnAppearing()
+    public override async void Initialize()
     {
         IsBusy = true;
 
