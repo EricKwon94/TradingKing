@@ -12,4 +12,9 @@
         ContentTemplate="{DataTemplate pages:LoginPage}"
         Route="LoginPage" />
 
+    <ShellContent
+        Title="메인"
+        ContentTemplate="{DataTemplate pages:MainPage}"
+        Route="main" />
+
 </Shell>

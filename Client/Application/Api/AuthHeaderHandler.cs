@@ -17,7 +17,7 @@ internal class AuthHeaderHandler : DelegatingHandler
 
     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        string token = _preferences.Get("token", "");
+        string token = _preferences.Get("jwt", "");
 
         if (!string.IsNullOrEmpty(token))
         {
