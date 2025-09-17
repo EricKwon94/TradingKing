@@ -1,6 +1,8 @@
-﻿using Domain.Persistences;
+﻿using Application;
+using Domain.Persistences;
 using Infrastructure.EFCore;
 using Infrastructure.Persistences;
+using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -27,6 +29,7 @@ public static class InfrastructureExtensions
 #endif
             })
             .AddTransient<IUserRepository, UserRepository>()
+            .AddTransient<IAuthService, AuthService>()
         ;
     }
 }

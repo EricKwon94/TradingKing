@@ -72,31 +72,4 @@ public class AccountController : ControllerBase
     {
         return "Admin LoggedIn";
     }
-
-    private string CreateAuthToken()
-    {
-        string issKey = _configuration["ISS_KEY"]!;
-
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(issKey));
-        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-        IEnumerable<Claim> claims = [
-            new Claim(ClaimTypes.Role, "User"),
-            ];
-
-        var issuedAt = DateTime.UtcNow;
-        var expires = issuedAt.AddHours(12);
-
-        var header = new JwtHeader(credentials);
-        var payload = new JwtPayload(
-            issuer: Env.ISSUER,
-            audience: Env.AUD,
-            claims: claims,
-            notBefore: null,
-            expires: expires,
-            issuedAt: issuedAt);
-
-        var token = new JwtSecurityToken(header, payload);
-        return new JwtSecurityTokenHandler().WriteToken(token);
-    }
 }
