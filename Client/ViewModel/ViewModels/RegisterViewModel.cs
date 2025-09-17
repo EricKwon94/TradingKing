@@ -65,6 +65,7 @@ public partial class RegisterViewModel : BaseViewModel
             await _alert.DisplayAlertAsync("Error", e.Message, "ok", ct);
             return;
         }
+        await _alert.DisplayAlertAsync("회원가입", "가입성공", "ok", default);
         await _navigationService.GoToAsync("..", ct);
     }
 
@@ -103,25 +104,26 @@ public partial class RegisterViewModel : BaseViewModel
         return false;
     }
 
-    private async Task ShowErrorAsync(HttpStatusCode statusCode, int errorCode, CancellationToken ct)
+    private Task ShowErrorAsync(HttpStatusCode statusCode, int errorCode, CancellationToken ct)
     {
         if (statusCode == HttpStatusCode.BadRequest)
         {
             if (errorCode == -1)
-                await _alert.DisplayAlertAsync("Error", "ID는 영문과 숫자 조합", "ok", ct);
+                return _alert.DisplayAlertAsync("Error", "ID는 영문, 숫자", "ok", ct);
             else if (errorCode == -2)
-                await _alert.DisplayAlertAsync("Error", "닉네임은 영어, 완성된 한글, 숫자", "ok", ct);
+                return _alert.DisplayAlertAsync("Error", "닉네임은 영어, 완성된 한글, 숫자", "ok", ct);
             else if (errorCode == -3)
-                await _alert.DisplayAlertAsync("Error", "패스워드 이상함", "ok", ct);
+                return _alert.DisplayAlertAsync("Error", "패스워드 이상함", "ok", ct);
         }
         else if (statusCode == HttpStatusCode.Conflict)
         {
             if (errorCode == -1)
-                await _alert.DisplayAlertAsync("Error", "ID 중복", "ok", ct);
+                return _alert.DisplayAlertAsync("Error", "ID 중복", "ok", ct);
             else if (errorCode == -2)
-                await _alert.DisplayAlertAsync("Error", "닉네임 중복", "ok", ct);
+                return _alert.DisplayAlertAsync("Error", "닉네임 중복", "ok", ct);
             else if (errorCode == -3)
-                await _alert.DisplayAlertAsync("Error", "계정 중복", "ok", ct);
+                return _alert.DisplayAlertAsync("Error", "계정 중복", "ok", ct);
         }
+        return Task.CompletedTask;
     }
 }

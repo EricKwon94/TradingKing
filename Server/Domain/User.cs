@@ -24,7 +24,7 @@ public class User
     /// <exception cref="InvalidPasswordException"></exception>
     public User(string id, string nickname, string password)
     {
-        string idPattern = $@"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z0-9]{{{MIN_ID_LENGTH},{MAX_ID_LENGTH}}}$";
+        string idPattern = $@"^[A-Za-z0-9]{{{MIN_ID_LENGTH},{MAX_ID_LENGTH}}}$";
         bool idValid = Regex.IsMatch(id, idPattern);
         if (!idValid)
             throw new InvalidIdException();

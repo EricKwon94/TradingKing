@@ -23,7 +23,10 @@ public class UserTests
     }
 
     [Theory]
+    [InlineData("abca")]
+    [InlineData("abcA")]
     [InlineData("abc1")]
+    [InlineData("1234")]
     [InlineData("abcA3")]
     [InlineData("abc123456789012")]
     public void Can_create_user_if_valid_id(string id)
@@ -41,7 +44,7 @@ public class UserTests
     [Theory]
     [InlineData("abc")]
     [InlineData("abc@")]
-    [InlineData("abcA")]
+    [InlineData("abcㄱ")]
     [InlineData("abc1234567890123")]
     public void Can_not_create_user_if_invalid_id(string id)
     {
