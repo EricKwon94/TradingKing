@@ -39,4 +39,17 @@ internal class UserRepository : IUserRepository
         }
         return true;
     }
+
+    public Task<User?> GetAsync(string id, string encryptedPassword, CancellationToken ct)
+    {
+        return _context.Users.AsNoTracking()
+            .SingleOrDefaultAsync(e => e.Id == id && e.Password == encryptedPassword, ct);
+    }
+
+    public Task UpdateTokenAsync(User user, string token, CancellationToken ct)
+    {
+        _context.Users.Attach(user);
+        user.Jwt = token;
+        return _context.SaveChangesAsync(ct);
+    }
 }
