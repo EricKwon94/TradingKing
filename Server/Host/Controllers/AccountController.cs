@@ -59,7 +59,7 @@ public class AccountController : ControllerBase
     {
         string issKey = _configuration["ISS_KEY"]!;
 
-        string? jwt = await _accountService.LoginAsync(body.Id, body.EncryptedPassword, issKey, Env.ISSUER, Env.AUD, ct);
+        string? jwt = await _accountService.LoginAsync(body.Id, body.Password, issKey, Env.ISSUER, Env.AUD, ct);
         if (string.IsNullOrEmpty(jwt))
             return NotFound();
 

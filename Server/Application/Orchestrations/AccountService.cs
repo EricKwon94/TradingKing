@@ -12,11 +12,13 @@ public class AccountService
 {
     private readonly IUserRepository _userRepository;
     private readonly IAuthService _authService;
+    private readonly IEncryptService _encryptService;
 
-    public AccountService(IUserRepository userRepository, IAuthService authService)
+    public AccountService(IUserRepository userRepository, IAuthService authService, IEncryptService encryptService)
     {
         _userRepository = userRepository;
         _authService = authService;
+        _encryptService = encryptService;
     }
 
     public FormRes GetForm()
@@ -31,7 +33,8 @@ public class AccountService
     /// <exception cref="InvalidPasswordException"></exception>
     public async Task<RegisterResult> RegisterAsync(string id, string nickname, string password, CancellationToken ct)
     {
-        var user = new User(id, nickname, password);
+        string encrypted = _encryptService.Encrypt(password);
+        var user = new User(id, nickname, encrypted);
 
         bool existId = await _userRepository.ExistIdAsync(id, ct);
         if (existId)
@@ -49,11 +52,11 @@ public class AccountService
     }
 
     public async Task<string?> LoginAsync(
-        string id, string encryptedPassword,
-        string issKey, string iss, string aud,
+        string id, string password, string issKey, string iss, string aud,
         CancellationToken ct)
     {
-        var user = await _userRepository.GetAsync(id, encryptedPassword, ct);
+        string encrypted = _encryptService.Encrypt(password);
+        var user = await _userRepository.GetAsync(id, encrypted, ct);
         if (user == null)
             return null;
 
@@ -71,7 +74,7 @@ public class AccountService
 
     public record LoginReq(
         [MinLength(User.MIN_ID_LENGTH)][MaxLength(User.MAX_ID_LENGTH)] string Id,
-        string EncryptedPassword);
+        [MinLength(User.MIN_PASSWORD_LENGTH)] string Password);
 
     public enum RegisterResult { Ok, DuplicateId, DuplicateNickname, DuplicateAccount }
 }

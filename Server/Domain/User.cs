@@ -1,7 +1,4 @@
 ﻿using Domain.Exceptions;
-using System;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Domain;
@@ -40,7 +37,6 @@ public class User
 
         Id = id;
         Nickname = nickname;
-        byte[] encrypt = SHA256.HashData(Encoding.UTF8.GetBytes(password));
-        Password = Convert.ToHexString(encrypt);
+        Password = password;
     }
 }

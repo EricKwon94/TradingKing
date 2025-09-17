@@ -1,8 +1,6 @@
 ﻿using Domain.Exceptions;
 using FluentAssertions;
 using System;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace Domain.Tests;
 
@@ -13,10 +11,9 @@ public class UserTests
     {
         string expectedId = "id13";
         string expectedNickname = "nick1";
-        string password = "password1";
-        string expectedPassword = Encrypt(password);
+        string expectedPassword = "password1";
 
-        User sut = new User(expectedId, expectedNickname, password);
+        User sut = new User(expectedId, expectedNickname, expectedPassword);
         sut.Id.Should().Be(expectedId);
         sut.Nickname.Should().Be(expectedNickname);
         sut.Password.Should().Be(expectedPassword);
@@ -32,10 +29,9 @@ public class UserTests
     public void Can_create_user_if_valid_id(string id)
     {
         string expectedNickname = "nick";
-        string password = "password1";
-        string expectedPassword = Encrypt(password);
+        string expectedPassword = "password1";
 
-        User sut = new User(id, "nick", password);
+        User sut = new User(id, "nick", expectedPassword);
         sut.Id.Should().Be(id);
         sut.Nickname.Should().Be(expectedNickname);
         sut.Password.Should().Be(expectedPassword);
@@ -59,10 +55,9 @@ public class UserTests
     public void Can_create_user_if_valid_nickname(string nickname)
     {
         string expectedId = "Id123";
-        string password = "password1";
-        string expectedPassword = Encrypt(password);
+        string expectedPassword = "password1";
 
-        User sut = new User(expectedId, nickname, password);
+        User sut = new User(expectedId, nickname, expectedPassword);
         sut.Id.Should().Be(expectedId);
         sut.Nickname.Should().Be(nickname);
         sut.Password.Should().Be(expectedPassword);
@@ -86,12 +81,11 @@ public class UserTests
     {
         string expectedId = "Id123";
         string expectedNickname = "nick";
-        string expectedPassword = Encrypt(password);
 
         User sut = new User(expectedId, expectedNickname, password);
         sut.Id.Should().Be(expectedId);
         sut.Nickname.Should().Be(expectedNickname);
-        sut.Password.Should().Be(expectedPassword);
+        sut.Password.Should().Be(password);
     }
 
     [Theory]
@@ -100,11 +94,5 @@ public class UserTests
     {
         Func<User> sut = () => new User("Id123", "nick", password);
         sut.Should().Throw<InvalidPasswordException>();
-    }
-
-    private static string Encrypt(string password)
-    {
-        byte[] encrypt = SHA256.HashData(Encoding.UTF8.GetBytes(password));
-        return Convert.ToHexString(encrypt);
     }
 }
