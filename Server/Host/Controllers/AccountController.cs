@@ -31,16 +31,9 @@ public class AccountController : ControllerBase
     }
 
     [HttpGet]
-    public object GetForm()
+    public AccountService.FormRes GetForm()
     {
-        return new
-        {
-            MinIdLength = Domain.User.MIN_ID_LENGTH,
-            MaxIdLength = Domain.User.MAX_ID_LENGTH,
-            MinNicknameLength = Domain.User.MIN_NICKNAME_LENGTH,
-            MaxNicknameLength = Domain.User.MAX_NICKNAME_LENGTH,
-            MinPasswordLength = Domain.User.MIN_PASSWORD_LENGTH,
-        };
+        return _accountService.GetForm();
     }
 
     [HttpPost]

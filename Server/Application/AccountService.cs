@@ -16,6 +16,13 @@ public class AccountService
         _userRepository = userRepository;
     }
 
+    public FormRes GetForm()
+    {
+        return new FormRes(
+            User.MIN_ID_LENGTH, User.MAX_ID_LENGTH, User.MIN_NICKNAME_LENGTH,
+            User.MAX_NICKNAME_LENGTH, User.MIN_PASSWORD_LENGTH);
+    }
+
     /// <exception cref="InvalidIdException"></exception>
     /// <exception cref="InvalidNicknameException"></exception>
     /// <exception cref="InvalidPasswordException"></exception>
@@ -37,6 +44,8 @@ public class AccountService
 
         return RegisterResult.Ok;
     }
+
+    public record FormRes(int MinIdLength, int MaxIdLength, int MinNicknameLength, int MaxNicknameLength, int MinPasswordLength);
 
     public record RegisterReq(
         [MinLength(User.MIN_ID_LENGTH)][MaxLength(User.MAX_ID_LENGTH)] string Id,
