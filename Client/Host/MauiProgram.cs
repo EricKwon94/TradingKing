@@ -23,7 +23,7 @@ namespace Host
 #if DEBUG
             builder.Logging.AddDebug();
 #endif
-            builder.Services.AddApplication();
+            builder.Services.AddApplication(Env.serverAddress);
             builder.Services.AddInfrastructure();
             builder.Services.AddViewModel();
 
