@@ -22,23 +22,14 @@
             <Label Text="오늘애 단타 왕" Style="{StaticResource Headline}" />
 
             <Grid RowDefinitions="*, *" ColumnDefinitions="auto, *" RowSpacing="8" ColumnSpacing="8">
-                <Label Grid.Row="0" Grid.Column="0"
-                       Text="ID" VerticalOptions="Center"/>
+                <Label Grid.Row="0" Grid.Column="0" Text="ID" VerticalOptions="Center"/>
 
-                <Entry Grid.Row="0" Grid.Column="1" ReturnType="Next" MaxLength="{Binding MaxIdLength}">
-                    <Entry.Placeholder>
-                        <MultiBinding StringFormat="{}{0} - {1} 글자">
-                            <Binding Path="MinIdLength"/>
-                            <Binding Path="MaxIdLength"/>
-                        </MultiBinding>
-                    </Entry.Placeholder>
-                </Entry>
+                <Entry Grid.Row="0" Grid.Column="1" ReturnType="Next" MaxLength="{Binding MaxIdLength}" Text="{Binding UserId}"/>
 
-                <Label Grid.Row="1" Grid.Column="0" 
-                       Text="PASSWORD" VerticalOptions="Center"/>
+                <Label Grid.Row="1" Grid.Column="0" Text="PASSWORD" VerticalOptions="Center"/>
                 
                 <Entry Grid.Row="1" Grid.Column="1" ReturnCommand="{Binding LoginCommand}"
-                       Placeholder="asdasd" IsPassword="True"/>
+                       Placeholder="asdasd" IsPassword="True" Text="{Binding UserPassword}"/>
             </Grid>
 
             <Button Text="로그인" Command="{Binding LoginCommand}"/>
