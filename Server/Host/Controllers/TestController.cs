@@ -21,7 +21,7 @@ public class TestController : ControllerBase
         {
             timer.Elapsed += (s, e) =>
             {
-                _logger.LogInformation("{time}: Scale out test", e.SignalTime);
+                _logger.LogInformation("{time}: Scale out test {num}", e.SignalTime, num);
             };
             timer.Start();
         }
