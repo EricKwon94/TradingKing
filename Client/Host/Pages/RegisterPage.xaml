@@ -27,20 +27,6 @@
                         </MultiBinding>
                     </Entry.Placeholder>
                 </Entry>
-                
-                <!-- Nickname -->
-                <Label Grid.Row="1" Grid.Column="0"
-                       Text="Nickname" VerticalOptions="Center"/>
-
-                <Entry Grid.Row="1" Grid.Column="1" ReturnType="Next" MaxLength="{Binding MaxNicknameLength}"
-                       Text="{Binding UserNickname}">
-                    <Entry.Placeholder>
-                        <MultiBinding StringFormat="{}{0} - {1} 글자">
-                            <Binding Path="MinNicknameLength"/>
-                            <Binding Path="MaxNicknameLength"/>
-                        </MultiBinding>
-                    </Entry.Placeholder>
-                </Entry>
 
                 <!-- Password -->
                 <Label Grid.Row="2" Grid.Column="0" 

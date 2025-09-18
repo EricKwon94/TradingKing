@@ -15,7 +15,7 @@ public interface IAccountService
     [Post("/account/login")]
     Task<string> LoginAsync([Body] LoginReq body, CancellationToken ct);
 
-    public record RegisterReq(string Id, string Nickname, string Password);
+    public record RegisterReq(string Id, string Password);
     public record LoginReq(string Id, string Password);
-    public record FormRes(int MinIdLength, int MaxIdLength, int MinNicknameLength, int MaxNicknameLength, int MinPasswordLength);
+    public record FormRes(int MinIdLength, int MaxIdLength, int MinPasswordLength);
 }
