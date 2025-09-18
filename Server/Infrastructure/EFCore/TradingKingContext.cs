@@ -28,7 +28,7 @@ internal class TradingKingContext : DbContext, IEntityTypeConfiguration<User>
         builder.Property(e => e.Id)
             .HasMaxLength(User.MAX_ID_LENGTH)
             .IsRequired()
-            .IsUnicode(false);
+            .IsUnicode(true);
 
         builder.Property(e => e.Password)
             .HasMaxLength(100)
