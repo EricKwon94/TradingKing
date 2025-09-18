@@ -21,11 +21,6 @@ internal class UserRepository : IUserRepository
         return _context.Users.AsNoTracking().AnyAsync(u => u.Id == userId, ct);
     }
 
-    public Task<bool> ExistNicknameAsync(string nickname, CancellationToken ct)
-    {
-        return _context.Users.AsNoTracking().AnyAsync(u => u.Nickname == nickname, ct);
-    }
-
     public async Task<bool> AddAsync(User user, CancellationToken ct)
     {
         await _context.Users.AddAsync(user, ct);

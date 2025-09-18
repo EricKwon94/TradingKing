@@ -10,12 +10,10 @@ public class UserTests
     public void Create_user()
     {
         string expectedId = "id13";
-        string expectedNickname = "nick1";
         string expectedPassword = "password1";
 
-        User sut = new User(expectedId, expectedNickname, expectedPassword);
+        User sut = new User(expectedId, expectedPassword);
         sut.Id.Should().Be(expectedId);
-        sut.Nickname.Should().Be(expectedNickname);
         sut.Password.Should().Be(expectedPassword);
     }
 
@@ -25,15 +23,14 @@ public class UserTests
     [InlineData("abc1")]
     [InlineData("1234")]
     [InlineData("abcA3")]
-    [InlineData("abc123456789012")]
+    [InlineData("가나다라")]
+    [InlineData("abc1234567")]
     public void Can_create_user_if_valid_id(string id)
     {
-        string expectedNickname = "nick";
         string expectedPassword = "password1";
 
-        User sut = new User(id, "nick", expectedPassword);
+        User sut = new User(id, expectedPassword);
         sut.Id.Should().Be(id);
-        sut.Nickname.Should().Be(expectedNickname);
         sut.Password.Should().Be(expectedPassword);
     }
 
@@ -41,37 +38,11 @@ public class UserTests
     [InlineData("abc")]
     [InlineData("abc@")]
     [InlineData("abcㄱ")]
-    [InlineData("abc1234567890123")]
+    [InlineData("abc12345678")]
     public void Can_not_create_user_if_invalid_id(string id)
     {
-        Func<User> sut = () => new User(id, "nick", "password123");
+        Func<User> sut = () => new User(id, "password123");
         sut.Should().Throw<InvalidIdException>();
-    }
-
-    [Theory]
-    [InlineData("ab")]
-    [InlineData("123")]
-    [InlineData("abcA12")]
-    public void Can_create_user_if_valid_nickname(string nickname)
-    {
-        string expectedId = "Id123";
-        string expectedPassword = "password1";
-
-        User sut = new User(expectedId, nickname, expectedPassword);
-        sut.Id.Should().Be(expectedId);
-        sut.Nickname.Should().Be(nickname);
-        sut.Password.Should().Be(expectedPassword);
-    }
-
-    [Theory]
-    [InlineData("b")]
-    [InlineData("123@@")]
-    [InlineData("abcㄱ12")]
-    [InlineData("abcA123")]
-    public void Can_not_create_user_if_invalid_nickname(string nickname)
-    {
-        Func<User> sut = () => new User("Id123", nickname, "password123");
-        sut.Should().Throw<InvalidNicknameException>();
     }
 
     [Theory]
@@ -80,11 +51,9 @@ public class UserTests
     public void Can_create_user_if_valid_password(string password)
     {
         string expectedId = "Id123";
-        string expectedNickname = "nick";
 
-        User sut = new User(expectedId, expectedNickname, password);
+        User sut = new User(expectedId, password);
         sut.Id.Should().Be(expectedId);
-        sut.Nickname.Should().Be(expectedNickname);
         sut.Password.Should().Be(password);
     }
 
@@ -92,7 +61,7 @@ public class UserTests
     [InlineData("12345")]
     public void Can_not_create_user_if_invalid_password(string password)
     {
-        Func<User> sut = () => new User("Id123", "nick", password);
+        Func<User> sut = () => new User("Id123", password);
         sut.Should().Throw<InvalidPasswordException>();
     }
 }
