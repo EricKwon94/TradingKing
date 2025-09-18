@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Timers;
+using System.Threading;
 
 namespace Host.Controllers;
 
@@ -10,21 +10,16 @@ namespace Host.Controllers;
 public class TestController : ControllerBase
 {
     public static int num = Random.Shared.Next();
-    public static Timer timer = new Timer(3000);
+    public static Timer timer = new Timer(_ =>
+    {
+        Console.WriteLine("Scale out test" + num);
+    }, null, 1000, 3000);
 
     private readonly ILogger<TestController> _logger;
 
     public TestController(ILogger<TestController> logger)
     {
         _logger = logger;
-        if (!timer.Enabled)
-        {
-            timer.Elapsed += (s, e) =>
-            {
-                _logger.LogInformation("{time}: Scale out test", e.SignalTime);
-            };
-            timer.Start();
-        }
     }
 
     [HttpGet]
