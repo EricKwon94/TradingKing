@@ -5,8 +5,8 @@ using System.Timers;
 
 namespace Host.Controllers;
 
-[Route("api/[controller]")]
-[ApiController]
+//[Route("api/[controller]")]
+//[ApiController]
 public class TestController : ControllerBase
 {
     public static int num = Random.Shared.Next();
