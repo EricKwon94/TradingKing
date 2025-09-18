@@ -23,20 +23,12 @@ public partial class RegisterViewModel : BaseViewModel
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(RegisterCommand))]
-    private string _userNickname = string.Empty;
-
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(RegisterCommand))]
     private string _userPassword = string.Empty;
 
     [ObservableProperty]
     private int? _minIdLength;
     [ObservableProperty]
     private int? _maxIdLength;
-    [ObservableProperty]
-    private int? _minNicknameLength;
-    [ObservableProperty]
-    private int? _maxNicknameLength;
     [ObservableProperty]
     private int? _minPasswordLength;
 
@@ -50,7 +42,7 @@ public partial class RegisterViewModel : BaseViewModel
     [RelayCommand(CanExecute = nameof(CanRegister))]
     public async Task RegisterAsync(CancellationToken ct)
     {
-        var body = new RegisterReq(UserId, UserNickname, UserPassword);
+        var body = new RegisterReq(UserId, UserPassword);
         try
         {
             await _accountService.RegisterAsync(body, ct);
@@ -87,8 +79,6 @@ public partial class RegisterViewModel : BaseViewModel
         {
             MinIdLength = res.MinIdLength;
             MaxIdLength = res.MaxIdLength;
-            MinNicknameLength = res.MinNicknameLength;
-            MaxNicknameLength = res.MaxNicknameLength;
             MinPasswordLength = res.MinPasswordLength;
         }
 
@@ -98,7 +88,6 @@ public partial class RegisterViewModel : BaseViewModel
     private bool CanRegister()
     {
         if (UserId.Length >= MinIdLength && UserId.Length <= MaxIdLength &&
-            UserNickname.Length >= MinNicknameLength && UserNickname.Length <= MaxNicknameLength &&
             UserPassword.Length >= MinPasswordLength)
             return true;
         return false;
@@ -109,10 +98,8 @@ public partial class RegisterViewModel : BaseViewModel
         if (statusCode == HttpStatusCode.BadRequest)
         {
             if (errorCode == -1)
-                return _alert.DisplayAlertAsync("Error", "ID는 영문, 숫자", "ok", ct);
+                return _alert.DisplayAlertAsync("Error", "ID는 영문, 숫자, 완성된 한글", "ok", ct);
             else if (errorCode == -2)
-                return _alert.DisplayAlertAsync("Error", "닉네임은 영어, 완성된 한글, 숫자", "ok", ct);
-            else if (errorCode == -3)
                 return _alert.DisplayAlertAsync("Error", "패스워드 이상함", "ok", ct);
         }
         else if (statusCode == HttpStatusCode.Conflict)
@@ -120,8 +107,6 @@ public partial class RegisterViewModel : BaseViewModel
             if (errorCode == -1)
                 return _alert.DisplayAlertAsync("Error", "ID 중복", "ok", ct);
             else if (errorCode == -2)
-                return _alert.DisplayAlertAsync("Error", "닉네임 중복", "ok", ct);
-            else if (errorCode == -3)
                 return _alert.DisplayAlertAsync("Error", "계정 중복", "ok", ct);
         }
         return Task.CompletedTask;
