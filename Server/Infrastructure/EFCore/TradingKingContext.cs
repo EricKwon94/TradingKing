@@ -24,15 +24,11 @@ internal class TradingKingContext : DbContext, IEntityTypeConfiguration<User>
         builder.HasKey(e => e.Seq);
 
         builder.HasIndex(e => e.Id).IsUnique();
-        builder.HasIndex(e => e.Nickname).IsUnique();
 
         builder.Property(e => e.Id)
             .HasMaxLength(User.MAX_ID_LENGTH)
             .IsRequired()
             .IsUnicode(false);
-
-        builder.Property(e => e.Nickname)
-            .HasMaxLength(User.MAX_NICKNAME_LENGTH);
 
         builder.Property(e => e.Password)
             .HasMaxLength(100)

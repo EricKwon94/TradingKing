@@ -37,7 +37,7 @@ public class AccountController : ControllerBase
         AccountService.RegisterResult result;
         try
         {
-            result = await _accountService.RegisterAsync(body.Id, body.Nickname, body.Password, ct);
+            result = await _accountService.RegisterAsync(body.Id, body.Password, ct);
         }
         catch (DomainException e)
         {
@@ -48,8 +48,7 @@ public class AccountController : ControllerBase
         {
             AccountService.RegisterResult.Ok => Ok(),
             AccountService.RegisterResult.DuplicateId => Conflict(-1),
-            AccountService.RegisterResult.DuplicateNickname => Conflict(-2),
-            AccountService.RegisterResult.DuplicateAccount => Conflict(-3),
+            AccountService.RegisterResult.DuplicateAccount => Conflict(-2),
             _ => throw new NotImplementedException(),
         };
     }
