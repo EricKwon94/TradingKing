@@ -1,16 +1,15 @@
-﻿using Application.Services;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace Infrastructure.Services;
+namespace Common;
 
-internal class AuthService : IAuthService
+public class TokenGenerator
 {
-    public string CreateToken(string identifier, string issKey, string iss, string aud)
+    public string CreateJwt(string identifier, string issKey, string iss, string aud)
     {
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(issKey));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);

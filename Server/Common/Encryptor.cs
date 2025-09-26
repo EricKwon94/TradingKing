@@ -1,11 +1,10 @@
-﻿using Application.Services;
-using System;
+﻿using System;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Infrastructure.Services;
+namespace Common;
 
-internal class EncryptService : IEncryptService
+public class Encryptor
 {
     public string Encrypt(string plainText)
     {
