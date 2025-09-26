@@ -1,4 +1,4 @@
-﻿using Application.Services;
+﻿using Common;
 using Domain;
 using Domain.Exceptions;
 using Domain.Persistences;
@@ -11,14 +11,12 @@ namespace Application.Orchestrations;
 public class AccountService
 {
     private readonly IUserRepository _userRepository;
-    private readonly IAuthService _authService;
-    private readonly IEncryptService _encryptService;
+    private readonly TokenGenerator _tokenGenerator = new();
+    private readonly Encryptor _encryptor = new();
 
-    public AccountService(IUserRepository userRepository, IAuthService authService, IEncryptService encryptService)
+    public AccountService(IUserRepository userRepository)
     {
         _userRepository = userRepository;
-        _authService = authService;
-        _encryptService = encryptService;
     }
 
     public FormRes GetForm()
@@ -31,7 +29,7 @@ public class AccountService
     /// <exception cref="InvalidPasswordException"></exception>
     public async Task<RegisterResult> RegisterAsync(string id, string password, CancellationToken ct)
     {
-        string encrypted = _encryptService.Encrypt(password);
+        string encrypted = _encryptor.Encrypt(password);
         var user = new User(id, encrypted);
 
         bool existId = await _userRepository.ExistIdAsync(id, ct);
@@ -49,12 +47,12 @@ public class AccountService
         string id, string password, string issKey, string iss, string aud,
         CancellationToken ct)
     {
-        string encrypted = _encryptService.Encrypt(password);
+        string encrypted = _encryptor.Encrypt(password);
         var user = await _userRepository.GetAsync(id, encrypted, ct);
         if (user == null)
             return null;
 
-        string jwt = _authService.CreateToken(user.Seq.ToString(), issKey, iss, aud);
+        string jwt = _tokenGenerator.CreateJwt(user.Seq.ToString(), issKey, iss, aud);
         await _userRepository.UpdateTokenAsync(user, jwt, ct);
         return jwt;
     }
