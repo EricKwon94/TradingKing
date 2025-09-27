@@ -1,12 +1,13 @@
 name: Client CI
 
 on:
-  push:
-    branches-ignore:
+  pull_request:
+    branches:
       - master
       - dev
     paths:
       - "Client/**"
+      - .github/workflows/client-ci.yml
 
 jobs:
   job1:
@@ -28,4 +29,12 @@ jobs:
     - name: Build and Test
       run: |
         dotnet build ./Client -c Release
-        dotnet test ./Client -c Release
+        dotnet test ./Client -c Release --logger trx
+
+    - name: Publish Test Results
+      uses: dorny/test-reporter@v2
+      if: always()
+      with:
+        name: Tests
+        path: ./TestResults/*.trx
+        reporter: dotnet-trx
