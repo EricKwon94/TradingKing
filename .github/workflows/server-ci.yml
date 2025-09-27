@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      SA_PASSWORD: sanklfj2045!@$#%jsjS
+      SA_PASSWORD: Strongsanklfj2045!@$#%jsjS
 
     services:
       sqlserver:
@@ -22,10 +22,10 @@ jobs:
         ports:
           - 1433:1433
         env:
-          SA_PASSWORD: ${{ env.SA_PASSWORD }}
+          SA_PASSWORD: "Strongsanklfj2045!@$#%jsjS"
           ACCEPT_EULA: "Y"
         options: >-
-          --health-cmd "until /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'sanklfj2045!@$#%jsjS' -Q 'SELECT 1'; do sleep 1; done"
+          --health-cmd "until /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'Strongsanklfj2045!@$#%jsjS' -Q 'SELECT 1'; do sleep 1; done"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 10
@@ -42,7 +42,7 @@ jobs:
     - name: Wait for SQL Server to be ready
       run: |
         for i in {1..20}; do
-          /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${{ env.SA_PASSWORD }} -Q "SELECT 1" && break
+          /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "Strongsanklfj2045!@$#%jsjS" -Q "SELECT 1" && break
           sleep 5
         done
 
