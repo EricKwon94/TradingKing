@@ -27,6 +27,7 @@ public static class InfrastructureExtensions
 #endif
             })
             .AddTransient<IUserRepository, UserRepository>()
+            .AddTransient<ITransaction, Transaction>()
         ;
     }
 }

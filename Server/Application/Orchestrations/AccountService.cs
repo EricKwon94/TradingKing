@@ -10,12 +10,14 @@ namespace Application.Orchestrations;
 
 public class AccountService
 {
+    private readonly ITransaction _transaction;
     private readonly IUserRepository _userRepository;
     private readonly TokenGenerator _tokenGenerator = new();
     private readonly Encryptor _encryptor = new();
 
-    public AccountService(IUserRepository userRepository)
+    public AccountService(ITransaction transaction, IUserRepository userRepository)
     {
+        _transaction = transaction;
         _userRepository = userRepository;
     }
 
@@ -36,9 +38,15 @@ public class AccountService
         if (existId)
             return RegisterResult.DuplicateId;
 
-        bool succ = await _userRepository.AddAsync(user, ct);
-        if (!succ)
+        await _userRepository.AddAsync(user, ct);
+        try
+        {
+            await _transaction.SaveChangesAsync(ct);
+        }
+        catch
+        {
             return RegisterResult.DuplicateAccount;
+        }
 
         return RegisterResult.Ok;
     }
@@ -53,7 +61,8 @@ public class AccountService
             return null;
 
         string jwt = _tokenGenerator.CreateJwt(user.Seq.ToString(), issKey, iss, aud);
-        await _userRepository.UpdateTokenAsync(user, jwt, ct);
+        _userRepository.UpdateToken(user, jwt);
+        await _transaction.SaveChangesAsync(ct);
         return jwt;
     }
 

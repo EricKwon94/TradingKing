@@ -9,42 +9,32 @@ namespace Infrastructure.Persistences;
 
 internal class UserRepository : IUserRepository
 {
-    private readonly TradingKingContext _context;
+    private readonly DbSet<User> _users;
 
     public UserRepository(TradingKingContext context)
     {
-        _context = context;
+        _users = context.Users;
     }
 
     public Task<bool> ExistIdAsync(string userId, CancellationToken ct)
     {
-        return _context.Users.AsNoTracking().AnyAsync(u => u.Id == userId, ct);
+        return _users.AsNoTracking().AnyAsync(u => u.Id == userId, ct);
     }
 
-    public async Task<bool> AddAsync(User user, CancellationToken ct)
+    public async ValueTask AddAsync(User user, CancellationToken ct)
     {
-        await _context.Users.AddAsync(user, ct);
-        try
-        {
-            await _context.SaveChangesAsync(ct);
-        }
-        catch (DbUpdateException)
-        {
-            return false;
-        }
-        return true;
+        await _users.AddAsync(user, ct);
     }
 
     public Task<User?> GetAsync(string id, string encryptedPassword, CancellationToken ct)
     {
-        return _context.Users.AsNoTracking()
+        return _users.AsNoTracking()
             .SingleOrDefaultAsync(e => e.Id == id && e.Password == encryptedPassword, ct);
     }
 
-    public Task UpdateTokenAsync(User user, string token, CancellationToken ct)
+    public void UpdateToken(User user, string token)
     {
-        _context.Users.Attach(user);
+        _users.Attach(user);
         user.Jwt = token;
-        return _context.SaveChangesAsync(ct);
     }
 }
