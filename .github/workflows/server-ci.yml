@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      SA_PASSWORD: sanklfj2045!@$#%jsj
+      SA_PASSWORD: sanklfj2045!@$#%jsjS
 
     services:
       sqlserver:
@@ -25,7 +25,7 @@ jobs:
           SA_PASSWORD: ${{ env.SA_PASSWORD }}
           ACCEPT_EULA: "Y"
         options: >-
-          --health-cmd "until /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'sanklfj2045!@$#%jsj' -Q 'SELECT 1'; do sleep 1; done"
+          --health-cmd "until /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'sanklfj2045!@$#%jsjS' -Q 'SELECT 1'; do sleep 1; done"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 10
