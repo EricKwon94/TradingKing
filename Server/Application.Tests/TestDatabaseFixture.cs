@@ -8,7 +8,8 @@ namespace Application.Tests;
 
 public class TestDatabaseFixture
 {
-    private const string ConnectionString = "Server=(localdb)\\MSSQLLocalDB;Database=TradingKingTests;";
+    private const string WINDOWS = "Server=(localdb)\\MSSQLLocalDB;Database=TradingKingTests;";
+    private const string OTHERES = "Server=localhost,1433;Database=TradingKingTests;User Id=sa;Password=Strongsanklfj2045!@$#%jsjS;TrustServerCertificate=True";
 
     private static readonly Lock _lock = new();
     private static bool _databaseInitialized;
@@ -19,20 +20,27 @@ public class TestDatabaseFixture
         {
             if (!_databaseInitialized)
             {
-                using (var context = CreateContext())
+                try
                 {
+                    using var context = CreateContext(WINDOWS);
                     context.Database.EnsureDeleted();
-                    context.Database.EnsureCreated(); ;
+                    context.Database.EnsureCreated();
+                }
+                catch (PlatformNotSupportedException)
+                {
+                    using var context = CreateContext(OTHERES);
+                    context.Database.EnsureDeleted();
+                    context.Database.EnsureCreated();
                 }
                 _databaseInitialized = true;
             }
         }
     }
 
-    internal TradingKingContext CreateContext()
+    internal TradingKingContext CreateContext(string connectionString)
     {
         var builder = new DbContextOptionsBuilder<TradingKingContext>()
-            .UseSqlServer(ConnectionString)
+            .UseSqlServer(connectionString)
             .EnableSensitiveDataLogging()
             .LogTo(Console.WriteLine, LogLevel.Information);
 
