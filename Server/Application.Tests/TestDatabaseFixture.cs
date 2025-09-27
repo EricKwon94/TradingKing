@@ -20,29 +20,32 @@ public class TestDatabaseFixture
         {
             if (!_databaseInitialized)
             {
-                try
-                {
-                    using var context = CreateContext(WINDOWS);
-                    context.Database.EnsureDeleted();
-                    context.Database.EnsureCreated();
-                }
-                catch (PlatformNotSupportedException)
-                {
-                    using var context = CreateContext(OTHERES);
-                    context.Database.EnsureDeleted();
-                    context.Database.EnsureCreated();
-                }
+                using var context = CreateContext();
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
                 _databaseInitialized = true;
             }
         }
     }
 
-    internal TradingKingContext CreateContext(string connectionString)
+    internal TradingKingContext CreateContext()
     {
-        var builder = new DbContextOptionsBuilder<TradingKingContext>()
-            .UseSqlServer(connectionString)
-            .EnableSensitiveDataLogging()
-            .LogTo(Console.WriteLine, LogLevel.Information);
+        DbContextOptionsBuilder<TradingKingContext> builder;
+
+        if (OperatingSystem.IsWindows())
+        {
+            builder = new DbContextOptionsBuilder<TradingKingContext>()
+                .UseSqlServer(WINDOWS)
+                .EnableSensitiveDataLogging()
+                .LogTo(Console.WriteLine, LogLevel.Information);
+        }
+        else
+        {
+            builder = new DbContextOptionsBuilder<TradingKingContext>()
+                .UseSqlServer(OTHERES)
+                .EnableSensitiveDataLogging()
+                .LogTo(Console.WriteLine, LogLevel.Information);
+        }
 
         return new TradingKingContext(builder.Options);
     }
