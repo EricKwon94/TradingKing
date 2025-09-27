@@ -30,22 +30,12 @@ public class TestDatabaseFixture
 
     internal TradingKingContext CreateContext()
     {
-        DbContextOptionsBuilder<TradingKingContext> builder;
+        string connectionString = OperatingSystem.IsWindows() ? WINDOWS : OTHERES;
 
-        if (OperatingSystem.IsWindows())
-        {
-            builder = new DbContextOptionsBuilder<TradingKingContext>()
-                .UseSqlServer(WINDOWS)
-                .EnableSensitiveDataLogging()
-                .LogTo(Console.WriteLine, LogLevel.Information);
-        }
-        else
-        {
-            builder = new DbContextOptionsBuilder<TradingKingContext>()
-                .UseSqlServer(OTHERES)
-                .EnableSensitiveDataLogging()
-                .LogTo(Console.WriteLine, LogLevel.Information);
-        }
+        var builder = new DbContextOptionsBuilder<TradingKingContext>()
+            .UseSqlServer(connectionString)
+            .EnableSensitiveDataLogging()
+            .LogTo(Console.WriteLine, LogLevel.Information);
 
         return new TradingKingContext(builder.Options);
     }
