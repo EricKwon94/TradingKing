@@ -22,13 +22,8 @@ jobs:
         ports:
           - 1433:1433
         env:
-          SA_PASSWORD: "Strongsanklfj2045!@$#%jsjS"
+          MSSQL_SA_PASSWORD: "Strongsanklfj2045!@$#%jsjS"
           ACCEPT_EULA: "Y"
-        options: >-
-          --health-cmd "until /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'Strongsanklfj2045!@$#%jsjS' -Q 'SELECT 1'; do sleep 1; done"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 10
 
     steps:
     - name: Checkout code

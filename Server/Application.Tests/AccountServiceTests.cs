@@ -74,7 +74,7 @@ public class AccountServiceTests : IClassFixture<TestDatabaseFixture>
         using var context = _fixture.CreateContext();
         context.Database.BeginTransaction();
         var transaction = new Transaction(context);
-        var repo = new UserRepository(context);
+        var repo = new UserRepository(context); ;
 
         var sut = new AccountService(transaction, repo);
 
