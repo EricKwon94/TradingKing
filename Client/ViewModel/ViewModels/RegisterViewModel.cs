@@ -47,9 +47,17 @@ public partial class RegisterViewModel : BaseViewModel
         {
             await _accountService.RegisterAsync(body, ct);
         }
-        catch (ApiException e) when (int.TryParse(e.Content, out int errorCode))
+        catch (ApiException e) when (e.StatusCode == HttpStatusCode.Conflict)
         {
-            await ShowErrorAsync(e.StatusCode, errorCode, default);
+            await _alert.DisplayAlertAsync("Error", "ID 중복", "ok", ct);
+            return;
+        }
+        catch (ApiException e) when (e.StatusCode == HttpStatusCode.BadRequest && int.TryParse(e.Content, out int errorCode))
+        {
+            if (errorCode == -1)
+                await _alert.DisplayAlertAsync("Error", "ID는 영문, 숫자, 완성된 한글", "ok", ct);
+            else if (errorCode == -2)
+                await _alert.DisplayAlertAsync("Error", "패스워드 이상함", "ok", ct);
             return;
         }
         catch (Exception e)
@@ -91,24 +99,5 @@ public partial class RegisterViewModel : BaseViewModel
             UserPassword.Length >= MinPasswordLength)
             return true;
         return false;
-    }
-
-    private Task ShowErrorAsync(HttpStatusCode statusCode, int errorCode, CancellationToken ct)
-    {
-        if (statusCode == HttpStatusCode.BadRequest)
-        {
-            if (errorCode == -1)
-                return _alert.DisplayAlertAsync("Error", "ID는 영문, 숫자, 완성된 한글", "ok", ct);
-            else if (errorCode == -2)
-                return _alert.DisplayAlertAsync("Error", "패스워드 이상함", "ok", ct);
-        }
-        else if (statusCode == HttpStatusCode.Conflict)
-        {
-            if (errorCode == -1)
-                return _alert.DisplayAlertAsync("Error", "ID 중복", "ok", ct);
-            else if (errorCode == -2)
-                return _alert.DisplayAlertAsync("Error", "계정 중복", "ok", ct);
-        }
-        return Task.CompletedTask;
     }
 }
