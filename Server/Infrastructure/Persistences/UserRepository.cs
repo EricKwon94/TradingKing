@@ -16,11 +16,6 @@ internal class UserRepository : IUserRepository
         _users = context.Users;
     }
 
-    public Task<bool> ExistIdAsync(string userId, CancellationToken ct)
-    {
-        return _users.AsNoTracking().AnyAsync(u => u.Id == userId, ct);
-    }
-
     public async ValueTask AddAsync(User user, CancellationToken ct)
     {
         await _users.AddAsync(user, ct);

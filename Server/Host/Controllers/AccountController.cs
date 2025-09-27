@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -34,7 +33,7 @@ public class AccountController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult> RegisterAsync([FromBody] AccountService.RegisterReq body, CancellationToken ct)
     {
-        AccountService.RegisterResult result;
+        bool result;
         try
         {
             result = await _accountService.RegisterAsync(body.Id, body.Password, ct);
@@ -44,13 +43,7 @@ public class AccountController : ControllerBase
             return BadRequest(e.Code);
         }
 
-        return result switch
-        {
-            AccountService.RegisterResult.Ok => Ok(),
-            AccountService.RegisterResult.DuplicateId => Conflict(-1),
-            AccountService.RegisterResult.DuplicateAccount => Conflict(-2),
-            _ => throw new NotImplementedException(),
-        };
+        return result ? Ok() : Conflict();
     }
 
     [HttpPost("login")]

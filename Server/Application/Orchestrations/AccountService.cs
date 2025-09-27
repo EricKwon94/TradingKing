@@ -29,14 +29,10 @@ public class AccountService
 
     /// <exception cref="InvalidIdException"></exception>
     /// <exception cref="InvalidPasswordException"></exception>
-    public async Task<RegisterResult> RegisterAsync(string id, string password, CancellationToken ct)
+    public async Task<bool> RegisterAsync(string id, string password, CancellationToken ct)
     {
         string encrypted = _encryptor.Encrypt(password);
         var user = new User(id, encrypted);
-
-        bool existId = await _userRepository.ExistIdAsync(id, ct);
-        if (existId)
-            return RegisterResult.DuplicateId;
 
         await _userRepository.AddAsync(user, ct);
         try
@@ -45,10 +41,10 @@ public class AccountService
         }
         catch
         {
-            return RegisterResult.DuplicateAccount;
+            return false;
         }
 
-        return RegisterResult.Ok;
+        return true;
     }
 
     public async Task<string?> LoginAsync(
@@ -75,6 +71,4 @@ public class AccountService
     public record LoginReq(
         [MinLength(User.MIN_ID_LENGTH)][MaxLength(User.MAX_ID_LENGTH)] string Id,
         [MinLength(User.MIN_PASSWORD_LENGTH)] string Password);
-
-    public enum RegisterResult { Ok, DuplicateId, DuplicateAccount }
 }
