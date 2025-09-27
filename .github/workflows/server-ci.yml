@@ -1,17 +1,30 @@
 name: Server CI
 
 on:
-  push:
-    branches-ignore:
+  pull_request:
+    branches:
       - master
       - dev
     paths:
       - "Server/**"
+      - .github/workflows/server-ci.yml
 
 jobs:
   job1:
     name: CI
     runs-on: ubuntu-latest
+
+    env:
+      SA_PASSWORD: Strongsanklfj2045!@$#%jsjS
+
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        ports:
+          - 1433:1433
+        env:
+          MSSQL_SA_PASSWORD: ${{ env.SA_PASSWORD }}
+          ACCEPT_EULA: Y
 
     steps:
     - name: Checkout code
@@ -25,4 +38,12 @@ jobs:
     - name: Build and Test
       run: |
         dotnet build ./Server -c Release
-        dotnet test ./Server -c Release
+        dotnet test ./Server -c Release --logger trx
+      
+    - name: Publish Test Results
+      uses: dorny/test-reporter@v2
+      if: always()
+      with:
+        name: Tests
+        path: ./Server/**/TestResults/*.trx
+        reporter: dotnet-trx
