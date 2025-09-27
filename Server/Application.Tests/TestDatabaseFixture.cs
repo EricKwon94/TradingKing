@@ -22,7 +22,7 @@ public class TestDatabaseFixture
                 using (var context = CreateContext())
                 {
                     context.Database.EnsureDeleted();
-                    context.Database.EnsureCreated();
+                    context.Database.EnsureCreated(); ;
                 }
                 _databaseInitialized = true;
             }
