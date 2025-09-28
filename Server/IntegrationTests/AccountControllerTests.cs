@@ -6,7 +6,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Xunit.Abstractions;
 
 namespace IntegrationTests;
 
@@ -14,16 +13,14 @@ public class AccountControllerTests : IClassFixture<CustomWebApplicationFactory<
 {
     private readonly HttpClient _client;
     private readonly CustomWebApplicationFactory<Program> _factory;
-    private readonly ITestOutputHelper _output;
 
-    public AccountControllerTests(CustomWebApplicationFactory<Program> factory, ITestOutputHelper output)
+    public AccountControllerTests(CustomWebApplicationFactory<Program> factory)
     {
         _factory = factory;
         _client = factory.CreateClient(new WebApplicationFactoryClientOptions
         {
             AllowAutoRedirect = false
         });
-        _output = output;
     }
 
     [Fact]
@@ -70,8 +67,6 @@ public class AccountControllerTests : IClassFixture<CustomWebApplicationFactory<
 
         // assert
         string body = await res.Content.ReadAsStringAsync();
-        System.Console.WriteLine(body);
-        _output.WriteLine(body);
         body.Should().Be("-1");
         res.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
