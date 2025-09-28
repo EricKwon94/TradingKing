@@ -67,6 +67,7 @@ public class AccountControllerTests : IClassFixture<CustomWebApplicationFactory<
 
         // assert
         string body = await res.Content.ReadAsStringAsync();
+        System.Console.WriteLine(body);
         body.Should().Be("-1");
         res.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
