@@ -22,22 +22,19 @@ public class AccountServiceTests : IClassFixture<TestDatabaseFixture>
     public async Task Register_user()
     {
         // arrange
-        string id = "string1";
+        string id = _fixture.IndependentId;
         string pwd = "asdasd";
         string expectedPwd = new Encryptor().Encrypt(pwd);
         using var context = _fixture.CreateContext();
-        context.Database.BeginTransaction();
-        var transaction = new Transaction(context);
-        var repo = new UserRepository(context);
 
-        var sut = new AccountService(transaction, repo);
+        var sut = CreateAccountService(context);
 
         // act
         bool result = await sut.RegisterAsync(id, pwd, default);
 
         // assert
         result.Should().BeTrue();
-        var user = await context.Users.FirstAsync(e => e.Id == id);
+        var user = await context.Users.SingleAsync(e => e.Id == id);
         user.Id.Should().Be(id);
         user.Password.Should().Be(expectedPwd);
         user.Jwt.Should().BeNull();
@@ -47,14 +44,11 @@ public class AccountServiceTests : IClassFixture<TestDatabaseFixture>
     public async Task Can_not_register_user_if_already_exist()
     {
         // arrange
-        string id = "string1";
+        string id = _fixture.IndependentId;
         string pwd = "asdasd";
         using var context = _fixture.CreateContext();
-        context.Database.BeginTransaction();
-        var transaction = new Transaction(context);
-        var repo = new UserRepository(context);
 
-        var sut = new AccountService(transaction, repo);
+        var sut = CreateAccountService(context);
         bool r = await sut.RegisterAsync(id, pwd, default);
         Assert.True(r);
 
@@ -69,14 +63,10 @@ public class AccountServiceTests : IClassFixture<TestDatabaseFixture>
     public async Task Can_login_if_user_exist()
     {
         // arrange
-        string id = "string1";
+        string id = _fixture.IndependentId;
         string pwd = "asdasd";
         using var context = _fixture.CreateContext();
-        context.Database.BeginTransaction();
-        var transaction = new Transaction(context);
-        var repo = new UserRepository(context);
-
-        var sut = new AccountService(transaction, repo);
+        var sut = CreateAccountService(context);
 
         bool r = await sut.RegisterAsync(id, pwd, default);
         Assert.True(r);
@@ -87,7 +77,32 @@ public class AccountServiceTests : IClassFixture<TestDatabaseFixture>
 
         // assert
         expectedJwt.Should().NotBeNullOrEmpty();
-        var user = await context.Users.FirstAsync(e => e.Id == id);
+        var user = await context.Users.SingleAsync(e => e.Id == id);
         user.Jwt.Should().Be(expectedJwt);
+    }
+
+    [Fact]
+    public async Task Can_not_login_if_user_no_exist()
+    {
+        // arrange
+        string id = _fixture.IndependentId;
+        string pwd = "asdasd";
+        using var context = _fixture.CreateContext();
+        var sut = CreateAccountService(context);
+
+        // act
+        string? jwt = await sut.LoginAsync(id, pwd, ISSKEY, "iss", "aud", default);
+
+        // assert
+        jwt.Should().BeNullOrEmpty();
+        var user = await context.Users.SingleOrDefaultAsync(e => e.Id == id);
+        user.Should().BeNull();
+    }
+
+    private AccountService CreateAccountService(TradingKingContext context)
+    {
+        var transaction = new Transaction(context);
+        var repo = new UserRepository(context);
+        return new AccountService(transaction, repo);
     }
 }
