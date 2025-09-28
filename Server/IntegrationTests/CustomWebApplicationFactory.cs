@@ -43,6 +43,7 @@ public class CustomWebApplicationFactory<TProgram>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.UseSetting("ISS_KEY", "x08z5dZcVX4QDJa3!QumT8?5y1Ezzp2bXjzHeDgzfR");
         builder.ConfigureTestServices(services =>
         {
             var dbContextDescriptor = services.Single(d => d.ServiceType == typeof(IDbContextOptionsConfiguration<TradingKingContext>));
