@@ -23,6 +23,7 @@
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="Application.Tests" />
+		<InternalsVisibleTo Include="IntegrationTests" />
 	</ItemGroup>
 
 </Project>
