@@ -1,0 +1,30 @@
+version: 2
+updates:
+  - package-ecosystem: "nuget"
+    directory: "Server"
+    schedule:
+      interval: "daily"
+    groups:
+      efcore:
+        patterns:
+          - "Microsoft.EntityFrameworkCore*"
+      microsoft-extensions:
+        patterns:
+          - Microsoft.Extensions.*
+      microsoft-aspnetcore:
+        patterns:
+          - Microsoft.AspNetCore.*
+      xnuit:
+        patterns:
+          - xunit*
+  - package-ecosystem: "nuget"
+    directory: "Client"
+    schedule:
+      interval: "daily"
+    groups:
+      microsoft-extensions:
+        patterns:
+          - Microsoft.Extensions.*
+      xnuit:
+        patterns:
+          - xunit*
