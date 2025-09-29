@@ -1,7 +1,7 @@
 ﻿using Microsoft.Maui;
 using Microsoft.Maui.Controls;
 
-namespace Host
+namespace View
 {
     public partial class App : Microsoft.Maui.Controls.Application
     {

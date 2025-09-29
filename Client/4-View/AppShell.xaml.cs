@@ -1,7 +1,7 @@
-﻿using Host.Pages;
-using Microsoft.Maui.Controls;
+﻿using Microsoft.Maui.Controls;
+using View.Pages;
 
-namespace Host
+namespace View
 {
     public partial class AppShell : Shell
     {

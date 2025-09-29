@@ -1,7 +1,7 @@
 ﻿using Microsoft.Maui.Controls;
 using ViewModel.ViewModels;
 
-namespace Host.Pages;
+namespace View.Pages;
 
 public partial class BasePage : ContentPage
 {

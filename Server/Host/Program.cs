@@ -63,9 +63,9 @@ public class Program
                 opt.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
-                    ValidIssuer = Env.ISSUER,
+                    ValidIssuer = builder.Configuration["Issuer"]!,
                     ValidateAudience = true,
-                    ValidAudience = Env.AUD,
+                    ValidAudience = builder.Configuration["Aud"]!,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["ISS_KEY"]!)),
