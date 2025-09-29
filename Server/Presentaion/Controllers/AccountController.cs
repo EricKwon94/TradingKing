@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Host.Controllers;
+namespace Presentaion.Controllers;
 
 [ApiController]
 [Route("[controller]")]
@@ -50,8 +50,10 @@ public class AccountController : ControllerBase
     public async Task<ActionResult<string>> LoginAsync([FromBody] AccountService.LoginReq body, CancellationToken ct)
     {
         string issKey = _configuration["ISS_KEY"]!;
+        string issuer = _configuration["Issuer"]!;
+        string aud = _configuration["Aud"]!;
 
-        string? jwt = await _accountService.LoginAsync(body.Id, body.Password, issKey, Env.ISSUER, Env.AUD, ct);
+        string? jwt = await _accountService.LoginAsync(body.Id, body.Password, issKey, issuer, aud, ct);
         if (string.IsNullOrEmpty(jwt))
             return NotFound();
 
