@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Refit;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -46,6 +47,8 @@ public partial class LoginViewModel : BaseViewModel
     [RelayCommand(CanExecute = nameof(CanLogin))]
     public async Task LoginAsync(CancellationToken ct)
     {
+        IsBusy = true;
+
         var body = new LoginReq(UserId, UserPassword);
         string? jwt = null;
         try
@@ -55,15 +58,23 @@ public partial class LoginViewModel : BaseViewModel
         catch (ApiException e) when (e.StatusCode == HttpStatusCode.NotFound)
         {
             await _alert.DisplayAlertAsync("Error", "계정을 찾을 수 없어", "ok", ct);
-            return;
         }
         catch (Exception e)
         {
             await _alert.DisplayAlertAsync("Error", e.Message, "ok", ct);
-            return;
         }
-        _preferences.Set("jwt", jwt);
-        await _navigationService.GoToAsync("//main", ct);
+
+        if (!string.IsNullOrEmpty(jwt))
+        {
+            _preferences.Set("jwt", jwt);
+            var parameters = new Dictionary<string, object>
+            {
+                ["Id"] = UserId,
+            };
+            await _navigationService.GoToAsync("//main", parameters, ct);
+        }
+
+        IsBusy = false;
     }
 
     [RelayCommand]

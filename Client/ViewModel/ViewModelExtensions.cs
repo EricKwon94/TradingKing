@@ -9,6 +9,7 @@ public static class ViewModelExtensions
     {
         return builder.AddTransient<LoginViewModel>()
             .AddTransient<RegisterViewModel>()
+            .AddTransient<MainViewModel>()
             ;
     }
 }

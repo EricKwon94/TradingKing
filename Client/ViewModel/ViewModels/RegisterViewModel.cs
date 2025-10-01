@@ -42,15 +42,18 @@ public partial class RegisterViewModel : BaseViewModel
     [RelayCommand(CanExecute = nameof(CanRegister))]
     public async Task RegisterAsync(CancellationToken ct)
     {
+        IsBusy = true;
+
         var body = new RegisterReq(UserId, UserPassword);
+        bool succ = false;
         try
         {
             await _accountService.RegisterAsync(body, ct);
+            succ = true;
         }
         catch (ApiException e) when (e.StatusCode == HttpStatusCode.Conflict)
         {
             await _alert.DisplayAlertAsync("Error", "ID 중복", "ok", ct);
-            return;
         }
         catch (ApiException e) when (e.StatusCode == HttpStatusCode.BadRequest && int.TryParse(e.Content, out int errorCode))
         {
@@ -58,15 +61,18 @@ public partial class RegisterViewModel : BaseViewModel
                 await _alert.DisplayAlertAsync("Error", "ID는 영문, 숫자, 완성된 한글", "ok", ct);
             else if (errorCode == -2)
                 await _alert.DisplayAlertAsync("Error", "패스워드 이상함", "ok", ct);
-            return;
         }
         catch (Exception e)
         {
             await _alert.DisplayAlertAsync("Error", e.Message, "ok", ct);
-            return;
         }
-        await _alert.DisplayAlertAsync("회원가입", "가입성공", "ok", default);
-        await _navigationService.GoToAsync("..", ct);
+
+        if (succ)
+        {
+            await _alert.DisplayAlertAsync("회원가입", "가입성공", "ok", ct);
+            await _navigationService.GoToAsync("..", ct);
+        }
+        IsBusy = false;
     }
 
     public override async void Initialize()
