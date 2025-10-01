@@ -11,9 +11,4 @@ public partial class BaseViewModel : ObservableObject
     {
 
     }
-
-    public virtual void OnAppearing()
-    {
-
-    }
 }

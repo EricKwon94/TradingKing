@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Application.Services;
@@ -6,4 +7,5 @@ namespace Application.Services;
 public interface INavigationService
 {
     Task GoToAsync(string uri, CancellationToken ct);
+    Task GoToAsync(string uri, IDictionary<string, object> parameters, CancellationToken ct);
 }
