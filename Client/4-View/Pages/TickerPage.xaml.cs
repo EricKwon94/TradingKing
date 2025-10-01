@@ -2,9 +2,9 @@ using ViewModel.ViewModels;
 
 namespace View.Pages;
 
-public partial class MainPage : BasePage
+public partial class TickerPage : BasePage
 {
-    public MainPage(MainViewModel vm) : base(vm)
+    public TickerPage(TickerViewModel vm) : base(vm)
     {
         InitializeComponent();
     }

@@ -3,8 +3,12 @@ using ViewModel.Contracts;
 
 namespace ViewModel.ViewModels;
 
-public class MainViewModel : BaseViewModel, IQueryAttributable
+public class TickerViewModel : BaseViewModel, IQueryAttributable
 {
+    public TickerViewModel()
+    {
+
+    }
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
 
