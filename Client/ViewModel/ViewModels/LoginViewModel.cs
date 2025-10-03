@@ -1,4 +1,4 @@
-﻿using Application.Api;
+﻿using Application.Gateways;
 using Application.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using static Application.Api.IAccountService;
+using static Application.Gateways.IAccountService;
 
 namespace ViewModel.ViewModels;
 

@@ -1,4 +1,4 @@
-﻿using Application.Api;
+﻿using Application.Gateways;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.Extensions.Http;
@@ -12,6 +12,11 @@ public static class ApplicationExtensions
     public static IServiceCollection AddApplication(this IServiceCollection builder, Uri address)
     {
         builder.AddTransient<AuthHeaderHandler>();
+
+        builder.AddRefitClient<ICryptoService>()
+            .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://api.upbit.com"))
+            .AddPolicyHandler(HttpPolicyExtensions.HandleTransientHttpError().WaitAndRetryAsync(4, count => TimeSpan.FromSeconds(2 * count)))
+            ;
 
         builder.AddRefitClient<IAccountService>()
             .ConfigureHttpClient(c => c.BaseAddress = address)

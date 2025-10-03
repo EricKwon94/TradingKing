@@ -1,4 +1,6 @@
-﻿using Application.Services;
+﻿using Application.Gateways;
+using Application.Services;
+using Infrastructure.Gateways;
 using Infrastructure.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,6 +13,7 @@ public static class InfrastructureExtensions
         return builder.AddTransient<IPreferences, Preferences>()
             .AddTransient<IAlertService, AlertService>()
             .AddTransient<INavigationService, NavigationService>()
+            .AddTransient<ICryptoTickerService, CryptoTickerService>()
             ;
     }
 }
