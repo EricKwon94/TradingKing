@@ -4,7 +4,7 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Application.Api;
+namespace Application.Gateways;
 
 internal class AuthHeaderHandler : DelegatingHandler
 {
