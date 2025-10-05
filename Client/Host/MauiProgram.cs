@@ -1,4 +1,5 @@
 ﻿using Application;
+using CommunityToolkit.Maui;
 using Infrastructure;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Controls.Hosting;
@@ -15,6 +16,7 @@ namespace Host
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseMauiCommunityToolkit()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");

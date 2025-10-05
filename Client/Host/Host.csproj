@@ -40,11 +40,11 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.5" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.9" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\4-View\4-View.csproj" />
+	  <ProjectReference Include="..\View\4-View.csproj" />
 	  <ProjectReference Include="..\Infrastructure\2-Infrastructure.csproj" />
 	</ItemGroup>
 
