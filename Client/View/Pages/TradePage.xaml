@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<local:BasePage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:View.Pages"
+                xmlns:cnv="clr-namespace:View.Converters"
+                xmlns:vm="clr-namespace:ViewModel.ViewModels;assembly=ViewModel"        
+                xmlns:tk="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+                Title="시세와 거래"
+                x:DataType="vm:TradeViewModel"
+             x:Class="View.Pages.TradePage">
+
+    <VerticalStackLayout Padding="16" Spacing="8">
+
+        <VerticalStackLayout.Resources>
+            <ResourceDictionary>
+                <tk:IsNotNullConverter x:Key="IsNotNullConv" x:Name="IsNotNullConv"/>
+                <tk:InvertedBoolConverter x:Key="InvertedBoolConv" x:Name="InvertedBoolConv"/>
+                <cnv:TickerChangeToConverter x:Key="TickerChangeConv"/>
+            </ResourceDictionary>
+        </VerticalStackLayout.Resources>
+
+        <ActivityIndicator IsRunning="True" IsVisible="{Binding IsBusy}" HorizontalOptions="Start"/>
+
+        <HorizontalStackLayout Spacing="8">
+            <Label Text="코인 검색" FontSize="Small" VerticalOptions="Center"/>
+            <Entry Text="{Binding SearchText}" ReturnCommand="{Binding SearchCommand}"
+                   Placeholder="ex) 비트코인" WidthRequest="100" ReturnType="Search"/>
+            <Button Text="검색" Command="{Binding SearchCommand}"/>
+        </HorizontalStackLayout>
+
+        <VerticalStackLayout IsVisible="{Binding SelectedTicker, Converter={StaticResource IsNotNullConv}}" Spacing="8">
+            <HorizontalStackLayout Spacing="8">
+                <Label Text="현재가" FontSize="Small"/>
+                <Label Text="{Binding SelectedTicker.Price, StringFormat='{0:N0}'}" 
+                       TextColor="{Binding SelectedTicker.Change2, Converter={StaticResource TickerChangeConv}}" FontSize="Small"/>
+            </HorizontalStackLayout>
+
+            <BoxView HeightRequest="2" WidthRequest="300" HorizontalOptions="Start" Color="LightGray" Margin="0,8,0,0"/>
+
+            <HorizontalStackLayout Spacing="8">
+                <RadioButton IsChecked="{Binding IsOrderByQuantity}" Content="수량으로 거래"/>
+                <RadioButton Content="가격으로 거래"/>
+            </HorizontalStackLayout>
+
+            <HorizontalStackLayout Spacing="8" IsVisible="{Binding IsOrderByQuantity}">
+                <Label Text="주문 수량" FontSize="Small" VerticalOptions="Center"/>
+                <Entry Text="{Binding OrderCount}" Keyboard="Numeric" WidthRequest="100"/>
+                <Label VerticalOptions="Center" Text="{Binding FinalCount, StringFormat='{}가격 {0:N0}'}"/>
+            </HorizontalStackLayout>
+
+            <HorizontalStackLayout Spacing="8" IsVisible="{Binding IsOrderByQuantity, Converter={StaticResource InvertedBoolConv}}">
+                <Label Text="주문 가격" FontSize="Small" VerticalOptions="Center"/>
+                <Entry Text="{Binding OrderCount}" Keyboard="Numeric" WidthRequest="100"/>
+                <Label VerticalOptions="Center" Text="{Binding FinalCount, StringFormat='{}수량 {0:N8}'}"/>
+            </HorizontalStackLayout>
+
+            <HorizontalStackLayout Spacing="8">
+                <Button Text="구매" Command="{Binding BuyCommand}"/>
+                <Button Text="판매" Command="{Binding SellCommand}"/>
+            </HorizontalStackLayout>
+
+        </VerticalStackLayout>
+    </VerticalStackLayout>
+</local:BasePage>

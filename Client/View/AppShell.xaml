@@ -13,7 +13,7 @@
         Route="LoginPage" />
 
     <TabBar Route="main">
-        <ShellContent Title="거래" Icon="coin.png" ContentTemplate="{DataTemplate pages:TickerPage}"/>
+        <ShellContent Title="거래" Icon="coin.png" ContentTemplate="{DataTemplate pages:TradePage}"/>
         <ShellContent Title="랭킹" Icon="ranking.png" ContentTemplate="{DataTemplate pages:RankingPage}"/>
     </TabBar>
 

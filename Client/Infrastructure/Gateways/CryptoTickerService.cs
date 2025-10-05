@@ -1,6 +1,7 @@
 ﻿using Application.Gateways;
 using System;
 using System.Buffers;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Runtime.CompilerServices;
@@ -13,11 +14,15 @@ namespace Infrastructure.Gateways;
 
 internal class CryptoTickerService : ICryptoTickerService
 {
-    private readonly ClientWebSocket _socket = new ClientWebSocket();
+    private ClientWebSocket _currentSocket = null!;
+    private readonly ConcurrentQueue<ClientWebSocket> _sockets = [];
 
     public Task ConnectAsync(CancellationToken cancellationToken)
     {
-        return _socket.ConnectAsync(new Uri("wss://api.upbit.com/websocket/v1"), cancellationToken);
+        var socket = new ClientWebSocket();
+        _sockets.Enqueue(socket);
+        _currentSocket = socket;
+        return socket.ConnectAsync(new Uri("wss://api.upbit.com/websocket/v1"), cancellationToken);
     }
 
     public ValueTask SendAsync(string[] codes, CancellationToken cancellationToken)
@@ -30,17 +35,17 @@ internal class CryptoTickerService : ICryptoTickerService
         string json = JsonSerializer.Serialize(body);
         ReadOnlyMemory<byte> buffer = Encoding.UTF8.GetBytes(json);
 
-        return _socket.SendAsync(buffer, WebSocketMessageType.Binary, true, cancellationToken);
+        return _currentSocket.SendAsync(buffer, WebSocketMessageType.Binary, true, cancellationToken);
     }
 
     public async IAsyncEnumerable<ICryptoTickerService.Ticker> ReceiveAsync([EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        while (_socket.State == WebSocketState.Open)
+        while (_currentSocket.State == WebSocketState.Open)
         {
             using var owner = MemoryPool<byte>.Shared.Rent(2048);
             Memory<byte> buffer = owner.Memory;
 
-            ValueWebSocketReceiveResult result = await _socket.ReceiveAsync(buffer, cancellationToken);
+            ValueWebSocketReceiveResult result = await _currentSocket.ReceiveAsync(buffer, cancellationToken);
             ICryptoTickerService.Ticker ticker = JsonSerializer.Deserialize<ICryptoTickerService.Ticker>(buffer.Span[..result.Count])!;
 
             yield return ticker;
@@ -51,6 +56,9 @@ internal class CryptoTickerService : ICryptoTickerService
 
     public void Dispose()
     {
-        _socket.Dispose();
+        if (_sockets.TryDequeue(out var socket))
+        {
+            socket.Dispose();
+        }
     }
 }

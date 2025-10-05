@@ -17,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{8F0DAF3B-8F7D-4EBC-9A56-802897FF46B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "4-View", "4-View\4-View.csproj", "{EEFC14C1-9290-4677-87AA-20792CDB9D88}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "4-View", "View\4-View.csproj", "{EEFC14C1-9290-4677-87AA-20792CDB9D88}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
