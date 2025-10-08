@@ -49,8 +49,8 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
         set
         {
             SetProperty(ref _orderCount, value);
-            if (!string.IsNullOrEmpty(value))
-                CalculateFinalCount(value);
+            if (SelectedTicker != null)
+                CalculateFinalCount(this, SelectedTicker.Price);
             BuyCommand.NotifyCanExecuteChanged();
             SellCommand.NotifyCanExecuteChanged();
         }
@@ -58,6 +58,9 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
 
     [ObservableProperty]
     private double _finalCount;
+
+    [ObservableProperty]
+    public int _availableCash = 100_000_000;
 
     public TradeViewModel(
         ILogger<TradeViewModel> logger, IAlertService alert,
@@ -158,17 +161,6 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
             return int.TryParse(OrderCount, out var d) && d >= MIN_ORDER_PRICE;
     }
 
-    private void CalculateFinalCount(string orderCount)
-    {
-        if (SelectedTicker != null)
-        {
-            if (IsOrderByQuantity && double.TryParse(orderCount, out var quantity))
-                FinalCount = SelectedTicker.Price * quantity;
-            else if (!IsOrderByQuantity && int.TryParse(orderCount, out var price))
-                FinalCount = price / SelectedTicker.Price;
-        }
-    }
-
     private async void ReceiveTickerAsync(object? sender)
     {
         try
@@ -179,6 +171,7 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
                 if (SelectedTicker == null)
                 {
                     SelectedTicker = new TickerViewModel(ticker.code, ticker.trade_price, TickerViewModel.Change.Base);
+                    SelectedTicker.PriceChanged += CalculateFinalCount;
                 }
                 else
                 {
@@ -188,8 +181,6 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
                         SelectedTicker.Code = ticker.code;
                         SelectedTicker.Change2 = TickerViewModel.Change.Base;
                     }
-                    if (!string.IsNullOrEmpty(OrderCount))
-                        CalculateFinalCount(OrderCount);
                 }
             }
         }
@@ -197,6 +188,14 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
         {
             _cryptoTickerService.Dispose();
         }
+    }
+
+    private void CalculateFinalCount(object? sender, double tickerPrice)
+    {
+        if (IsOrderByQuantity && double.TryParse(OrderCount, out var quantity))
+            FinalCount = tickerPrice * quantity;
+        else if (!IsOrderByQuantity && int.TryParse(OrderCount, out var price))
+            FinalCount = price / tickerPrice;
     }
 }
 
