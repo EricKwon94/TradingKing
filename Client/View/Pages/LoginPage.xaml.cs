@@ -1,12 +1,12 @@
 ﻿using ViewModel.ViewModels;
 
-namespace View.Pages
+namespace View.Pages;
+
+public partial class LoginPage : BasePage
 {
-    public partial class LoginPage : BasePage
+    public LoginPage(LoginViewModel vm)
     {
-        public LoginPage(LoginViewModel vm) : base(vm)
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+        BindingContext = vm;
     }
 }

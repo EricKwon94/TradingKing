@@ -4,8 +4,9 @@ namespace View.Pages;
 
 public partial class RegisterPage : BasePage
 {
-    public RegisterPage(RegisterViewModel vm) : base(vm)
+    public RegisterPage(RegisterViewModel vm)
     {
         InitializeComponent();
+        BindingContext = vm;
     }
 }

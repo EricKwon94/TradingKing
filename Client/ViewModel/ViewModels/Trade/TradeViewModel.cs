@@ -23,7 +23,7 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
     private readonly ICryptoTickerService _cryptoTickerService;
     private readonly IDispatcher _dispatcher;
 
-    private IEnumerable<ICryptoService.CryptoAsset>? _cryptoAssets;
+    private readonly List<ICryptoService.MarketRes> _markets = [];
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SearchCommand))]
@@ -75,10 +75,7 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
     [RelayCommand(CanExecute = nameof(CanSearch))]
     public async Task SearchAsync(CancellationToken ct)
     {
-        if (_cryptoAssets == null)
-            return;
-
-        var asset = _cryptoAssets.Single(x => x.korean_name == SearchText);
+        var asset = _markets.Single(x => x.korean_name == SearchText);
 
         if (SelectedTicker?.Code == asset.market)
         {
@@ -124,26 +121,29 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
     public override async void Initialize()
     {
         IsBusy = true;
-        IEnumerable<ICryptoService.CryptoAsset>? cryptos = null;
+        IEnumerable<ICryptoService.MarketRes>? markets = null;
         try
         {
-            cryptos = await _cryptoService.GetAssetsAsync(default);
+            markets = await _cryptoService.GetMarketsAsync(default);
         }
         catch (Exception e)
         {
             await _alert.DisplayAlertAsync("Error", e.Message, "ok", default);
         }
 
-        if (cryptos != null)
+        if (markets != null)
         {
-            _cryptoAssets = cryptos.Where(c => c.market.Contains("KRW"));
+            foreach (var market in markets.Where(c => c.market.StartsWith("KRW-")))
+            {
+                _markets.Add(market);
+            }
         }
         IsBusy = false;
     }
 
     private bool CanSearch()
     {
-        return _cryptoAssets != null && _cryptoAssets.Any(x => x.korean_name == SearchText);
+        return _markets.Any(x => x.korean_name == SearchText);
     }
 
     private bool CanBuy()
