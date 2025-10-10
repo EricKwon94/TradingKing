@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using ViewModel.ViewModels;
+using ViewModel.ViewModels.Trade;
 
 namespace ViewModel;
 
@@ -11,6 +12,7 @@ public static class ViewModelExtensions
             .AddTransient<RegisterViewModel>()
             .AddTransient<TradeViewModel>()
             .AddTransient<RankingViewModel>()
+            .AddTransient<AssetViewModel>()
             ;
     }
 }

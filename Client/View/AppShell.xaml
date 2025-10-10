@@ -14,6 +14,7 @@
 
     <TabBar Route="main">
         <ShellContent Title="거래" Icon="coin.png" ContentTemplate="{DataTemplate pages:TradePage}"/>
+        <ShellContent Title="자산" Icon="coin.png" ContentTemplate="{DataTemplate pages:AssetPage}"/>
         <ShellContent Title="랭킹" Icon="ranking.png" ContentTemplate="{DataTemplate pages:RankingPage}"/>
     </TabBar>
 
