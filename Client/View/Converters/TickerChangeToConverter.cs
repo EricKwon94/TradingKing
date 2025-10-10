@@ -7,7 +7,7 @@ using ViewModel.ViewModels.Trade;
 
 namespace View.Converters;
 
-public class TickerChangeToConverter : IValueConverter
+internal class TickerChangeToConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {

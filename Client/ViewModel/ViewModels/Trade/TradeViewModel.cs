@@ -21,6 +21,7 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
     private readonly IAlertService _alert;
     private readonly ICryptoService _cryptoService;
     private readonly ICryptoTickerService _cryptoTickerService;
+    private readonly IDispatcher _dispatcher;
 
     private IEnumerable<ICryptoService.CryptoAsset>? _cryptoAssets;
 
@@ -42,29 +43,31 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
         }
     }
 
-    private string? _orderCount;
-    public string? OrderCount
+    private string _orderCount = "0";
+    public string OrderCount
     {
         get => _orderCount;
         set
         {
             SetProperty(ref _orderCount, value);
-            if (!string.IsNullOrEmpty(value))
-                CalculateFinalCount(value);
+            if (SelectedTicker != null)
+                CalculateFinalCount(this, SelectedTicker.Price);
             BuyCommand.NotifyCanExecuteChanged();
             SellCommand.NotifyCanExecuteChanged();
         }
     }
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(BuyCommand), nameof(SellCommand))]
     private double _finalCount;
 
     public TradeViewModel(
-        ILogger<TradeViewModel> logger, IAlertService alert,
+        ILogger<TradeViewModel> logger, IAlertService alert, IDispatcher dispatcher,
         ICryptoService cryptoService, ICryptoTickerService cryptoTickerService)
     {
         _logger = logger;
         _alert = alert;
+        _dispatcher = dispatcher;
         _cryptoService = cryptoService;
         _cryptoTickerService = cryptoTickerService;
     }
@@ -97,6 +100,7 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
             return;
         }
 
+        OrderCount = "0";
         ThreadPool.QueueUserWorkItem(ReceiveTickerAsync, ct);
     }
 
@@ -145,7 +149,7 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
     private bool CanBuy()
     {
         if (IsOrderByQuantity)
-            return double.TryParse(OrderCount, out var d) && d > 0;
+            return FinalCount >= MIN_ORDER_PRICE;
         else
             return int.TryParse(OrderCount, out var d) && d >= MIN_ORDER_PRICE;
     }
@@ -153,20 +157,9 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
     private bool CanSell()
     {
         if (IsOrderByQuantity)
-            return double.TryParse(OrderCount, out var d) && d > 0;
+            return FinalCount >= MIN_ORDER_PRICE;
         else
             return int.TryParse(OrderCount, out var d) && d >= MIN_ORDER_PRICE;
-    }
-
-    private void CalculateFinalCount(string orderCount)
-    {
-        if (SelectedTicker != null)
-        {
-            if (IsOrderByQuantity && double.TryParse(orderCount, out var quantity))
-                FinalCount = SelectedTicker.Price * quantity;
-            else if (!IsOrderByQuantity && int.TryParse(orderCount, out var price))
-                FinalCount = price / SelectedTicker.Price;
-        }
     }
 
     private async void ReceiveTickerAsync(object? sender)
@@ -176,27 +169,37 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
             CancellationToken ct = (CancellationToken)sender!;
             await foreach (var ticker in _cryptoTickerService.ReceiveAsync(ct))
             {
-                if (SelectedTicker == null)
+                _dispatcher.Invoke(() =>
                 {
-                    SelectedTicker = new TickerViewModel(ticker.code, ticker.trade_price, TickerViewModel.Change.Base);
-                }
-                else
-                {
-                    SelectedTicker.Price = ticker.trade_price;
-                    if (SelectedTicker.Code != ticker.code)
+                    if (SelectedTicker == null)
                     {
-                        SelectedTicker.Code = ticker.code;
-                        SelectedTicker.Change2 = TickerViewModel.Change.Base;
+                        SelectedTicker = new TickerViewModel(ticker.code, ticker.trade_price, TickerViewModel.Change.Base);
+                        SelectedTicker.PriceChanged += CalculateFinalCount;
                     }
-                    if (!string.IsNullOrEmpty(OrderCount))
-                        CalculateFinalCount(OrderCount);
-                }
+                    else
+                    {
+                        SelectedTicker.Price = ticker.trade_price;
+                        if (SelectedTicker.Code != ticker.code)
+                        {
+                            SelectedTicker.Code = ticker.code;
+                            SelectedTicker.Change2 = TickerViewModel.Change.Base;
+                        }
+                    }
+                });
             }
         }
         catch (OperationCanceledException)
         {
             _cryptoTickerService.Dispose();
         }
+    }
+
+    private void CalculateFinalCount(object? sender, double tickerPrice)
+    {
+        if (IsOrderByQuantity && double.TryParse(OrderCount, out var quantity))
+            FinalCount = tickerPrice * quantity;
+        else if (!IsOrderByQuantity && int.TryParse(OrderCount, out var price))
+            FinalCount = price / tickerPrice;
     }
 }
 

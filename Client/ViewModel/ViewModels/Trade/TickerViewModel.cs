@@ -1,10 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 
 namespace ViewModel.ViewModels.Trade;
 
 public class TickerViewModel : ObservableObject
 {
     public enum Change { Fall, Base, Rise }
+
+    public event EventHandler<double>? PriceChanged;
 
     public string Code { get; set; }
 
@@ -19,6 +22,7 @@ public class TickerViewModel : ObservableObject
             else if (value < _price)
                 Change2 = Change.Fall;
             SetProperty(ref _price, value);
+            PriceChanged?.Invoke(this, value);
         }
     }
 

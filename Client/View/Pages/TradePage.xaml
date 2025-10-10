@@ -9,15 +9,16 @@
                 x:DataType="vm:TradeViewModel"
              x:Class="View.Pages.TradePage">
 
-    <VerticalStackLayout Padding="16" Spacing="8">
+    <local:BasePage.Resources>
+        <ResourceDictionary>
+            <tk:IsNotNullConverter x:Key="IsNotNullConv" x:Name="IsNotNullConv"/>
+            <tk:InvertedBoolConverter x:Key="InvertedBoolConv" x:Name="InvertedBoolConv"/>
+            <cnv:TickerChangeToConverter x:Key="TickerChangeConv"/>
+            <cnv:DoubleToStringConv x:Key="DoubleToStringConv"/>
+        </ResourceDictionary>
+    </local:BasePage.Resources>
 
-        <VerticalStackLayout.Resources>
-            <ResourceDictionary>
-                <tk:IsNotNullConverter x:Key="IsNotNullConv" x:Name="IsNotNullConv"/>
-                <tk:InvertedBoolConverter x:Key="InvertedBoolConv" x:Name="InvertedBoolConv"/>
-                <cnv:TickerChangeToConverter x:Key="TickerChangeConv"/>
-            </ResourceDictionary>
-        </VerticalStackLayout.Resources>
+    <VerticalStackLayout Padding="16" Spacing="8">
 
         <ActivityIndicator IsRunning="True" IsVisible="{Binding IsBusy}" HorizontalOptions="Start"/>
 
@@ -31,7 +32,7 @@
         <VerticalStackLayout IsVisible="{Binding SelectedTicker, Converter={StaticResource IsNotNullConv}}" Spacing="8">
             <HorizontalStackLayout Spacing="8">
                 <Label Text="현재가" FontSize="Small"/>
-                <Label Text="{Binding SelectedTicker.Price, StringFormat='{0:N0}'}" 
+                <Label Text="{Binding SelectedTicker.Price, Converter={StaticResource DoubleToStringConv}}" 
                        TextColor="{Binding SelectedTicker.Change2, Converter={StaticResource TickerChangeConv}}" FontSize="Small"/>
             </HorizontalStackLayout>
 
@@ -45,13 +46,15 @@
             <HorizontalStackLayout Spacing="8" IsVisible="{Binding IsOrderByQuantity}">
                 <Label Text="주문 수량" FontSize="Small" VerticalOptions="Center"/>
                 <Entry Text="{Binding OrderCount}" Keyboard="Numeric" WidthRequest="100"/>
-                <Label VerticalOptions="Center" Text="{Binding FinalCount, StringFormat='{}가격 {0:N0}'}"/>
+                <Label Text="가격" VerticalOptions="Center"/>
+                <Label VerticalOptions="Center" Text="{Binding FinalCount, Converter={StaticResource DoubleToStringConv}}"/>
             </HorizontalStackLayout>
 
             <HorizontalStackLayout Spacing="8" IsVisible="{Binding IsOrderByQuantity, Converter={StaticResource InvertedBoolConv}}">
                 <Label Text="주문 가격" FontSize="Small" VerticalOptions="Center"/>
                 <Entry Text="{Binding OrderCount}" Keyboard="Numeric" WidthRequest="100"/>
-                <Label VerticalOptions="Center" Text="{Binding FinalCount, StringFormat='{}수량 {0:N8}'}"/>
+                <Label Text="수량" VerticalOptions="Center"/>
+                <Label VerticalOptions="Center" Text="{Binding FinalCount, Converter={StaticResource DoubleToStringConv}}"/>
             </HorizontalStackLayout>
 
             <HorizontalStackLayout Spacing="8">

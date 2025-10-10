@@ -14,6 +14,7 @@ public static class InfrastructureExtensions
             .AddTransient<IAlertService, AlertService>()
             .AddTransient<INavigationService, NavigationService>()
             .AddTransient<ICryptoTickerService, CryptoTickerService>()
+            .AddTransient<IDispatcher, Dispatcher>()
             ;
     }
 }
