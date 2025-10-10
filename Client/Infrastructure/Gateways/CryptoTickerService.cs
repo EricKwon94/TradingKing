@@ -25,7 +25,7 @@ internal partial class CryptoTickerService : ICryptoTickerService
         return socket.ConnectAsync(new Uri("wss://api.upbit.com/websocket/v1"), cancellationToken);
     }
 
-    public ValueTask SendAsync(string[] codes, CancellationToken cancellationToken)
+    public ValueTask SendAsync(IEnumerable<string> codes, CancellationToken cancellationToken)
     {
         var a = new { ticket = Guid.NewGuid().ToString() };
         var b = new { type = "ticker", codes };
