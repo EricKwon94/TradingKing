@@ -21,6 +21,7 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
     private readonly IAlertService _alert;
     private readonly ICryptoService _cryptoService;
     private readonly ICryptoTickerService _cryptoTickerService;
+    private readonly IDispatcher _dispatcher;
 
     private IEnumerable<ICryptoService.CryptoAsset>? _cryptoAssets;
 
@@ -42,8 +43,8 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
         }
     }
 
-    private string? _orderCount;
-    public string? OrderCount
+    private string _orderCount = "0";
+    public string OrderCount
     {
         get => _orderCount;
         set
@@ -57,17 +58,16 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
     }
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(BuyCommand), nameof(SellCommand))]
     private double _finalCount;
 
-    [ObservableProperty]
-    public int _availableCash = 100_000_000;
-
     public TradeViewModel(
-        ILogger<TradeViewModel> logger, IAlertService alert,
+        ILogger<TradeViewModel> logger, IAlertService alert, IDispatcher dispatcher,
         ICryptoService cryptoService, ICryptoTickerService cryptoTickerService)
     {
         _logger = logger;
         _alert = alert;
+        _dispatcher = dispatcher;
         _cryptoService = cryptoService;
         _cryptoTickerService = cryptoTickerService;
     }
@@ -100,6 +100,7 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
             return;
         }
 
+        OrderCount = "0";
         ThreadPool.QueueUserWorkItem(ReceiveTickerAsync, ct);
     }
 
@@ -148,7 +149,7 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
     private bool CanBuy()
     {
         if (IsOrderByQuantity)
-            return double.TryParse(OrderCount, out var d) && d > 0;
+            return FinalCount >= MIN_ORDER_PRICE;
         else
             return int.TryParse(OrderCount, out var d) && d >= MIN_ORDER_PRICE;
     }
@@ -156,7 +157,7 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
     private bool CanSell()
     {
         if (IsOrderByQuantity)
-            return double.TryParse(OrderCount, out var d) && d > 0;
+            return FinalCount >= MIN_ORDER_PRICE;
         else
             return int.TryParse(OrderCount, out var d) && d >= MIN_ORDER_PRICE;
     }
@@ -168,20 +169,23 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
             CancellationToken ct = (CancellationToken)sender!;
             await foreach (var ticker in _cryptoTickerService.ReceiveAsync(ct))
             {
-                if (SelectedTicker == null)
+                _dispatcher.Invoke(() =>
                 {
-                    SelectedTicker = new TickerViewModel(ticker.code, ticker.trade_price, TickerViewModel.Change.Base);
-                    SelectedTicker.PriceChanged += CalculateFinalCount;
-                }
-                else
-                {
-                    SelectedTicker.Price = ticker.trade_price;
-                    if (SelectedTicker.Code != ticker.code)
+                    if (SelectedTicker == null)
                     {
-                        SelectedTicker.Code = ticker.code;
-                        SelectedTicker.Change2 = TickerViewModel.Change.Base;
+                        SelectedTicker = new TickerViewModel(ticker.code, ticker.trade_price, TickerViewModel.Change.Base);
+                        SelectedTicker.PriceChanged += CalculateFinalCount;
                     }
-                }
+                    else
+                    {
+                        SelectedTicker.Price = ticker.trade_price;
+                        if (SelectedTicker.Code != ticker.code)
+                        {
+                            SelectedTicker.Code = ticker.code;
+                            SelectedTicker.Change2 = TickerViewModel.Change.Base;
+                        }
+                    }
+                });
             }
         }
         catch (OperationCanceledException)
