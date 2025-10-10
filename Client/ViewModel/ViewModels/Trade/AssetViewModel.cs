@@ -3,6 +3,7 @@ using Application.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -20,14 +21,15 @@ public partial class AssetViewModel : BaseViewModel
     private readonly IDispatcher _dispatcher;
 
     private readonly List<ICryptoService.MarketRes> _markets = [];
+    private readonly ConcurrentQueue<CancellationTokenSource> _cts = [];
 
-    private CancellationTokenSource? cts;
-
-    [ObservableProperty]
-    private int _availableCash = 100_000_000;
+    private TaskCompletionSource _initialized = new TaskCompletionSource();
 
     [ObservableProperty]
-    private int _totalCash = 100_000_000;
+    private long _availableCash = 100_000_000;
+
+    [ObservableProperty]
+    private long _coinCash;
 
     public ObservableCollection<MyAsset> Purchases { get; } = [];
 
@@ -63,18 +65,23 @@ public partial class AssetViewModel : BaseViewModel
             }
         }
         IsBusy = false;
+        _initialized.SetResult();
     }
 
     public override async void OnAppearing()
     {
-        await Task.Delay(100);
-        cts = new CancellationTokenSource();
+        var cts = new CancellationTokenSource();
+        _cts.Enqueue(cts);
+        await _initialized.Task;
+        if (cts.Token.IsCancellationRequested)
+            return;
 
         IEnumerable<MyAsset> purchases = [
-            new MyAsset("KRW-BTC","", 1, 100_000_000),
-            new MyAsset("KRW-BTC","", 2, 120_000_000),
+            new MyAsset("KRW-BTC","", 1, 177_120_000),
+            new MyAsset("KRW-BTC","", 2, 177_020_000),
             new MyAsset("KRW-DOGE","", 10, 300),
-            new MyAsset("KRW-DOGE","", 3, 1000)
+            new MyAsset("KRW-DOGE","", 3, 400),
+            new MyAsset("KRW-MBL","", 500.5, 2.905),
             ];
 
         var grouped = purchases
@@ -97,17 +104,19 @@ public partial class AssetViewModel : BaseViewModel
             Purchases.Add(purchse);
         }
 
-        await _cryptoTickerService.ConnectAsync(cts.Token);
-        await _cryptoTickerService.SendAsync(grouped.Select(x => x.Code), cts.Token);
         try
         {
+            await _cryptoTickerService.ConnectAsync(cts.Token);
+            await _cryptoTickerService.SendAsync(grouped.Select(x => x.Code), cts.Token);
             await foreach (var item in _cryptoTickerService.ReceiveAsync(cts.Token))
             {
                 MyAsset asset = Purchases.Single(e => e.Code == item.code);
                 asset.EvaluationPrice = asset.TotalQuantity * item.trade_price;
+
+                CoinCash = Convert.ToInt64(Purchases.Sum(x => x.EvaluationPrice));
             }
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException e)
         {
             _cryptoTickerService.Dispose();
         }
@@ -115,7 +124,8 @@ public partial class AssetViewModel : BaseViewModel
 
     public override void OnDisappearing()
     {
-        cts?.Cancel();
+        if (_cts.TryDequeue(out var cts))
+            cts.Cancel();
         Purchases.Clear();
     }
 }

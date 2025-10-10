@@ -25,13 +25,13 @@
         <ActivityIndicator IsRunning="True" IsVisible="{Binding IsBusy}"/>
         
         <HorizontalStackLayout Spacing="8">
-            <Label Text="주문 가능 KRW: " FontSize="Micro" VerticalOptions="Center"/>
+            <Label Text="원화 KRW: " FontSize="Micro" VerticalOptions="Center"/>
             <Label Text="{Binding AvailableCash, StringFormat='{0:N0}'}" FontSize="Medium"/>
         </HorizontalStackLayout>
         
         <HorizontalStackLayout Spacing="8">
-            <Label Text="총 보유 자산 KRW: " FontSize="Micro" VerticalOptions="Center"/>
-            <Label Text="{Binding TotalCash, StringFormat='{0:N0}'}" FontSize="Medium"/>
+            <Label Text="코인 KRW: " FontSize="Micro" VerticalOptions="Center"/>
+            <Label Text="{Binding CoinCash, StringFormat='{0:N0}'}" FontSize="Medium"/>
         </HorizontalStackLayout>
 
         <CollectionView ItemsSource="{Binding Purchases}">
