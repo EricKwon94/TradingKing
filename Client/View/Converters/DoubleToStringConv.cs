@@ -11,7 +11,7 @@ internal class DoubleToStringConv : IValueConverter
         double price = System.Convert.ToDouble(value);
         string result = price % 1 == 0
             ? price.ToString("N0")
-            : price.ToString("N8").TrimEnd('0').TrimEnd('.');
+            : price.ToString("N4").TrimEnd('0').TrimEnd('.');
 
         return result;
     }

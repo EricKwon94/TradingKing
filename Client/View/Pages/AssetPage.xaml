@@ -2,12 +2,75 @@
 <local:BasePage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:View.Pages"
+                xmlns:vm="clr-namespace:ViewModel.ViewModels.Trade;assembly=ViewModel"
+                xmlns:cv="clr-namespace:View.Converters"
              x:Class="View.Pages.AssetPage"
+                x:DataType="vm:AssetViewModel"
              Title="나의 자산">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+
+    <local:BasePage.Resources>
+        <cv:DoubleToStringConv x:Key="DoubleToStringConv"/>
+        <Style x:Key="AssetHeader" TargetType="Label">
+            <Setter Property="FontSize" Value="Micro" />
+            <Setter Property="TextColor" Value="Gray"/>
+            <Setter Property="HorizontalOptions" Value="Center"/>
+        </Style>
+        <Style x:Key="AssetContent" TargetType="Label">
+            <Setter Property="FontSize" Value="Micro" />
+            <Setter Property="HorizontalOptions" Value="Center"/>
+        </Style>
+    </local:BasePage.Resources>
+    
+    <VerticalStackLayout Padding="8" Spacing="8">
+        <ActivityIndicator IsRunning="True" IsVisible="{Binding IsBusy}"/>
+        
+        <HorizontalStackLayout Spacing="8">
+            <Label Text="원화 KRW: " FontSize="Micro" VerticalOptions="Center"/>
+            <Label Text="{Binding AvailableCash, StringFormat='{0:N0}'}" FontSize="Medium"/>
+        </HorizontalStackLayout>
+        
+        <HorizontalStackLayout Spacing="8">
+            <Label Text="코인 KRW: " FontSize="Micro" VerticalOptions="Center"/>
+            <Label Text="{Binding CoinCash, StringFormat='{0:N0}'}" FontSize="Medium"/>
+        </HorizontalStackLayout>
+
+        <CollectionView ItemsSource="{Binding Purchases}">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="8" />
+            </CollectionView.ItemsLayout>
+
+            <CollectionView.Header>
+                <Grid ColumnDefinitions="*, *, *, *, *, *, *">
+                    <Label Style="{StaticResource AssetHeader}" Grid.Column="0" Text="자산구분"/>
+                    <Label Style="{StaticResource AssetHeader}" Grid.Column="1" Text="보유잔고"/>
+                    <Label Style="{StaticResource AssetHeader}" Grid.Column="2" Text="평균매수가"/>
+                    <Label Style="{StaticResource AssetHeader}" Grid.Column="3" Text="매수금액"/>
+                    <Label Style="{StaticResource AssetHeader}" Grid.Column="4" Text="평가금액(원)"/>
+                    <Label Style="{StaticResource AssetHeader}" Grid.Column="5" Text="평가손익(원)"/>
+                    <Label Style="{StaticResource AssetHeader}" Grid.Column="6" Text="수익률(%)"/>
+                </Grid>
+            </CollectionView.Header>
+            
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:MyAsset">
+                    <Grid ColumnDefinitions="*, *, *, *, *, *, *">
+                        <Label Style="{StaticResource AssetContent}" Grid.Column="0" Text="{Binding Name}"/>
+                        <Label Style="{StaticResource AssetContent}" Grid.Column="1" 
+                               Text="{Binding TotalQuantity,Converter={StaticResource DoubleToStringConv}}"/>
+                        <Label Style="{StaticResource AssetContent}" Grid.Column="2" 
+                               Text="{Binding AvgPrice,Converter={StaticResource DoubleToStringConv}}"/>
+                        <Label Style="{StaticResource AssetContent}" Grid.Column="3" 
+                               Text="{Binding TotalPrice,Converter={StaticResource DoubleToStringConv}}"/>
+                        <Label Style="{StaticResource AssetContent}" Grid.Column="4" 
+                               Text="{Binding EvaluationPrice,Converter={StaticResource DoubleToStringConv}}"/>
+                        <Label Style="{StaticResource AssetContent}" Grid.Column="5" 
+                               Text="{Binding EvaluationProfit,Converter={StaticResource DoubleToStringConv}}"/>
+                        <Label Style="{StaticResource AssetContent}" Grid.Column="6" 
+                               Text="{Binding ProfitRate,Converter={StaticResource DoubleToStringConv}}"/>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        
     </VerticalStackLayout>
 </local:BasePage>

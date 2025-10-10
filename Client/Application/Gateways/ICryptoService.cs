@@ -17,7 +17,7 @@ public interface ICryptoService
 public interface ICryptoTickerService : IDisposable
 {
     Task ConnectAsync(CancellationToken cancellationToken);
-    ValueTask SendAsync(string[] codes, CancellationToken cancellationToken);
+    ValueTask SendAsync(IEnumerable<string> codes, CancellationToken cancellationToken);
     IAsyncEnumerable<TickerRes> ReceiveAsync(CancellationToken cancellationToken);
 
     public record TickerRes(string type, string code, double trade_price, string change);

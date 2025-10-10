@@ -22,4 +22,20 @@ public partial class BasePage : ContentPage, IQueryAttributable
             vm.Initialize();
         }
     }
+
+    protected override void OnAppearing()
+    {
+        if (BindingContext is BaseViewModel vm)
+        {
+            vm.OnAppearing();
+        }
+    }
+
+    protected override void OnDisappearing()
+    {
+        if (BindingContext is BaseViewModel vm)
+        {
+            vm.OnDisappearing();
+        }
+    }
 }
