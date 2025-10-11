@@ -5,9 +5,10 @@ using System;
 
 namespace Infrastructure.EFCore;
 
-internal class TradingKingContext : DbContext, IEntityTypeConfiguration<User>
+internal class TradingKingContext : DbContext, IEntityTypeConfiguration<User>, IEntityTypeConfiguration<Purchase>
 {
-    public DbSet<User> Users { get; set; }
+    public DbSet<User> Users { get; private set; }
+    public DbSet<Purchase> Purchases { get; private set; }
 
     public TradingKingContext(DbContextOptions<TradingKingContext> options)
         : base(options)
@@ -16,7 +17,8 @@ internal class TradingKingContext : DbContext, IEntityTypeConfiguration<User>
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfiguration(this);
+        modelBuilder.ApplyConfiguration<User>(this);
+        modelBuilder.ApplyConfiguration<Purchase>(this);
     }
 
     public void Configure(EntityTypeBuilder<User> builder)
@@ -37,6 +39,26 @@ internal class TradingKingContext : DbContext, IEntityTypeConfiguration<User>
         builder.Property(e => e.Jwt)
             .HasMaxLength(1000)
             .IsUnicode(false);
+
+        builder.Property<DateTime>("CreatedAt")
+            .HasDefaultValueSql("getutcdate()");
+    }
+
+    public void Configure(EntityTypeBuilder<Purchase> builder)
+    {
+        builder.Property<Guid>("Id")
+            .HasDefaultValueSql("newid()");
+        builder.HasKey("Id");
+
+        builder.Property(e => e.Code)
+            .HasMaxLength(10)
+            .IsUnicode(false);
+        builder.Property(e => e.Quantity);
+        builder.Property(e => e.Price);
+
+        builder.HasOne(purchase => purchase.User)
+            .WithMany(user => user.Purchases)
+            .HasForeignKey(purchase => purchase.UserSeq);
 
         builder.Property<DateTime>("CreatedAt")
             .HasDefaultValueSql("getutcdate()");
