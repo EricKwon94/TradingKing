@@ -1,14 +1,19 @@
-﻿using Infrastructure.EFCore;
+﻿using Application.Orchestrations;
+using Domain;
+using Infrastructure.EFCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Data.Common;
 using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace IntegrationTests;
 
@@ -33,10 +38,7 @@ public class CustomWebApplicationFactory<TProgram>
             _ids.Enqueue(str);
         }
 
-        var builder = new DbContextOptionsBuilder<TradingKingContext>()
-            .UseSqlServer(ConnectionString);
-
-        using var context = new TradingKingContext(builder.Options);
+        using var context = CreateContext();
         context.Database.EnsureDeleted();
         context.Database.EnsureCreated();
     }
@@ -58,5 +60,27 @@ public class CustomWebApplicationFactory<TProgram>
                 opt.UseSqlServer(ConnectionString);
             });
         });
+    }
+
+    public async Task<User> RegisterAsync(HttpClient client, string id, string pwd)
+    {
+        var content = new AccountService.RegisterReq(id, pwd).ToContent();
+        var res = await client.PostAsync("/account/register", content);
+        res.EnsureSuccessStatusCode();
+
+        using var context = CreateContext();
+        return await context.Users.AsNoTracking().SingleAsync(e => e.Id == id);
+    }
+
+    private static TradingKingContext CreateContext()
+    {
+        string connectionString = OperatingSystem.IsWindows() ? WINDOWS : OTHERES;
+
+        var builder = new DbContextOptionsBuilder<TradingKingContext>()
+            .UseSqlServer(connectionString)
+            .EnableSensitiveDataLogging()
+            .LogTo(Console.WriteLine, LogLevel.Information);
+
+        return new TradingKingContext(builder.Options);
     }
 }
