@@ -75,18 +75,18 @@ public partial class RegisterViewModel : BaseViewModel
         IsBusy = false;
     }
 
-    public override async void Initialize()
+    public override async Task LoadAsync(CancellationToken ct)
     {
         IsBusy = true;
 
         FormRes? res = null;
         try
         {
-            res = await _accountService.GetFormAsync(default);
+            res = await _accountService.GetFormAsync(ct);
         }
         catch (Exception e)
         {
-            await _alert.DisplayAlertAsync("Error", e.Message, "ok", default);
+            await _alert.DisplayAlertAsync("Error", e.Message, "ok", ct);
         }
 
         if (res != null)

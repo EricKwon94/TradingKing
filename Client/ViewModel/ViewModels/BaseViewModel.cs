@@ -1,4 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ViewModel.ViewModels;
 
@@ -7,14 +9,14 @@ public partial class BaseViewModel : ObservableObject
     [ObservableProperty]
     private bool _isBusy = false;
 
-    public virtual void Initialize()
+    public virtual Task LoadAsync(CancellationToken ct)
     {
-
+        return Task.CompletedTask;
     }
 
-    public virtual void OnAppearing()
+    public virtual Task OnAppearingAsync(CancellationToken ct)
     {
-
+        return Task.CompletedTask;
     }
 
     public virtual void OnDisappearing()

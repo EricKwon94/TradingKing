@@ -3,7 +3,6 @@ using Application.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -21,9 +20,6 @@ public partial class AssetViewModel : BaseViewModel
     private readonly IDispatcher _dispatcher;
 
     private readonly List<ICryptoService.MarketRes> _markets = [];
-    private readonly ConcurrentQueue<CancellationTokenSource> _cts = [];
-
-    private TaskCompletionSource _initialized = new TaskCompletionSource();
 
     [ObservableProperty]
     private long _availableCash = 100_000_000;
@@ -44,17 +40,17 @@ public partial class AssetViewModel : BaseViewModel
         _cryptoTickerService = cryptoTickerService;
     }
 
-    public override async void Initialize()
+    public override async Task LoadAsync(CancellationToken ct)
     {
         IsBusy = true;
         IEnumerable<ICryptoService.MarketRes>? markets = null;
         try
         {
-            markets = await _cryptoService.GetMarketsAsync(default);
+            markets = await _cryptoService.GetMarketsAsync(ct);
         }
         catch (Exception e)
         {
-            await _alert.DisplayAlertAsync("Error", e.Message, "ok", default);
+            await _alert.DisplayAlertAsync("Error", e.Message, "ok", ct);
         }
 
         if (markets != null)
@@ -65,15 +61,11 @@ public partial class AssetViewModel : BaseViewModel
             }
         }
         IsBusy = false;
-        _initialized.SetResult();
     }
 
-    public override async void OnAppearing()
+    public override async Task OnAppearingAsync(CancellationToken ct)
     {
-        var cts = new CancellationTokenSource();
-        _cts.Enqueue(cts);
-        await _initialized.Task;
-        if (cts.Token.IsCancellationRequested)
+        if (ct.IsCancellationRequested)
             return;
 
         IEnumerable<MyAsset> purchases = [
@@ -106,9 +98,9 @@ public partial class AssetViewModel : BaseViewModel
 
         try
         {
-            await _cryptoTickerService.ConnectAsync(cts.Token);
-            await _cryptoTickerService.SendAsync(grouped.Select(x => x.Code), cts.Token);
-            await foreach (var item in _cryptoTickerService.ReceiveAsync(cts.Token))
+            await _cryptoTickerService.ConnectAsync(ct);
+            await _cryptoTickerService.SendAsync(grouped.Select(x => x.Code), ct);
+            await foreach (var item in _cryptoTickerService.ReceiveAsync(ct))
             {
                 MyAsset asset = Purchases.Single(e => e.Code == item.code);
                 asset.EvaluationPrice = asset.TotalQuantity * item.trade_price;
@@ -116,7 +108,7 @@ public partial class AssetViewModel : BaseViewModel
                 CoinCash = Convert.ToInt64(Purchases.Sum(x => x.EvaluationPrice));
             }
         }
-        catch (OperationCanceledException e)
+        catch (OperationCanceledException)
         {
             _cryptoTickerService.Dispose();
         }
@@ -124,8 +116,6 @@ public partial class AssetViewModel : BaseViewModel
 
     public override void OnDisappearing()
     {
-        if (_cts.TryDequeue(out var cts))
-            cts.Cancel();
         Purchases.Clear();
     }
 }

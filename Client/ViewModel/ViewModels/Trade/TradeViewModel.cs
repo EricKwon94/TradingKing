@@ -118,17 +118,17 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
 
     }
 
-    public override async void Initialize()
+    public override async Task LoadAsync(CancellationToken ct)
     {
         IsBusy = true;
         IEnumerable<ICryptoService.MarketRes>? markets = null;
         try
         {
-            markets = await _cryptoService.GetMarketsAsync(default);
+            markets = await _cryptoService.GetMarketsAsync(ct);
         }
         catch (Exception e)
         {
-            await _alert.DisplayAlertAsync("Error", e.Message, "ok", default);
+            await _alert.DisplayAlertAsync("Error", e.Message, "ok", ct);
         }
 
         if (markets != null)
