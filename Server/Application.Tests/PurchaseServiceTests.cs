@@ -1,10 +1,12 @@
-﻿using Application.Orchestrations;
+﻿using Application.Gateways;
+using Application.Orchestrations;
 using Domain;
 using Domain.Exceptions;
 using FluentAssertions;
 using Infrastructure.EFCore;
 using Infrastructure.Persistences;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using System;
 using System.Threading.Tasks;
 
@@ -27,11 +29,11 @@ public class PurchaseServiceTests : IClassFixture<TestDatabaseFixture>
         using var context = _fixture.CreateContext();
         var user = await RegisterAccountAsync(id, context);
 
-        var req = new PurchaseService.PurchaseReq(user.Seq, "KRW-BTC", 1, 177_000_000);
-        var sut = CreateServiceAsync(context);
+        var req = new PurchaseService.PurchaseReq("KRW-BTC", 1);
+        var sut = CreateServiceAsync("KRW-BTC", 170_000_000, context);
 
         // act
-        Func<Task> action = () => sut.BuyAsync(req, default);
+        Func<Task> action = () => sut.BuyAsync(user.Seq, req, default);
 
         // assert
         await action.Should().ThrowAsync<NotEnoughCashException>();
@@ -47,11 +49,11 @@ public class PurchaseServiceTests : IClassFixture<TestDatabaseFixture>
         var user = await RegisterAccountAsync(id, context);
         var expectedCash = 100_000_000 - expectedQuantity * expectedPrice;
 
-        var req = new PurchaseService.PurchaseReq(user.Seq, expectedCode, expectedQuantity, expectedPrice);
-        var sut = CreateServiceAsync(context);
+        var req = new PurchaseService.PurchaseReq(expectedCode, expectedQuantity);
+        var sut = CreateServiceAsync(expectedCode, expectedPrice, context);
 
         // act
-        await sut.BuyAsync(req, default);
+        await sut.BuyAsync(user.Seq, req, default);
 
         // assert
         context.ChangeTracker.Clear();
@@ -75,10 +77,15 @@ public class PurchaseServiceTests : IClassFixture<TestDatabaseFixture>
         return await context.Users.AsNoTracking().SingleAsync(e => e.Id == id);
     }
 
-    private static PurchaseService CreateServiceAsync(TradingKingContext context)
+    private static PurchaseService CreateServiceAsync(string code, double price, TradingKingContext context)
     {
         var transaction = new Transaction(context);
         var repo = new PurchaseRepo(context);
-        return new PurchaseService(transaction, repo);
+
+        var mock = new Mock<IExchangeApi>();
+        mock.Setup(c => c.GetTickerAsync(code, default))
+            .ReturnsAsync([new IExchangeApi.TickerRes(code, price)]);
+
+        return new PurchaseService(transaction, repo, mock.Object);
     }
 }

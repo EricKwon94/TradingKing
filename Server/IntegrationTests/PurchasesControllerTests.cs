@@ -28,9 +28,9 @@ public class PurchasesControllerTests : IClassFixture<CustomWebApplicationFactor
         // arrange
         string id = _factory.IndependentId;
         string pwd = "asdasd";
-        var user = await _factory.RegisterAsync(_client, id, pwd);
+        var user = await _factory.RegisterAsync(_client, id, pwd, true);
 
-        var content = new PurchaseService.PurchaseReq(user.Seq, "KRW-DOGE", 11.5, 301).ToContent();
+        var content = new PurchaseService.PurchaseReq("KRW-DOGE", 11.5).ToContent();
 
         // act
         HttpResponseMessage res = await _client.PostAsync("/purchases/buy", content);
@@ -45,9 +45,9 @@ public class PurchasesControllerTests : IClassFixture<CustomWebApplicationFactor
         // arrange
         string id = _factory.IndependentId;
         string pwd = "asdasd";
-        var user = await _factory.RegisterAsync(_client, id, pwd);
+        await _factory.RegisterAsync(_client, id, pwd, true);
 
-        var content = new PurchaseService.PurchaseReq(user.Seq, "KRW-BTC", 1.2, 175_000_000).ToContent();
+        var content = new PurchaseService.PurchaseReq("KRW-BTC", 1.2).ToContent();
 
         // act
         HttpResponseMessage res = await _client.PostAsync("/purchases/buy", content);
