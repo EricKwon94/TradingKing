@@ -51,7 +51,7 @@ internal class TradingKingContext : DbContext, IEntityTypeConfiguration<User>, I
         builder.HasKey("Id");
 
         builder.Property(e => e.Code)
-            .HasMaxLength(10)
+            .HasMaxLength(20)
             .IsUnicode(false);
         builder.Property(e => e.Quantity);
         builder.Property(e => e.Price);
