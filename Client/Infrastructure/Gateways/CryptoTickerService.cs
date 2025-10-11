@@ -40,7 +40,7 @@ internal partial class CryptoTickerService : ICryptoTickerService
 
     public async IAsyncEnumerable<ICryptoTickerService.TickerRes> ReceiveAsync([EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        while (_currentSocket.State == WebSocketState.Open)
+        while (_currentSocket.State == WebSocketState.Open && !cancellationToken.IsCancellationRequested)
         {
             using var owner = MemoryPool<byte>.Shared.Rent(2048);
             Memory<byte> buffer = owner.Memory;
