@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using Application.Gateways;
+using Domain;
 using Domain.Exceptions;
 using Domain.Persistences;
 using System.Collections.Generic;
@@ -12,16 +13,19 @@ public class PurchaseService
 {
     private readonly ITransaction _transaction;
     private readonly IPurchaseRepo _purchaseRepo;
+    private readonly IExchangeApi _exchangeApi;
 
-    public PurchaseService(ITransaction transaction, IPurchaseRepo purchaseRepo)
+    public PurchaseService(ITransaction transaction, IPurchaseRepo purchaseRepo, IExchangeApi exchangeApi)
     {
         _transaction = transaction;
         _purchaseRepo = purchaseRepo;
+        _exchangeApi = exchangeApi;
     }
 
-    public Task<List<Purchase>> GetAllAsync(int userSeq, CancellationToken ct)
+    public async Task<IEnumerable<PurchaseRes>> GetAllAsync(int userSeq, CancellationToken ct)
     {
-        return _purchaseRepo.GetAllAsync(userSeq, ct);
+        var purchases = await _purchaseRepo.GetAllAsync(userSeq, ct);
+        return purchases.Select(e => new PurchaseRes(e.Code, e.Quantity, e.Price));
     }
 
     public async Task<double> GetCashAsync(int userSeq, CancellationToken ct)
@@ -31,20 +35,24 @@ public class PurchaseService
     }
 
     /// <exception cref="NotEnoughCashException"></exception>
-    public async Task BuyAsync(PurchaseReq req, CancellationToken ct)
+    public async Task BuyAsync(int userSeq, PurchaseReq req, CancellationToken ct)
     {
-        double availableCash = await GetCashAsync(req.UserSeq, ct);
-        double price = req.Quantity * req.Price;
+        var tickers = await _exchangeApi.GetTickerAsync(req.Code, ct);
+        var ticker = tickers.Single();
+
+        double availableCash = await GetCashAsync(userSeq, ct);
+        double price = req.Quantity * ticker.trade_price;
         if (availableCash < price)
             throw new NotEnoughCashException();
 
-        var cryto = new Purchase(req.UserSeq, req.Code, req.Quantity, req.Price);
-        var cash = new Purchase(req.UserSeq, Purchase.DEFAULT_CODE, 1, price * -1);
+        var cryto = new Purchase(userSeq, req.Code, req.Quantity, ticker.trade_price);
+        var cash = new Purchase(userSeq, Purchase.DEFAULT_CODE, 1, price * -1);
         await _purchaseRepo.AddAsync(cryto, ct);
         await _purchaseRepo.AddAsync(cash, ct);
 
         await _transaction.SaveChangesAsync(ct);
     }
 
-    public record PurchaseReq(int UserSeq, string Code, double Quantity, double Price);
+    public record PurchaseRes(string Code, double Quantity, double Price);
+    public record PurchaseReq(string Code, double Quantity);
 }

@@ -18,9 +18,9 @@ internal class PurchaseRepo : IPurchaseRepo
         _purchases = context.Purchases;
     }
 
-    public async Task<List<Purchase>> GetAllAsync(int userSeq, CancellationToken ct)
+    public Task<List<Purchase>> GetAllAsync(int userSeq, CancellationToken ct)
     {
-        return await _purchases.AsNoTracking()
+        return _purchases.AsNoTracking()
             .Where(e => e.UserSeq == userSeq)
             .ToListAsync(ct);
     }

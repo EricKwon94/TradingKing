@@ -44,7 +44,7 @@ public class AccountControllerTests : IClassFixture<CustomWebApplicationFactory<
         string id = _factory.IndependentId;
         string pwd = "asdasd";
         var content = new AccountService.RegisterReq(id, pwd).ToContent();
-        await _factory.RegisterAsync(_client, id, pwd);
+        await _factory.RegisterAsync(_client, id, pwd, false);
 
         // act
         HttpResponseMessage res = await _client.PostAsync("/account/register", content);
@@ -91,7 +91,7 @@ public class AccountControllerTests : IClassFixture<CustomWebApplicationFactory<
         // arrange
         string id = _factory.IndependentId;
         string pwd = "asdasd";
-        await _factory.RegisterAsync(_client, id, pwd);
+        await _factory.RegisterAsync(_client, id, pwd, false);
         var content = new AccountService.LoginReq(id, pwd).ToContent();
 
         // act

@@ -13,6 +13,7 @@ using System.Collections.Concurrent;
 using System.Data.Common;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace IntegrationTests;
@@ -62,13 +63,23 @@ public class CustomWebApplicationFactory<TProgram>
         });
     }
 
-    public async Task<User> RegisterAsync(HttpClient client, string id, string pwd)
+    public async Task<User> RegisterAsync(HttpClient client, string id, string pwd, bool autoLogin)
     {
         var content = new AccountService.RegisterReq(id, pwd).ToContent();
         var res = await client.PostAsync("/account/register", content);
         res.EnsureSuccessStatusCode();
 
         using var context = CreateContext();
+
+        if (autoLogin)
+        {
+            var content2 = new AccountService.LoginReq(id, pwd).ToContent();
+            HttpResponseMessage res2 = await client.PostAsync("/account/login", content2);
+            res2.EnsureSuccessStatusCode();
+            string jwt = await res2.Content.ReadAsStringAsync();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+        }
+
         return await context.Users.AsNoTracking().SingleAsync(e => e.Id == id);
     }
 
