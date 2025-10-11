@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Application.Gateways;
 
-public interface IAccountService
+public interface IAccountApi
 {
     [Get("/account")]
     Task<FormRes> GetFormAsync(CancellationToken ct);

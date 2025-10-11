@@ -7,13 +7,13 @@ using System;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using static Application.Gateways.IAccountService;
+using static Application.Gateways.IAccountApi;
 
 namespace ViewModel.ViewModels;
 
 public partial class RegisterViewModel : BaseViewModel
 {
-    private readonly IAccountService _accountService;
+    private readonly IAccountApi _accountApi;
     private readonly IAlertService _alert;
     private readonly INavigationService _navigationService;
 
@@ -32,9 +32,9 @@ public partial class RegisterViewModel : BaseViewModel
     [ObservableProperty]
     private int? _minPasswordLength;
 
-    public RegisterViewModel(IAccountService accountService, IAlertService alert, INavigationService navigationService)
+    public RegisterViewModel(IAccountApi accountApi, IAlertService alert, INavigationService navigationService)
     {
-        _accountService = accountService;
+        _accountApi = accountApi;
         _alert = alert;
         _navigationService = navigationService;
     }
@@ -44,7 +44,7 @@ public partial class RegisterViewModel : BaseViewModel
         FormRes? res = null;
         try
         {
-            res = await _accountService.GetFormAsync(ct);
+            res = await _accountApi.GetFormAsync(ct);
         }
         catch (Exception e)
         {
@@ -66,7 +66,7 @@ public partial class RegisterViewModel : BaseViewModel
         bool succ = false;
         try
         {
-            await _accountService.RegisterAsync(body, ct);
+            await _accountApi.RegisterAsync(body, ct);
             succ = true;
         }
         catch (ApiException e) when (e.StatusCode == HttpStatusCode.Conflict)

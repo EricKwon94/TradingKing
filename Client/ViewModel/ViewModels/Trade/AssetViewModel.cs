@@ -15,11 +15,11 @@ public partial class AssetViewModel : BaseViewModel
 {
     private readonly ILogger<AssetViewModel> _logger;
     private readonly IAlertService _alert;
-    private readonly ICryptoService _cryptoService;
-    private readonly ICryptoTickerService _cryptoTickerService;
+    private readonly IExchangeApi _exchangeApi;
+    private readonly IExchangeTickerApi _tickerApi;
     private readonly IDispatcher _dispatcher;
 
-    private readonly List<ICryptoService.MarketRes> _markets = [];
+    private readonly List<IExchangeApi.MarketRes> _markets = [];
 
     [ObservableProperty]
     private long _availableCash = 100_000_000;
@@ -31,21 +31,21 @@ public partial class AssetViewModel : BaseViewModel
 
     public AssetViewModel(
         ILogger<AssetViewModel> logger, IAlertService alert, IDispatcher dispatcher,
-        ICryptoService cryptoService, ICryptoTickerService cryptoTickerService)
+        IExchangeApi exchangeApi, IExchangeTickerApi tickerApi)
     {
         _logger = logger;
         _alert = alert;
         _dispatcher = dispatcher;
-        _cryptoService = cryptoService;
-        _cryptoTickerService = cryptoTickerService;
+        _exchangeApi = exchangeApi;
+        _tickerApi = tickerApi;
     }
 
     public override async Task LoadAsync(CancellationToken ct)
     {
-        IEnumerable<ICryptoService.MarketRes>? markets = null;
+        IEnumerable<IExchangeApi.MarketRes>? markets = null;
         try
         {
-            markets = await _cryptoService.GetMarketsAsync(ct);
+            markets = await _exchangeApi.GetMarketsAsync(ct);
         }
         catch (Exception e)
         {
@@ -96,10 +96,10 @@ public partial class AssetViewModel : BaseViewModel
 
         try
         {
-            await _cryptoTickerService.ConnectAsync(ct);
-            await _cryptoTickerService.SendAsync(grouped.Select(x => x.Code), ct);
+            await _tickerApi.ConnectAsync(ct);
+            await _tickerApi.SendAsync(grouped.Select(x => x.Code), ct);
             IsBusy = false;
-            await foreach (var item in _cryptoTickerService.ReceiveAsync(ct))
+            await foreach (var item in _tickerApi.ReceiveAsync(ct))
             {
                 MyAsset asset = Purchases.Single(e => e.Code == item.code);
                 asset.EvaluationPrice = asset.TotalQuantity * item.trade_price;
@@ -109,7 +109,7 @@ public partial class AssetViewModel : BaseViewModel
         }
         catch (OperationCanceledException)
         {
-            _cryptoTickerService.Dispose();
+            _tickerApi.Dispose();
         }
     }
 

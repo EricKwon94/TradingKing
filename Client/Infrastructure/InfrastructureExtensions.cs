@@ -13,7 +13,7 @@ public static class InfrastructureExtensions
         return builder.AddTransient<IPreferences, Preferences>()
             .AddTransient<IAlertService, AlertService>()
             .AddTransient<INavigationService, NavigationService>()
-            .AddTransient<ICryptoTickerService, CryptoTickerService>()
+            .AddTransient<IExchangeTickerApi, UpbitTickerApi>()
             .AddTransient<IDispatcher, Dispatcher>()
             ;
     }

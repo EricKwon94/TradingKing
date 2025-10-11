@@ -8,13 +8,13 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using static Application.Gateways.IAccountService;
+using static Application.Gateways.IAccountApi;
 
 namespace ViewModel.ViewModels;
 
 public partial class LoginViewModel : BaseViewModel
 {
-    private readonly IAccountService _accountService;
+    private readonly IAccountApi _accountApi;
     private readonly IPreferences _preferences;
     private readonly IAlertService _alert;
     private readonly INavigationService _navigationService;
@@ -35,10 +35,10 @@ public partial class LoginViewModel : BaseViewModel
     private int? _minPasswordLength;
 
     public LoginViewModel(
-        IAccountService accountService, IPreferences preferences,
+        IAccountApi accountApi, IPreferences preferences,
         IAlertService alert, INavigationService navigationService)
     {
-        _accountService = accountService;
+        _accountApi = accountApi;
         _preferences = preferences;
         _alert = alert;
         _navigationService = navigationService;
@@ -49,7 +49,7 @@ public partial class LoginViewModel : BaseViewModel
         FormRes? res = null;
         try
         {
-            res = await _accountService.GetFormAsync(ct);
+            res = await _accountApi.GetFormAsync(ct);
         }
         catch (Exception e)
         {
@@ -71,7 +71,7 @@ public partial class LoginViewModel : BaseViewModel
         string? jwt = null;
         try
         {
-            jwt = await _accountService.LoginAsync(body, ct);
+            jwt = await _accountApi.LoginAsync(body, ct);
         }
         catch (ApiException e) when (e.StatusCode == HttpStatusCode.NotFound)
         {

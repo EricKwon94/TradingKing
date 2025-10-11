@@ -19,11 +19,11 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
 
     private readonly ILogger<TradeViewModel> _logger;
     private readonly IAlertService _alert;
-    private readonly ICryptoService _cryptoService;
-    private readonly ICryptoTickerService _cryptoTickerService;
+    private readonly IExchangeApi _exchangeApi;
+    private readonly IExchangeTickerApi _tickerApi;
     private readonly IDispatcher _dispatcher;
 
-    private readonly List<ICryptoService.MarketRes> _markets = [];
+    private readonly List<IExchangeApi.MarketRes> _markets = [];
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SearchCommand))]
@@ -63,21 +63,21 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
 
     public TradeViewModel(
         ILogger<TradeViewModel> logger, IAlertService alert, IDispatcher dispatcher,
-        ICryptoService cryptoService, ICryptoTickerService cryptoTickerService)
+        IExchangeApi exchangeApi, IExchangeTickerApi tickerApi)
     {
         _logger = logger;
         _alert = alert;
         _dispatcher = dispatcher;
-        _cryptoService = cryptoService;
-        _cryptoTickerService = cryptoTickerService;
+        _exchangeApi = exchangeApi;
+        _tickerApi = tickerApi;
     }
 
     public override async Task LoadAsync(CancellationToken ct)
     {
-        IEnumerable<ICryptoService.MarketRes>? markets = null;
+        IEnumerable<IExchangeApi.MarketRes>? markets = null;
         try
         {
-            markets = await _cryptoService.GetMarketsAsync(ct);
+            markets = await _exchangeApi.GetMarketsAsync(ct);
         }
         catch (Exception e)
         {
@@ -107,8 +107,8 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
 
         try
         {
-            await _cryptoTickerService.ConnectAsync(ct);
-            await _cryptoTickerService.SendAsync([asset.market], ct);
+            await _tickerApi.ConnectAsync(ct);
+            await _tickerApi.SendAsync([asset.market], ct);
         }
         catch (Exception ex)
         {
@@ -165,7 +165,7 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
         try
         {
             CancellationToken ct = (CancellationToken)sender!;
-            await foreach (var ticker in _cryptoTickerService.ReceiveAsync(ct))
+            await foreach (var ticker in _tickerApi.ReceiveAsync(ct))
             {
                 _dispatcher.Invoke(() =>
                 {
@@ -188,7 +188,7 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
         }
         catch (OperationCanceledException)
         {
-            _cryptoTickerService.Dispose();
+            _tickerApi.Dispose();
         }
     }
 

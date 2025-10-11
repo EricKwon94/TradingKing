@@ -13,12 +13,18 @@ public static class ApplicationExtensions
     {
         builder.AddTransient<AuthHeaderHandler>();
 
-        builder.AddRefitClient<ICryptoService>()
+        builder.AddRefitClient<IExchangeApi>()
             .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://api.upbit.com"))
             .AddPolicyHandler(HttpPolicyExtensions.HandleTransientHttpError().WaitAndRetryAsync(4, count => TimeSpan.FromSeconds(2 * count)))
             ;
 
-        builder.AddRefitClient<IAccountService>()
+        builder.AddRefitClient<IAccountApi>()
+            .ConfigureHttpClient(c => c.BaseAddress = address)
+            .AddPolicyHandler(HttpPolicyExtensions.HandleTransientHttpError().WaitAndRetryAsync(4, count => TimeSpan.FromSeconds(2 * count)))
+            .AddHttpMessageHandler<AuthHeaderHandler>()
+            ;
+
+        builder.AddRefitClient<IPurchaseApi>()
             .ConfigureHttpClient(c => c.BaseAddress = address)
             .AddPolicyHandler(HttpPolicyExtensions.HandleTransientHttpError().WaitAndRetryAsync(4, count => TimeSpan.FromSeconds(2 * count)))
             .AddHttpMessageHandler<AuthHeaderHandler>()

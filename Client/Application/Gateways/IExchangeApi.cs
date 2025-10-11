@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.Gateways;
 
-public interface ICryptoService
+public interface IExchangeApi
 {
     [Get("/v1/market/all")]
     Task<IEnumerable<MarketRes>> GetMarketsAsync(CancellationToken ct);
@@ -14,7 +14,7 @@ public interface ICryptoService
     public record MarketRes(string market, string korean_name, string english_name);
 }
 
-public interface ICryptoTickerService : IDisposable
+public interface IExchangeTickerApi : IDisposable
 {
     Task ConnectAsync(CancellationToken cancellationToken);
     ValueTask SendAsync(IEnumerable<string> codes, CancellationToken cancellationToken);

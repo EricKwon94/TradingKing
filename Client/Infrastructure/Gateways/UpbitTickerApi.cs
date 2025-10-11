@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Gateways;
 
-internal partial class CryptoTickerService : ICryptoTickerService
+internal partial class UpbitTickerApi : IExchangeTickerApi
 {
     private ClientWebSocket _currentSocket = null!;
     private readonly ConcurrentQueue<ClientWebSocket> _sockets = [];
@@ -38,7 +38,7 @@ internal partial class CryptoTickerService : ICryptoTickerService
         return _currentSocket.SendAsync(buffer, WebSocketMessageType.Binary, true, cancellationToken);
     }
 
-    public async IAsyncEnumerable<ICryptoTickerService.TickerRes> ReceiveAsync([EnumeratorCancellation] CancellationToken cancellationToken)
+    public async IAsyncEnumerable<IExchangeTickerApi.TickerRes> ReceiveAsync([EnumeratorCancellation] CancellationToken cancellationToken)
     {
         while (_currentSocket.State == WebSocketState.Open && !cancellationToken.IsCancellationRequested)
         {
@@ -46,7 +46,7 @@ internal partial class CryptoTickerService : ICryptoTickerService
             Memory<byte> buffer = owner.Memory;
 
             ValueWebSocketReceiveResult result = await _currentSocket.ReceiveAsync(buffer, cancellationToken);
-            ICryptoTickerService.TickerRes ticker = JsonSerializer.Deserialize<ICryptoTickerService.TickerRes>(buffer.Span[..result.Count])!;
+            IExchangeTickerApi.TickerRes ticker = JsonSerializer.Deserialize<IExchangeTickerApi.TickerRes>(buffer.Span[..result.Count])!;
 
             yield return ticker;
 
