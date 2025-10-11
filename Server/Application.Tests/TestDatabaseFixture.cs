@@ -1,4 +1,5 @@
-﻿using Infrastructure.EFCore;
+﻿using Domain;
+using Infrastructure.EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -35,6 +36,11 @@ public class TestDatabaseFixture
                 using var context = CreateContext();
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
+
+                var user = new User(IndependentId, "jkansklfndlk2048@");
+                context.Users.Add(user);
+                context.SaveChanges();
+
                 _databaseInitialized = true;
             }
         }

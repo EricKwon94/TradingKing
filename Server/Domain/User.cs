@@ -31,5 +31,7 @@ public class User
 
         Id = id;
         Password = password;
+
+        Purchases.Add(new Purchase(Seq, Purchase.DEFAULT_CODE, 1, Purchase.DEFAULT_PRICE));
     }
 }

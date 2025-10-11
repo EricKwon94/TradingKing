@@ -1,8 +1,5 @@
-﻿using System;
+﻿namespace Domain.Exceptions;
 
-namespace Domain.Exceptions;
-
-[Serializable]
 public class InvalidIdException : DomainException
 {
     public override int Code => -1;
@@ -11,7 +8,6 @@ public class InvalidIdException : DomainException
     internal InvalidIdException(string message) : base(message) { }
 }
 
-[Serializable]
 public class InvalidPasswordException : DomainException
 {
     public override int Code => -2;

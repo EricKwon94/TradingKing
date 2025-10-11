@@ -6,6 +6,6 @@ namespace Domain.Persistences;
 
 public interface IPurchaseRepo
 {
-    Task<List<Purchase>> GetPurchasesAsync(int userSeq, CancellationToken ct);
-    ValueTask AddPurchaseAsync(Purchase purchase, CancellationToken ct);
+    Task<List<Purchase>> GetAllAsync(int userSeq, CancellationToken ct);
+    ValueTask AddAsync(Purchase purchase, CancellationToken ct);
 }

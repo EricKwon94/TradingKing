@@ -1,4 +1,5 @@
 ﻿using Application.Orchestrations;
+using Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Threading;
@@ -22,6 +23,21 @@ public class PurchasesController : ControllerBase
     [HttpGet("{userSeq}")]
     public Task GetAsync(int userSeq, CancellationToken ct)
     {
-        return _purchaseService.GetAsync(userSeq, ct);
+        return _purchaseService.GetAllAsync(userSeq, ct);
+    }
+
+    [HttpPost("buy")]
+    public async Task<ActionResult> BuyAsync(PurchaseService.PurchaseReq req, CancellationToken ct)
+    {
+        try
+        {
+            await _purchaseService.BuyAsync(req, ct);
+        }
+        catch (DomainException e)
+        {
+            return Conflict(e.Code);
+        }
+
+        return Ok();
     }
 }

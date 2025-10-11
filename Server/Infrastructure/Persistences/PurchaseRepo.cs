@@ -18,14 +18,14 @@ internal class PurchaseRepo : IPurchaseRepo
         _purchases = context.Purchases;
     }
 
-    public async Task<List<Purchase>> GetPurchasesAsync(int userSeq, CancellationToken ct)
+    public async Task<List<Purchase>> GetAllAsync(int userSeq, CancellationToken ct)
     {
         return await _purchases.AsNoTracking()
             .Where(e => e.UserSeq == userSeq)
             .ToListAsync(ct);
     }
 
-    public async ValueTask AddPurchaseAsync(Purchase purchase, CancellationToken ct)
+    public async ValueTask AddAsync(Purchase purchase, CancellationToken ct)
     {
         await _purchases.AddAsync(purchase, ct);
     }

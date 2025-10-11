@@ -34,10 +34,15 @@ public class AccountServiceTests : IClassFixture<TestDatabaseFixture>
 
         // assert
         result.Should().BeTrue();
-        var user = await context.Users.SingleAsync(e => e.Id == id);
+        var user = await context.Users.AsNoTracking().SingleAsync(e => e.Id == id);
         user.Id.Should().Be(id);
         user.Password.Should().Be(expectedPwd);
         user.Jwt.Should().BeNull();
+
+        var purchase = await context.Purchases.AsNoTracking().SingleAsync(e => e.UserSeq == user.Seq);
+        purchase.Code.Should().Be("KRW-CASH");
+        purchase.Price.Should().Be(100_000_000);
+        purchase.Quantity.Should().Be(1);
     }
 
     [Fact]
