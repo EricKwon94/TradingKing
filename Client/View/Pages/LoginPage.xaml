@@ -17,7 +17,7 @@
                 Aspect="AspectFit"
                 SemanticProperties.Description="dot net bot in a hovercraft number nine" />
 
-            <ActivityIndicator IsVisible="{Binding IsBusy}" IsRunning="{Binding IsBusy}"/>
+            <ActivityIndicator IsVisible="{Binding IsBusy}" IsRunning="True"/>
 
             <Label Text="오늘애 단타 왕" Style="{StaticResource Headline}" />
 

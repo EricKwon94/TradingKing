@@ -9,7 +9,7 @@
     <ScrollView>
         <VerticalStackLayout HorizontalOptions="Center" WidthRequest="300" Spacing="8">
 
-            <ActivityIndicator IsVisible="{Binding IsBusy}" IsRunning="{Binding IsBusy}"/>
+            <ActivityIndicator IsVisible="{Binding IsBusy}" IsRunning="True"/>
 
             <Label Text="회원가입" Style="{StaticResource Headline}" />
 

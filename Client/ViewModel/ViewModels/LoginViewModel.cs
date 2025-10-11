@@ -44,11 +44,29 @@ public partial class LoginViewModel : BaseViewModel
         _navigationService = navigationService;
     }
 
+    public override async Task LoadAsync(CancellationToken ct)
+    {
+        FormRes? res = null;
+        try
+        {
+            res = await _accountService.GetFormAsync(ct);
+        }
+        catch (Exception e)
+        {
+            await _alert.DisplayAlertAsync("Error", e.Message, "ok", ct);
+        }
+
+        if (res != null)
+        {
+            MinIdLength = res.MinIdLength;
+            MaxIdLength = res.MaxIdLength;
+            MinPasswordLength = res.MinPasswordLength;
+        }
+    }
+
     [RelayCommand(CanExecute = nameof(CanLogin))]
     public async Task LoginAsync(CancellationToken ct)
     {
-        IsBusy = true;
-
         var body = new LoginReq(UserId, UserPassword);
         string? jwt = null;
         try
@@ -73,38 +91,12 @@ public partial class LoginViewModel : BaseViewModel
             };
             await _navigationService.GoToAsync("//main", parameters, ct);
         }
-
-        IsBusy = false;
     }
 
     [RelayCommand]
     public Task GoToRegisterAsync(CancellationToken ct)
     {
         return _navigationService.GoToAsync("login/register", ct);
-    }
-
-    public override async Task LoadAsync(CancellationToken ct)
-    {
-        IsBusy = true;
-
-        FormRes? res = null;
-        try
-        {
-            res = await _accountService.GetFormAsync(ct);
-        }
-        catch (Exception e)
-        {
-            await _alert.DisplayAlertAsync("Error", e.Message, "ok", ct);
-        }
-
-        if (res != null)
-        {
-            MinIdLength = res.MinIdLength;
-            MaxIdLength = res.MaxIdLength;
-            MinPasswordLength = res.MinPasswordLength;
-        }
-
-        IsBusy = false;
     }
 
     private bool CanLogin()

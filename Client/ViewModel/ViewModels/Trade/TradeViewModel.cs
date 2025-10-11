@@ -72,6 +72,27 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
         _cryptoTickerService = cryptoTickerService;
     }
 
+    public override async Task LoadAsync(CancellationToken ct)
+    {
+        IEnumerable<ICryptoService.MarketRes>? markets = null;
+        try
+        {
+            markets = await _cryptoService.GetMarketsAsync(ct);
+        }
+        catch (Exception e)
+        {
+            await _alert.DisplayAlertAsync("Error", e.Message, "ok", ct);
+        }
+
+        if (markets != null)
+        {
+            foreach (var market in markets.Where(c => c.market.StartsWith("KRW-")))
+            {
+                _markets.Add(market);
+            }
+        }
+    }
+
     [RelayCommand(CanExecute = nameof(CanSearch))]
     public async Task SearchAsync(CancellationToken ct)
     {
@@ -118,29 +139,6 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
 
     }
 
-    public override async Task LoadAsync(CancellationToken ct)
-    {
-        IsBusy = true;
-        IEnumerable<ICryptoService.MarketRes>? markets = null;
-        try
-        {
-            markets = await _cryptoService.GetMarketsAsync(ct);
-        }
-        catch (Exception e)
-        {
-            await _alert.DisplayAlertAsync("Error", e.Message, "ok", ct);
-        }
-
-        if (markets != null)
-        {
-            foreach (var market in markets.Where(c => c.market.StartsWith("KRW-")))
-            {
-                _markets.Add(market);
-            }
-        }
-        IsBusy = false;
-    }
-
     private bool CanSearch()
     {
         return _markets.Any(x => x.korean_name == SearchText);
@@ -149,7 +147,7 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
     private bool CanBuy()
     {
         if (IsOrderByQuantity)
-            return FinalCount >= MIN_ORDER_PRICE;
+            return double.TryParse(OrderCount, out var d) && d > 0 && FinalCount >= MIN_ORDER_PRICE;
         else
             return int.TryParse(OrderCount, out var d) && d >= MIN_ORDER_PRICE;
     }
@@ -157,7 +155,7 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
     private bool CanSell()
     {
         if (IsOrderByQuantity)
-            return FinalCount >= MIN_ORDER_PRICE;
+            return double.TryParse(OrderCount, out var d) && d > 0 && FinalCount >= MIN_ORDER_PRICE;
         else
             return int.TryParse(OrderCount, out var d) && d >= MIN_ORDER_PRICE;
     }

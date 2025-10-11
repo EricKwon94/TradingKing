@@ -25,6 +25,8 @@ public partial class BasePage : ContentPage, IQueryAttributable
         base.OnBindingContextChanged();
         if (BindingContext is BaseViewModel vm)
         {
+            vm.IsBusy = true;
+
             var cts = new CancellationTokenSource();
             _cts.Enqueue(cts);
             _loadTask = vm.LoadAsync(cts.Token);
@@ -35,11 +37,15 @@ public partial class BasePage : ContentPage, IQueryAttributable
     {
         if (BindingContext is BaseViewModel vm)
         {
+            vm.IsBusy = true;
+
             var cts = new CancellationTokenSource();
             _cts.Enqueue(cts);
             if (_loadTask != null)
                 await _loadTask;
             await vm.OnAppearingAsync(cts.Token);
+
+            vm.IsBusy = false;
         }
     }
 

@@ -39,11 +39,29 @@ public partial class RegisterViewModel : BaseViewModel
         _navigationService = navigationService;
     }
 
+    public override async Task LoadAsync(CancellationToken ct)
+    {
+        FormRes? res = null;
+        try
+        {
+            res = await _accountService.GetFormAsync(ct);
+        }
+        catch (Exception e)
+        {
+            await _alert.DisplayAlertAsync("Error", e.Message, "ok", ct);
+        }
+
+        if (res != null)
+        {
+            MinIdLength = res.MinIdLength;
+            MaxIdLength = res.MaxIdLength;
+            MinPasswordLength = res.MinPasswordLength;
+        }
+    }
+
     [RelayCommand(CanExecute = nameof(CanRegister))]
     public async Task RegisterAsync(CancellationToken ct)
     {
-        IsBusy = true;
-
         var body = new RegisterReq(UserId, UserPassword);
         bool succ = false;
         try
@@ -72,31 +90,6 @@ public partial class RegisterViewModel : BaseViewModel
             await _alert.DisplayAlertAsync("회원가입", "가입성공", "ok", ct);
             await _navigationService.GoToAsync("..", ct);
         }
-        IsBusy = false;
-    }
-
-    public override async Task LoadAsync(CancellationToken ct)
-    {
-        IsBusy = true;
-
-        FormRes? res = null;
-        try
-        {
-            res = await _accountService.GetFormAsync(ct);
-        }
-        catch (Exception e)
-        {
-            await _alert.DisplayAlertAsync("Error", e.Message, "ok", ct);
-        }
-
-        if (res != null)
-        {
-            MinIdLength = res.MinIdLength;
-            MaxIdLength = res.MaxIdLength;
-            MinPasswordLength = res.MinPasswordLength;
-        }
-
-        IsBusy = false;
     }
 
     private bool CanRegister()

@@ -7,7 +7,7 @@ namespace ViewModel.ViewModels;
 public partial class BaseViewModel : ObservableObject
 {
     [ObservableProperty]
-    private bool _isBusy = false;
+    private bool _isBusy;
 
     public virtual Task LoadAsync(CancellationToken ct)
     {

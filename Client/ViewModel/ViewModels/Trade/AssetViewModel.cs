@@ -42,7 +42,6 @@ public partial class AssetViewModel : BaseViewModel
 
     public override async Task LoadAsync(CancellationToken ct)
     {
-        IsBusy = true;
         IEnumerable<ICryptoService.MarketRes>? markets = null;
         try
         {
@@ -60,7 +59,6 @@ public partial class AssetViewModel : BaseViewModel
                 _markets.Add(market);
             }
         }
-        IsBusy = false;
     }
 
     public override async Task OnAppearingAsync(CancellationToken ct)
@@ -69,11 +67,11 @@ public partial class AssetViewModel : BaseViewModel
             return;
 
         IEnumerable<MyAsset> purchases = [
-            new MyAsset("KRW-BTC","", 1, 177_120_000),
-            new MyAsset("KRW-BTC","", 2, 177_020_000),
-            new MyAsset("KRW-DOGE","", 10, 300),
-            new MyAsset("KRW-DOGE","", 3, 400),
-            new MyAsset("KRW-MBL","", 500.5, 2.905),
+            new MyAsset(code:"KRW-BTC", name: "", totalQuantity: 1, avgPrice: 177_120_000),
+            new MyAsset(code:"KRW-BTC", name:"", totalQuantity: 2, avgPrice: 177_020_000),
+            new MyAsset(code:"KRW-DOGE", name:"", totalQuantity: 10, avgPrice: 300),
+            new MyAsset(code:"KRW-DOGE", name:"", totalQuantity: 3, avgPrice: 400),
+            new MyAsset(code:"KRW-MBL", name:"", totalQuantity:  500.5, avgPrice: 2.905),
             ];
 
         var grouped = purchases
@@ -100,6 +98,7 @@ public partial class AssetViewModel : BaseViewModel
         {
             await _cryptoTickerService.ConnectAsync(ct);
             await _cryptoTickerService.SendAsync(grouped.Select(x => x.Code), ct);
+            IsBusy = false;
             await foreach (var item in _cryptoTickerService.ReceiveAsync(ct))
             {
                 MyAsset asset = Purchases.Single(e => e.Code == item.code);
