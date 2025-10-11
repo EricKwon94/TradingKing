@@ -3,7 +3,7 @@ updates:
   - package-ecosystem: "nuget"
     directory: "Server"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     groups:
       efcore:
         patterns:
