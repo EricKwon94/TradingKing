@@ -1,4 +1,5 @@
 ﻿using Domain.Exceptions;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace Domain;
@@ -9,10 +10,12 @@ public class User
     public const int MAX_ID_LENGTH = 10;
     public const int MIN_PASSWORD_LENGTH = 6;
 
-    public int Seq { get; private set; }
-    public string Id { get; private set; }
-    public string Password { get; private set; }
+    public int Seq { get; }
+    public string Id { get; }
+    public string Password { get; }
     public string? Jwt { get; set; }
+
+    public ICollection<Purchase> Purchases { get; } = [];
 
     /// <exception cref="InvalidIdException"></exception>
     /// <exception cref="InvalidPasswordException"></exception>
