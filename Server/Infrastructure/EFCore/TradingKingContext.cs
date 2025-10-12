@@ -5,10 +5,10 @@ using System;
 
 namespace Infrastructure.EFCore;
 
-internal class TradingKingContext : DbContext, IEntityTypeConfiguration<User>, IEntityTypeConfiguration<Purchase>
+internal class TradingKingContext : DbContext, IEntityTypeConfiguration<User>, IEntityTypeConfiguration<Order>
 {
     public DbSet<User> Users { get; private set; }
-    public DbSet<Purchase> Purchases { get; private set; }
+    public DbSet<Order> Orderes { get; private set; }
 
     public TradingKingContext(DbContextOptions<TradingKingContext> options)
         : base(options)
@@ -18,7 +18,7 @@ internal class TradingKingContext : DbContext, IEntityTypeConfiguration<User>, I
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration<User>(this);
-        modelBuilder.ApplyConfiguration<Purchase>(this);
+        modelBuilder.ApplyConfiguration<Order>(this);
     }
 
     public void Configure(EntityTypeBuilder<User> builder)
@@ -44,7 +44,7 @@ internal class TradingKingContext : DbContext, IEntityTypeConfiguration<User>, I
             .HasDefaultValueSql("getutcdate()");
     }
 
-    public void Configure(EntityTypeBuilder<Purchase> builder)
+    public void Configure(EntityTypeBuilder<Order> builder)
     {
         builder.Property<Guid>("Id")
             .HasDefaultValueSql("newid()");

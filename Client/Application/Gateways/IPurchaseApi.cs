@@ -7,13 +7,13 @@ namespace Application.Gateways;
 
 public interface IPurchaseApi
 {
-    [Get("/purchases/policy")]
+    [Get("/orders/policy")]
     Task<int> GetPolicyAsync(CancellationToken ct);
 
-    [Get("/purchases")]
+    [Get("/orders")]
     Task<IEnumerable<PurchaseRes>> GetAllAsync(CancellationToken ct);
 
-    [Post("/purchases/buy")]
+    [Post("/orders/buy")]
     Task BuyAsync([Body] PurchaseReq body, CancellationToken ct);
 
     public record PurchaseRes(string Code, double Quantity, double Price);

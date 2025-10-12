@@ -15,7 +15,7 @@ public class User
     public string Password { get; }
     public string? Jwt { get; set; }
 
-    public ICollection<Purchase> Purchases { get; } = [];
+    public ICollection<Order> Purchases { get; } = [];
 
     /// <exception cref="InvalidIdException"></exception>
     /// <exception cref="InvalidPasswordException"></exception>
@@ -32,6 +32,6 @@ public class User
         Id = id;
         Password = password;
 
-        Purchases.Add(new Purchase(Seq, Purchase.DEFAULT_CODE, 1, Purchase.DEFAULT_PRICE));
+        Purchases.Add(new Order(Seq, Order.DEFAULT_CODE, 1, Order.DEFAULT_PRICE));
     }
 }

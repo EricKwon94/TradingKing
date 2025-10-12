@@ -16,7 +16,7 @@ public static class ApplicationExtensions
 
         return builder
             .AddTransient<AccountService>()
-            .AddTransient<PurchaseService>()
+            .AddTransient<OrderService>()
             ;
     }
 }

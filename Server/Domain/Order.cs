@@ -1,6 +1,6 @@
 ﻿namespace Domain;
 
-public class Purchase
+public class Order
 {
     public const string DEFAULT_CODE = "KRW-CASH";
     public const double DEFAULT_PRICE = 100_000_000;
@@ -13,7 +13,7 @@ public class Purchase
 
     public User? User { get; }
 
-    public Purchase(int userSeq, string code, double quantity, double price)
+    public Order(int userSeq, string code, double quantity, double price)
     {
         UserSeq = userSeq;
         Code = code;

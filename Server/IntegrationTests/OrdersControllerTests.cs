@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace IntegrationTests;
 
-public class PurchasesControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
+public class OrdersControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
 {
     private readonly HttpClient _client;
     private readonly CustomWebApplicationFactory<Program> _factory;
 
-    public PurchasesControllerTests(CustomWebApplicationFactory<Program> factory)
+    public OrdersControllerTests(CustomWebApplicationFactory<Program> factory)
     {
         _factory = factory;
         _client = factory.CreateClient(new WebApplicationFactoryClientOptions
@@ -30,10 +30,10 @@ public class PurchasesControllerTests : IClassFixture<CustomWebApplicationFactor
         string pwd = "asdasd";
         await _factory.RegisterAsync(_client, id, pwd, true);
 
-        var content = new PurchaseService.PurchaseReq("KRW-DOGE", 110.5).ToContent();
+        var content = new OrderService.OrderReq("KRW-DOGE", 110.5).ToContent();
 
         // act
-        HttpResponseMessage res = await _client.PostAsync("/purchases/buy", content);
+        HttpResponseMessage res = await _client.PostAsync("/orders/buy", content);
 
         // assert
         res.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -47,10 +47,10 @@ public class PurchasesControllerTests : IClassFixture<CustomWebApplicationFactor
         string pwd = "asdasd";
         await _factory.RegisterAsync(_client, id, pwd, true);
 
-        var content = new PurchaseService.PurchaseReq("KRW-DOGE", 1).ToContent();
+        var content = new OrderService.OrderReq("KRW-DOGE", 1).ToContent();
 
         // act
-        HttpResponseMessage res = await _client.PostAsync("/purchases/buy", content);
+        HttpResponseMessage res = await _client.PostAsync("/orders/buy", content);
 
         // assert
         res.StatusCode.Should().Be(HttpStatusCode.Conflict);
@@ -64,10 +64,10 @@ public class PurchasesControllerTests : IClassFixture<CustomWebApplicationFactor
         string pwd = "asdasd";
         await _factory.RegisterAsync(_client, id, pwd, true);
 
-        var content = new PurchaseService.PurchaseReq("KRW-BTC", 1.2).ToContent();
+        var content = new OrderService.OrderReq("KRW-BTC", 1.2).ToContent();
 
         // act
-        HttpResponseMessage res = await _client.PostAsync("/purchases/buy", content);
+        HttpResponseMessage res = await _client.PostAsync("/orders/buy", content);
 
         // assert
         res.StatusCode.Should().Be(HttpStatusCode.Conflict);
@@ -81,10 +81,10 @@ public class PurchasesControllerTests : IClassFixture<CustomWebApplicationFactor
         string pwd = "asdasd";
         await _factory.RegisterAsync(_client, id, pwd, false);
 
-        var content = new PurchaseService.PurchaseReq("KRW-DOGE", 110.5).ToContent();
+        var content = new OrderService.OrderReq("KRW-DOGE", 110.5).ToContent();
 
         // act
-        HttpResponseMessage res = await _client.PostAsync("/purchases/buy", content);
+        HttpResponseMessage res = await _client.PostAsync("/orders/buy", content);
 
         // assert
         res.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
