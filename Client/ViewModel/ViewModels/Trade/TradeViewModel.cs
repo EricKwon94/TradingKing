@@ -21,7 +21,7 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
     private readonly IAlertService _alert;
     private readonly IExchangeApi _exchangeApi;
     private readonly IExchangeTickerApi _tickerApi;
-    private readonly IPurchaseApi _purchaseApi;
+    private readonly IOrderApi _orderApi;
     private readonly IDispatcher _dispatcher;
 
     private readonly List<IExchangeApi.MarketRes> _markets = [];
@@ -66,14 +66,14 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
 
     public TradeViewModel(
         ILogger<TradeViewModel> logger, IAlertService alert, IDispatcher dispatcher,
-        IExchangeApi exchangeApi, IExchangeTickerApi tickerApi, IPurchaseApi purchaseApi)
+        IExchangeApi exchangeApi, IExchangeTickerApi tickerApi, IOrderApi oderApi)
     {
         _logger = logger;
         _alert = alert;
         _dispatcher = dispatcher;
         _exchangeApi = exchangeApi;
         _tickerApi = tickerApi;
-        _purchaseApi = purchaseApi;
+        _orderApi = oderApi;
     }
 
     public override async Task LoadAsync(CancellationToken ct)
@@ -82,7 +82,7 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
         try
         {
             markets = await _exchangeApi.GetMarketsAsync(ct);
-            _minOrderPrice = await _purchaseApi.GetPolicyAsync(ct);
+            _minOrderPrice = await _orderApi.GetPolicyAsync(ct);
         }
         catch (Exception e)
         {
@@ -131,11 +131,11 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
     public async Task BuyAsync(CancellationToken ct)
     {
         double quantity = IsOrderByQuantity ? double.Parse(OrderCount) : FinalCount;
-        var req = new IPurchaseApi.PurchaseReq(SelectedTicker!.Code, quantity);
+        var req = new IOrderApi.OrderReq(SelectedTicker!.Code, quantity);
 
         try
         {
-            await _purchaseApi.BuyAsync(req, ct);
+            await _orderApi.BuyAsync(req, ct);
         }
         catch (ApiException e) when (e.StatusCode == HttpStatusCode.Conflict && int.TryParse(e.Content, out int errorCode))
         {
