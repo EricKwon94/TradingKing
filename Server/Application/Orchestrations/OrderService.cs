@@ -29,14 +29,14 @@ public class OrderService
 
     public async Task<IEnumerable<OrderRes>> GetAllAsync(int userSeq, CancellationToken ct)
     {
-        var purchases = await _orderRepo.GetAllAsync(userSeq, ct);
-        return purchases.Select(e => new OrderRes(e.Code, e.Quantity, e.Price));
+        var orders = await _orderRepo.GetAllAsync(userSeq, ct);
+        return orders.Select(e => new OrderRes(e.Code, e.Quantity, e.Price));
     }
 
     public async Task<double> GetCashAsync(int userSeq, CancellationToken ct)
     {
-        var purchases = await GetAllAsync(userSeq, ct);
-        return purchases.Where(e => e.Code == Order.DEFAULT_CODE).Sum(e => e.Price);
+        var orders = await _orderRepo.GetAllAsync(userSeq, Order.DEFAULT_CODE, ct);
+        return orders.Sum(e => e.Price);
     }
 
     /// <exception cref="PriceTooLowException"></exception>
@@ -46,17 +46,42 @@ public class OrderService
         var tickers = await _exchangeApi.GetTickerAsync(req.Code, ct);
         var ticker = tickers.Single();
 
-        double availableCash = await GetCashAsync(userSeq, ct);
         double price = req.Quantity * ticker.trade_price;
-
         if (price < Order.MIN_ORDER_PRICE)
             throw new PriceTooLowException();
 
+        double availableCash = await GetCashAsync(userSeq, ct);
         if (availableCash < price)
             throw new NotEnoughCashException();
 
         var cryto = new Order(userSeq, req.Code, req.Quantity, ticker.trade_price);
         var cash = new Order(userSeq, Order.DEFAULT_CODE, 1, price * -1);
+        await _orderRepo.AddAsync(cryto, ct);
+        await _orderRepo.AddAsync(cash, ct);
+
+        await _transaction.SaveChangesAsync(ct);
+    }
+
+    /// <exception cref="PriceTooLowException"></exception>
+    /// <exception cref="NotEnoughCoinException"></exception>
+    public async Task SellAsync(int userSeq, OrderReq req, CancellationToken ct)
+    {
+        var orders = await _orderRepo.GetAllAsync(userSeq, req.Code, ct);
+        var quantity = orders.Sum(e => e.Quantity);
+
+        if (req.Quantity > quantity)
+            throw new NotEnoughCoinException();
+
+        var tickers = await _exchangeApi.GetTickerAsync(req.Code, ct);
+        var ticker = tickers.Single();
+
+        double price = req.Quantity * ticker.trade_price;
+
+        if (price < Order.MIN_ORDER_PRICE)
+            throw new PriceTooLowException();
+
+        var cryto = new Order(userSeq, req.Code, req.Quantity * -1, ticker.trade_price);
+        var cash = new Order(userSeq, Order.DEFAULT_CODE, 1, price);
         await _orderRepo.AddAsync(cryto, ct);
         await _orderRepo.AddAsync(cash, ct);
 

@@ -52,4 +52,20 @@ public class OrdersController : ControllerBase
 
         return Ok();
     }
+
+    [HttpPost("sell")]
+    public async Task<ActionResult> SellAsync(OrderService.OrderReq req, CancellationToken ct)
+    {
+        int userSeq = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        try
+        {
+            await _orderService.SellAsync(userSeq, req, ct);
+        }
+        catch (DomainException e)
+        {
+            return Conflict(e.Code);
+        }
+
+        return Ok();
+    }
 }
