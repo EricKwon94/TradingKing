@@ -11,9 +11,8 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using ViewModel.Contracts;
-using ViewModel.ViewModels.Trade;
 
-namespace ViewModel.ViewModels;
+namespace ViewModel.ViewModels.Trade;
 
 public partial class TradeViewModel : BaseViewModel, IQueryAttributable
 {

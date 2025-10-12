@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:View.Pages"
                 xmlns:cnv="clr-namespace:View.Converters"
-                xmlns:vm="clr-namespace:ViewModel.ViewModels;assembly=ViewModel"        
+                xmlns:vm="clr-namespace:ViewModel.ViewModels.Trade;assembly=ViewModel"        
                 xmlns:tk="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
                 Title="시세와 거래"
                 x:DataType="vm:TradeViewModel"

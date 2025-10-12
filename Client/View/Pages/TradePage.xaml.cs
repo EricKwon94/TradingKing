@@ -1,4 +1,4 @@
-using ViewModel.ViewModels;
+using ViewModel.ViewModels.Trade;
 
 namespace View.Pages;
 
