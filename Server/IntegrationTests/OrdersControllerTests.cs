@@ -39,7 +39,7 @@ public class OrdersControllerTests : IClassFixture<CustomWebApplicationFactory<P
         res.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
-    [Fact(DisplayName = "최소 주문 금액을 넘겨야 한다.")]
+    [Fact(DisplayName = "최소 구매 금액을 넘겨야 한다.")]
     public async Task Test2()
     {
         // arrange
@@ -54,6 +54,8 @@ public class OrdersControllerTests : IClassFixture<CustomWebApplicationFactory<P
 
         // assert
         res.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        var code = int.Parse(await res.Content.ReadAsStringAsync());
+        code.Should().Be(-4);
     }
 
     [Fact(DisplayName = "돈이 없으면 코인을 구매할 수 없다.")]
@@ -71,6 +73,8 @@ public class OrdersControllerTests : IClassFixture<CustomWebApplicationFactory<P
 
         // assert
         res.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        var code = int.Parse(await res.Content.ReadAsStringAsync());
+        code.Should().Be(-3);
     }
 
     [Fact(DisplayName = "로그인을 해야한다.")]
@@ -88,5 +92,64 @@ public class OrdersControllerTests : IClassFixture<CustomWebApplicationFactory<P
 
         // assert
         res.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact(DisplayName = "코인을 판매한다.")]
+    public async Task Test5()
+    {
+        // arrange
+        string id = _factory.IndependentId;
+        string pwd = "asdasd";
+        await _factory.RegisterAsync(_client, id, pwd, true);
+
+        var buyReq = new OrderService.OrderReq("KRW-DOGE", 200).ToContent();
+        var sellReq = new OrderService.OrderReq("KRW-DOGE", 110.5).ToContent();
+        await _client.PostAsync("/orders/buy", sellReq);
+
+        // act
+        HttpResponseMessage res = await _client.PostAsync("/orders/sell", sellReq);
+
+        // assert
+        res.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    [Fact(DisplayName = "최소 판매 금액을 넘겨야 한다.")]
+    public async Task Test6()
+    {
+        // arrange
+        string id = _factory.IndependentId;
+        string pwd = "asdasd";
+        await _factory.RegisterAsync(_client, id, pwd, true);
+
+        var buyReq = new OrderService.OrderReq("KRW-DOGE", 200).ToContent();
+        var sellReq = new OrderService.OrderReq("KRW-DOGE", 1).ToContent();
+        await _client.PostAsync("/orders/buy", buyReq);
+
+        // act
+        HttpResponseMessage res = await _client.PostAsync("/orders/sell", sellReq);
+
+        // assert
+        res.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        var code = int.Parse(await res.Content.ReadAsStringAsync());
+        code.Should().Be(-4);
+    }
+
+    [Fact(DisplayName = "코인이 부족하면 판매할 수 없다.")]
+    public async Task Test7()
+    {
+        // arrange
+        string id = _factory.IndependentId;
+        string pwd = "asdasd";
+        await _factory.RegisterAsync(_client, id, pwd, true);
+
+        var sellReq = new OrderService.OrderReq("KRW-DOGE", 1).ToContent();
+
+        // act
+        HttpResponseMessage res = await _client.PostAsync("/orders/sell", sellReq);
+
+        // assert
+        res.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        var code = int.Parse(await res.Content.ReadAsStringAsync());
+        code.Should().Be(-5);
     }
 }

@@ -15,3 +15,11 @@ public class PriceTooLowException : DomainException
     public PriceTooLowException() { }
     public PriceTooLowException(string message) : base(message) { }
 }
+
+public class NotEnoughCoinException : DomainException
+{
+    public override int Code => -5;
+
+    public NotEnoughCoinException() { }
+    public NotEnoughCoinException(string message) : base(message) { }
+}
