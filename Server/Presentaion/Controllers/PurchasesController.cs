@@ -24,6 +24,12 @@ public class PurchasesController : ControllerBase
         _purchaseService = purchaseService;
     }
 
+    [HttpGet("policy")]
+    public int GetPolicy()
+    {
+        return _purchaseService.GetPolicy();
+    }
+
     [HttpGet]
     public Task<IEnumerable<PurchaseService.PurchaseRes>> GetAsync(CancellationToken ct)
     {

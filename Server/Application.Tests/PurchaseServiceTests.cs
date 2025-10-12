@@ -39,9 +39,27 @@ public class PurchaseServiceTests : IClassFixture<TestDatabaseFixture>
         await action.Should().ThrowAsync<NotEnoughCashException>();
     }
 
+    [Fact(DisplayName = "최소 주문 금액을 넘겨야 합니다.")]
+    public async Task Test2()
+    {
+        // arrange
+        string id = _fixture.IndependentId;
+        using var context = _fixture.CreateContext();
+        var user = await RegisterAccountAsync(id, context);
+
+        var req = new PurchaseService.PurchaseReq("KRW-DOGE", 1);
+        var sut = CreateServiceAsync("KRW-DOGE", 280, context);
+
+        // act
+        Func<Task> action = () => sut.BuyAsync(user.Seq, req, default);
+
+        // assert
+        await action.Should().ThrowAsync<PriceTooLowException>();
+    }
+
     [Theory(DisplayName = "코인을 구매 한다.")]
-    [InlineData("KRW-DOGE", 11.5, 301)]
-    public async Task Test2(string expectedCode, double expectedQuantity, double expectedPrice)
+    [InlineData("KRW-DOGE", 110.5, 301)]
+    public async Task Test3(string expectedCode, double expectedQuantity, double expectedPrice)
     {
         // arrange
         string id = _fixture.IndependentId;

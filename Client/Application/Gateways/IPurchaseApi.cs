@@ -7,6 +7,9 @@ namespace Application.Gateways;
 
 public interface IPurchaseApi
 {
+    [Get("/purchases/policy")]
+    Task<int> GetPolicyAsync(CancellationToken ct);
+
     [Get("/purchases")]
     Task<IEnumerable<PurchaseRes>> GetAllAsync(CancellationToken ct);
 

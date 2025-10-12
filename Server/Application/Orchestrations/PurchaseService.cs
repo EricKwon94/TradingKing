@@ -22,6 +22,11 @@ public class PurchaseService
         _exchangeApi = exchangeApi;
     }
 
+    public int GetPolicy()
+    {
+        return Purchase.MIN_ORDER_PRICE;
+    }
+
     public async Task<IEnumerable<PurchaseRes>> GetAllAsync(int userSeq, CancellationToken ct)
     {
         var purchases = await _purchaseRepo.GetAllAsync(userSeq, ct);
@@ -34,6 +39,7 @@ public class PurchaseService
         return purchases.Where(e => e.Code == Purchase.DEFAULT_CODE).Sum(e => e.Price);
     }
 
+    /// <exception cref="PriceTooLowException"></exception>
     /// <exception cref="NotEnoughCashException"></exception>
     public async Task BuyAsync(int userSeq, PurchaseReq req, CancellationToken ct)
     {
@@ -42,6 +48,10 @@ public class PurchaseService
 
         double availableCash = await GetCashAsync(userSeq, ct);
         double price = req.Quantity * ticker.trade_price;
+
+        if (price < Purchase.MIN_ORDER_PRICE)
+            throw new PriceTooLowException();
+
         if (availableCash < price)
             throw new NotEnoughCashException();
 

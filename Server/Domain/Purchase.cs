@@ -4,6 +4,7 @@ public class Purchase
 {
     public const string DEFAULT_CODE = "KRW-CASH";
     public const double DEFAULT_PRICE = 100_000_000;
+    public const int MIN_ORDER_PRICE = 10_000;
 
     public int UserSeq { get; }
     public string Code { get; }

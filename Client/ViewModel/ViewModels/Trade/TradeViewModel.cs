@@ -15,15 +15,16 @@ namespace ViewModel.ViewModels;
 
 public partial class TradeViewModel : BaseViewModel, IQueryAttributable
 {
-    private const int MIN_ORDER_PRICE = 1000;
-
     private readonly ILogger<TradeViewModel> _logger;
     private readonly IAlertService _alert;
     private readonly IExchangeApi _exchangeApi;
     private readonly IExchangeTickerApi _tickerApi;
+    private readonly IPurchaseApi _purchaseApi;
     private readonly IDispatcher _dispatcher;
 
     private readonly List<IExchangeApi.MarketRes> _markets = [];
+
+    private int? _minOrderPrice;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SearchCommand))]
@@ -63,13 +64,14 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
 
     public TradeViewModel(
         ILogger<TradeViewModel> logger, IAlertService alert, IDispatcher dispatcher,
-        IExchangeApi exchangeApi, IExchangeTickerApi tickerApi)
+        IExchangeApi exchangeApi, IExchangeTickerApi tickerApi, IPurchaseApi purchaseApi)
     {
         _logger = logger;
         _alert = alert;
         _dispatcher = dispatcher;
         _exchangeApi = exchangeApi;
         _tickerApi = tickerApi;
+        _purchaseApi = purchaseApi;
     }
 
     public override async Task LoadAsync(CancellationToken ct)
@@ -78,6 +80,7 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
         try
         {
             markets = await _exchangeApi.GetMarketsAsync(ct);
+            _minOrderPrice = await _purchaseApi.GetPolicyAsync(ct);
         }
         catch (Exception e)
         {
@@ -147,17 +150,17 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
     private bool CanBuy()
     {
         if (IsOrderByQuantity)
-            return double.TryParse(OrderCount, out var d) && d > 0 && FinalCount >= MIN_ORDER_PRICE;
+            return double.TryParse(OrderCount, out var d) && d > 0 && FinalCount >= _minOrderPrice;
         else
-            return int.TryParse(OrderCount, out var d) && d >= MIN_ORDER_PRICE;
+            return int.TryParse(OrderCount, out var d) && d >= _minOrderPrice;
     }
 
     private bool CanSell()
     {
         if (IsOrderByQuantity)
-            return double.TryParse(OrderCount, out var d) && d > 0 && FinalCount >= MIN_ORDER_PRICE;
+            return double.TryParse(OrderCount, out var d) && d > 0 && FinalCount >= _minOrderPrice;
         else
-            return int.TryParse(OrderCount, out var d) && d >= MIN_ORDER_PRICE;
+            return int.TryParse(OrderCount, out var d) && d >= _minOrderPrice;
     }
 
     private async void ReceiveTickerAsync(object? sender)
