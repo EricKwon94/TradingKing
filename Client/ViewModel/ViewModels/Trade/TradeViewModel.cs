@@ -3,9 +3,11 @@ using Application.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
+using Refit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using ViewModel.Contracts;
@@ -128,7 +130,28 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
     [RelayCommand(CanExecute = nameof(CanBuy))]
     public async Task BuyAsync(CancellationToken ct)
     {
+        double quantity = IsOrderByQuantity ? double.Parse(OrderCount) : FinalCount;
+        var req = new IPurchaseApi.PurchaseReq(SelectedTicker!.Code, quantity);
 
+        try
+        {
+            await _purchaseApi.BuyAsync(req, ct);
+        }
+        catch (ApiException e) when (e.StatusCode == HttpStatusCode.Conflict && int.TryParse(e.Content, out int errorCode))
+        {
+            if (errorCode == -3)
+                await _alert.DisplayAlertAsync("error", "돈이 부족해", "ok", ct);
+            else if (errorCode == -4)
+                await _alert.DisplayAlertAsync("error", $"최소 주문 금액 {_minOrderPrice!.Value}", "ok", ct);
+            return;
+        }
+        catch (Exception e)
+        {
+            await _alert.DisplayAlertAsync("error", e.Message, "ok", ct);
+            return;
+        }
+
+        await _alert.DisplayAlertAsync("구매", "성공 o((>ω< ))o", "ok", ct);
     }
 
     [RelayCommand(CanExecute = nameof(CanSell))]
