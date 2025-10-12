@@ -16,6 +16,9 @@ public interface IOrderApi
     [Post("/orders/buy")]
     Task BuyAsync([Body] OrderReq body, CancellationToken ct);
 
+    [Post("/orders/sell")]
+    Task SellAsync([Body] OrderReq body, CancellationToken ct);
+
     public record OrderRes(string Code, double Quantity, double Price);
     public record OrderReq(string Code, double Quantity);
 }

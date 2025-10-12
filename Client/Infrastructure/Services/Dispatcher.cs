@@ -7,6 +7,6 @@ internal class Dispatcher : Application.Services.IDispatcher
 {
     public void Invoke(Action action)
     {
-        Shell.Current.Dispatcher.Dispatch(action);
+        Shell.Current?.Dispatcher?.Dispatch(action);
     }
 }

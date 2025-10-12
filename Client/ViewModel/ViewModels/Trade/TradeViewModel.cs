@@ -156,7 +156,28 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
     [RelayCommand(CanExecute = nameof(CanSell))]
     public async Task SellAsync(CancellationToken ct)
     {
+        double quantity = IsOrderByQuantity ? double.Parse(OrderCount) : FinalCount;
+        var req = new IOrderApi.OrderReq(SelectedTicker!.Code, quantity);
 
+        try
+        {
+            await _orderApi.SellAsync(req, ct);
+        }
+        catch (ApiException e) when (e.StatusCode == HttpStatusCode.Conflict && int.TryParse(e.Content, out int errorCode))
+        {
+            if (errorCode == -4)
+                await _alert.DisplayAlertAsync("error", $"최소 판매 금액 {_minOrderPrice!.Value}", "ok", ct);
+            else if (errorCode == -5)
+                await _alert.DisplayAlertAsync("error", "코인이 부족해", "ok", ct);
+            return;
+        }
+        catch (Exception e)
+        {
+            await _alert.DisplayAlertAsync("error", e.Message, "ok", ct);
+            return;
+        }
+
+        await _alert.DisplayAlertAsync("판매", "성공 o((>ω< ))o", "ok", ct);
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
