@@ -28,9 +28,9 @@ public class PurchasesControllerTests : IClassFixture<CustomWebApplicationFactor
         // arrange
         string id = _factory.IndependentId;
         string pwd = "asdasd";
-        var user = await _factory.RegisterAsync(_client, id, pwd, true);
+        await _factory.RegisterAsync(_client, id, pwd, true);
 
-        var content = new PurchaseService.PurchaseReq("KRW-DOGE", 11.5).ToContent();
+        var content = new PurchaseService.PurchaseReq("KRW-DOGE", 110.5).ToContent();
 
         // act
         HttpResponseMessage res = await _client.PostAsync("/purchases/buy", content);
@@ -39,8 +39,25 @@ public class PurchasesControllerTests : IClassFixture<CustomWebApplicationFactor
         res.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
-    [Fact(DisplayName = "돈이 없으면 코인을 구매할 수 없다.")]
+    [Fact(DisplayName = "최소 주문 금액을 넘겨야 한다.")]
     public async Task Test2()
+    {
+        // arrange
+        string id = _factory.IndependentId;
+        string pwd = "asdasd";
+        await _factory.RegisterAsync(_client, id, pwd, true);
+
+        var content = new PurchaseService.PurchaseReq("KRW-DOGE", 1).ToContent();
+
+        // act
+        HttpResponseMessage res = await _client.PostAsync("/purchases/buy", content);
+
+        // assert
+        res.StatusCode.Should().Be(HttpStatusCode.Conflict);
+    }
+
+    [Fact(DisplayName = "돈이 없으면 코인을 구매할 수 없다.")]
+    public async Task Test3()
     {
         // arrange
         string id = _factory.IndependentId;
@@ -54,5 +71,22 @@ public class PurchasesControllerTests : IClassFixture<CustomWebApplicationFactor
 
         // assert
         res.StatusCode.Should().Be(HttpStatusCode.Conflict);
+    }
+
+    [Fact(DisplayName = "로그인을 해야한다.")]
+    public async Task Test4()
+    {
+        // arrange
+        string id = _factory.IndependentId;
+        string pwd = "asdasd";
+        await _factory.RegisterAsync(_client, id, pwd, false);
+
+        var content = new PurchaseService.PurchaseReq("KRW-DOGE", 110.5).ToContent();
+
+        // act
+        HttpResponseMessage res = await _client.PostAsync("/purchases/buy", content);
+
+        // assert
+        res.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 }
