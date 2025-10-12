@@ -8,7 +8,7 @@ namespace Infrastructure.EFCore;
 internal class TradingKingContext : DbContext, IEntityTypeConfiguration<User>, IEntityTypeConfiguration<Order>
 {
     public DbSet<User> Users { get; private set; }
-    public DbSet<Order> Orderes { get; private set; }
+    public DbSet<Order> Orders { get; private set; }
 
     public TradingKingContext(DbContextOptions<TradingKingContext> options)
         : base(options)

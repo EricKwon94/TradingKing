@@ -79,7 +79,7 @@ public class OrderServiceTests : IClassFixture<TestDatabaseFixture>
         var cash = await sut.GetCashAsync(user.Seq, default);
         cash.Should().Be(expectedCash);
 
-        var doge = await context.Orderes.AsNoTracking().SingleAsync(e => e.Code == expectedCode);
+        var doge = await context.Orders.AsNoTracking().SingleAsync(e => e.Code == expectedCode);
         doge.Code.Should().Be(expectedCode);
         doge.Quantity.Should().Be(expectedQuantity);
         doge.Price.Should().Be(expectedPrice);

@@ -11,22 +11,22 @@ namespace Infrastructure.Persistences;
 
 internal class OrderRepo : IOrderRepo
 {
-    private readonly DbSet<Order> _orderes;
+    private readonly DbSet<Order> _orders;
 
     public OrderRepo(TradingKingContext context)
     {
-        _orderes = context.Orderes;
+        _orders = context.Orders;
     }
 
     public Task<List<Order>> GetAllAsync(int userSeq, CancellationToken ct)
     {
-        return _orderes.AsNoTracking()
+        return _orders.AsNoTracking()
             .Where(e => e.UserSeq == userSeq)
             .ToListAsync(ct);
     }
 
     public async ValueTask AddAsync(Order purchase, CancellationToken ct)
     {
-        await _orderes.AddAsync(purchase, ct);
+        await _orders.AddAsync(purchase, ct);
     }
 }
