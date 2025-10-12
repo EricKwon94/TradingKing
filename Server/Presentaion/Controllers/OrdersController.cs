@@ -13,37 +13,37 @@ namespace Presentaion.Controllers;
 [ApiController]
 [Authorize]
 [Route("[controller]")]
-public class PurchasesController : ControllerBase
+public class OrdersController : ControllerBase
 {
-    private readonly ILogger<PurchasesController> _logger;
-    private readonly PurchaseService _purchaseService;
+    private readonly ILogger<OrdersController> _logger;
+    private readonly OrderService _orderService;
 
-    public PurchasesController(ILogger<PurchasesController> logger, PurchaseService purchaseService)
+    public OrdersController(ILogger<OrdersController> logger, OrderService orderService)
     {
         _logger = logger;
-        _purchaseService = purchaseService;
+        _orderService = orderService;
     }
 
     [HttpGet("policy")]
     public int GetPolicy()
     {
-        return _purchaseService.GetPolicy();
+        return _orderService.GetPolicy();
     }
 
     [HttpGet]
-    public Task<IEnumerable<PurchaseService.PurchaseRes>> GetAsync(CancellationToken ct)
+    public Task<IEnumerable<OrderService.OrderRes>> GetAsync(CancellationToken ct)
     {
         int userSeq = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        return _purchaseService.GetAllAsync(userSeq, ct);
+        return _orderService.GetAllAsync(userSeq, ct);
     }
 
     [HttpPost("buy")]
-    public async Task<ActionResult> BuyAsync(PurchaseService.PurchaseReq req, CancellationToken ct)
+    public async Task<ActionResult> BuyAsync(OrderService.OrderReq req, CancellationToken ct)
     {
         int userSeq = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         try
         {
-            await _purchaseService.BuyAsync(userSeq, req, ct);
+            await _orderService.BuyAsync(userSeq, req, ct);
         }
         catch (DomainException e)
         {

@@ -39,7 +39,7 @@ public class AccountServiceTests : IClassFixture<TestDatabaseFixture>
         user.Password.Should().Be(expectedPwd);
         user.Jwt.Should().BeNull();
 
-        var purchase = await context.Purchases.AsNoTracking().SingleAsync(e => e.UserSeq == user.Seq);
+        var purchase = await context.Orders.AsNoTracking().SingleAsync(e => e.UserSeq == user.Seq);
         purchase.Code.Should().Be("KRW-CASH");
         purchase.Price.Should().Be(100_000_000);
         purchase.Quantity.Should().Be(1);

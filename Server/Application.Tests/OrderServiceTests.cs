@@ -12,11 +12,11 @@ using System.Threading.Tasks;
 
 namespace Application.Tests;
 
-public class PurchaseServiceTests : IClassFixture<TestDatabaseFixture>
+public class OrderServiceTests : IClassFixture<TestDatabaseFixture>
 {
     private readonly TestDatabaseFixture _fixture;
 
-    public PurchaseServiceTests(TestDatabaseFixture fixture)
+    public OrderServiceTests(TestDatabaseFixture fixture)
     {
         _fixture = fixture;
     }
@@ -29,7 +29,7 @@ public class PurchaseServiceTests : IClassFixture<TestDatabaseFixture>
         using var context = _fixture.CreateContext();
         var user = await RegisterAccountAsync(id, context);
 
-        var req = new PurchaseService.PurchaseReq("KRW-BTC", 1);
+        var req = new OrderService.OrderReq("KRW-BTC", 1);
         var sut = CreateServiceAsync("KRW-BTC", 170_000_000, context);
 
         // act
@@ -47,7 +47,7 @@ public class PurchaseServiceTests : IClassFixture<TestDatabaseFixture>
         using var context = _fixture.CreateContext();
         var user = await RegisterAccountAsync(id, context);
 
-        var req = new PurchaseService.PurchaseReq("KRW-DOGE", 1);
+        var req = new OrderService.OrderReq("KRW-DOGE", 1);
         var sut = CreateServiceAsync("KRW-DOGE", 280, context);
 
         // act
@@ -67,7 +67,7 @@ public class PurchaseServiceTests : IClassFixture<TestDatabaseFixture>
         var user = await RegisterAccountAsync(id, context);
         var expectedCash = 100_000_000 - expectedQuantity * expectedPrice;
 
-        var req = new PurchaseService.PurchaseReq(expectedCode, expectedQuantity);
+        var req = new OrderService.OrderReq(expectedCode, expectedQuantity);
         var sut = CreateServiceAsync(expectedCode, expectedPrice, context);
 
         // act
@@ -79,7 +79,7 @@ public class PurchaseServiceTests : IClassFixture<TestDatabaseFixture>
         var cash = await sut.GetCashAsync(user.Seq, default);
         cash.Should().Be(expectedCash);
 
-        var doge = await context.Purchases.AsNoTracking().SingleAsync(e => e.Code == expectedCode);
+        var doge = await context.Orders.AsNoTracking().SingleAsync(e => e.Code == expectedCode);
         doge.Code.Should().Be(expectedCode);
         doge.Quantity.Should().Be(expectedQuantity);
         doge.Price.Should().Be(expectedPrice);
@@ -95,15 +95,15 @@ public class PurchaseServiceTests : IClassFixture<TestDatabaseFixture>
         return await context.Users.AsNoTracking().SingleAsync(e => e.Id == id);
     }
 
-    private static PurchaseService CreateServiceAsync(string code, double price, TradingKingContext context)
+    private static OrderService CreateServiceAsync(string code, double price, TradingKingContext context)
     {
         var transaction = new Transaction(context);
-        var repo = new PurchaseRepo(context);
+        var repo = new OrderRepo(context);
 
         var mock = new Mock<IExchangeApi>();
         mock.Setup(c => c.GetTickerAsync(code, default))
             .ReturnsAsync([new IExchangeApi.TickerRes(code, price)]);
 
-        return new PurchaseService(transaction, repo, mock.Object);
+        return new OrderService(transaction, repo, mock.Object);
     }
 }

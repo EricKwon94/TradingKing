@@ -24,7 +24,7 @@ public static class ApplicationExtensions
             .AddHttpMessageHandler<AuthHeaderHandler>()
             ;
 
-        builder.AddRefitClient<IPurchaseApi>()
+        builder.AddRefitClient<IOrderApi>()
             .ConfigureHttpClient(c => c.BaseAddress = address)
             .AddPolicyHandler(HttpPolicyExtensions.HandleTransientHttpError().WaitAndRetryAsync(4, count => TimeSpan.FromSeconds(2 * count)))
             .AddHttpMessageHandler<AuthHeaderHandler>()
