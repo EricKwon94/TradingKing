@@ -236,6 +236,13 @@ public partial class TradeViewModel : BaseViewModel, IQueryAttributable
         {
             _tickerApi.Dispose();
         }
+        catch (Exception ex)
+        {
+            await _alert.DisplayAlertAsync("error", ex.Message, "ok", default);
+            SearchText = null;
+            SelectedTicker = null;
+            _tickerApi.Dispose();
+        }
     }
 
     private void CalculateFinalCount(object? sender, double tickerPrice)

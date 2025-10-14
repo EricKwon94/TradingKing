@@ -40,32 +40,29 @@
             </CollectionView.ItemsLayout>
 
             <CollectionView.Header>
-                <Grid ColumnDefinitions="*, *, *, *, *, *, *">
+                <Grid ColumnDefinitions="*, *, *, *, *, *">
                     <Label Style="{StaticResource AssetHeader}" Grid.Column="0" Text="자산구분"/>
                     <Label Style="{StaticResource AssetHeader}" Grid.Column="1" Text="보유잔고"/>
-                    <Label Style="{StaticResource AssetHeader}" Grid.Column="2" Text="평균매수가"/>
-                    <Label Style="{StaticResource AssetHeader}" Grid.Column="3" Text="매수금액"/>
-                    <Label Style="{StaticResource AssetHeader}" Grid.Column="4" Text="평가금액(원)"/>
-                    <Label Style="{StaticResource AssetHeader}" Grid.Column="5" Text="평가손익(원)"/>
-                    <Label Style="{StaticResource AssetHeader}" Grid.Column="6" Text="수익률(%)"/>
+                    <Label Style="{StaticResource AssetHeader}" Grid.Column="2" Text="실현손익"/>
+                    <Label Style="{StaticResource AssetHeader}" Grid.Column="3" Text="평가금액(원)"/>
+                    <Label Style="{StaticResource AssetHeader}" Grid.Column="4" Text="평가손익(원)"/>
+                    <Label Style="{StaticResource AssetHeader}" Grid.Column="5" Text="최종 수익률(%)"/>
                 </Grid>
             </CollectionView.Header>
             
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="vm:MyAsset">
-                    <Grid ColumnDefinitions="*, *, *, *, *, *, *">
+                <DataTemplate x:DataType="vm:MyAssetViewModel">
+                    <Grid ColumnDefinitions="*, *, *, *, *, *">
                         <Label Style="{StaticResource AssetContent}" Grid.Column="0" Text="{Binding Name}"/>
                         <Label Style="{StaticResource AssetContent}" Grid.Column="1" 
                                Text="{Binding TotalQuantity,Converter={StaticResource DoubleToStringConv}}"/>
                         <Label Style="{StaticResource AssetContent}" Grid.Column="2" 
-                               Text="{Binding AvgPrice,Converter={StaticResource DoubleToStringConv}}"/>
+                               Text="{Binding TotalPrice, StringFormat='{0:N0}'}"/>
                         <Label Style="{StaticResource AssetContent}" Grid.Column="3" 
-                               Text="{Binding TotalPrice,Converter={StaticResource DoubleToStringConv}}"/>
+                               Text="{Binding EvaluationPrice, StringFormat='{0:N0}'}"/>
                         <Label Style="{StaticResource AssetContent}" Grid.Column="4" 
-                               Text="{Binding EvaluationPrice,Converter={StaticResource DoubleToStringConv}}"/>
+                               Text="{Binding EvaluationProfit, StringFormat='{0:N0}'}"/>
                         <Label Style="{StaticResource AssetContent}" Grid.Column="5" 
-                               Text="{Binding EvaluationProfit,Converter={StaticResource DoubleToStringConv}}"/>
-                        <Label Style="{StaticResource AssetContent}" Grid.Column="6" 
                                Text="{Binding ProfitRate,Converter={StaticResource DoubleToStringConv}}"/>
                     </Grid>
                 </DataTemplate>
