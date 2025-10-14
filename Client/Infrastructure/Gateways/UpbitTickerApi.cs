@@ -49,8 +49,6 @@ internal partial class UpbitTickerApi : IExchangeTickerApi
             IExchangeTickerApi.TickerRes ticker = JsonSerializer.Deserialize<IExchangeTickerApi.TickerRes>(buffer.Span[..result.Count])!;
 
             yield return ticker;
-
-            await Task.Delay(100, cancellationToken);
         }
     }
 
