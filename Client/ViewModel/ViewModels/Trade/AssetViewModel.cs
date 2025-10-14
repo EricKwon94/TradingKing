@@ -78,13 +78,6 @@ public partial class AssetViewModel : BaseViewModel
             {
                 double totalBuyPrice = g.Where(e => e.Quantity > 0).Sum(e => e.Price * e.Quantity);
                 double totalSellPrice = -1 * g.Where(e => e.Quantity < 0).Sum(e => e.Price * e.Quantity);
-                /*foreach (var v in g)
-                {
-                    if (v.Quantity > 0)
-                        totalBuyPrice += v.Price * v.Quantity;
-                    else
-                        totalSellPrice += v.Price * v.Quantity * -1;
-                }*/
 
                 double totalQuantity = g.Sum(p => p.Quantity);
                 double totalPrice = -1 * g.Sum(p => p.Price * p.Quantity);
