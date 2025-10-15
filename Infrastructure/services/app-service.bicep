@@ -1,13 +1,13 @@
 param env string
 param location string
 param serverNumber string
-param registryUrl string
-param registryUserName string
+param dockerUrl string
+param dockerUserName string
 
 @secure()
 param issKey string
 @secure()
-param registryPassword string
+param dockerPassword string
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2024-11-01' = {
   name: 'tradingking-${env}-${location}-${serverNumber}'
@@ -61,13 +61,13 @@ resource appService 'Microsoft.Web/sites@2024-11-01' = {
   resource siteContainer 'sitecontainers' = {
     name: 'main'
     properties: {
-      image: registryUrl
+      image: dockerUrl
       targetPort: '8080'
       isMain: true
       startUpCommand: ''
       authType: 'UserCredentials'
-      userName: registryUserName
-      passwordSecret: registryPassword
+      userName: dockerUserName
+      passwordSecret: dockerPassword
     }
   }
 }

@@ -3,19 +3,19 @@ targetScope = 'subscription'
 param env string
 param location string
 param serverNumber string
-param registryUrl string
-param registryUserName string
+param dockerUrl string
+param dockerUserName string
 
 @secure()
 param issKey string
 @secure()
-param registryPassword string
+param dockerPassword string
 @secure()
 param sqlsrvId string
 @secure()
 param sqlsrvPwd string
 
-/*
+
 resource rgShared 'Microsoft.Resources/resourceGroups@2025-04-01' = {
   name: 'tradingking-shared-${location}'
   location: location
@@ -24,8 +24,12 @@ resource rgShared 'Microsoft.Resources/resourceGroups@2025-04-01' = {
 module shared 'services/_shared.bicep' = {
   name: 'dp-shared'
   scope: rgShared
+  params:{
+    env: env
+    serverNumber: serverNumber
+  }
 }
-*/
+
 
 resource rgApp 'Microsoft.Resources/resourceGroups@2025-04-01' = {
   name: 'tradingking-${env}-${location}-${serverNumber}'
@@ -39,9 +43,9 @@ module app 'services/_main.bicep' = {
     env: env
     serverNumber: serverNumber
     issKey: issKey
-    registryUrl: registryUrl
-    registryUserName: registryUserName
-    registryPassword: registryPassword
+    dockerUrl: dockerUrl
+    dockerUserName: dockerUserName
+    dockerPassword: dockerPassword
     sqlsrvId: sqlsrvId
     sqlsrvPwd: sqlsrvPwd
   }

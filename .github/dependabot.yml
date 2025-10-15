@@ -20,7 +20,7 @@ updates:
   - package-ecosystem: "nuget"
     directory: "Client"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     groups:
       microsoft-extensions:
         patterns:
