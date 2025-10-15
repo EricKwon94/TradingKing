@@ -27,7 +27,7 @@ namespace Host
             builder.Logging.AddDebug();
 #endif
             builder.Services.AddApplication(Env.serverAddress);
-            builder.Services.AddInfrastructure();
+            builder.Services.AddInfrastructure(Env.serverAddress);
             builder.Services.AddViewModel();
 
             return builder.Build();

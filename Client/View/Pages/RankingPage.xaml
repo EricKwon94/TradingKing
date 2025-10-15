@@ -12,5 +12,7 @@
             FontSize="Title"
             VerticalOptions="Center" 
             HorizontalOptions="Center" />
+
+        <Button Text="Invoke" Command="{Binding InvokeCommand}"/>
     </VerticalStackLayout>
 </local:BasePage>
