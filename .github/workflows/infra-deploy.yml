@@ -16,6 +16,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
+      DOCKER_IMAGE_NAME: webserver-dev
+      DOCKER_URL: tradingkingkoreacentral.azurecr.io
       DOCKER_USERNAME: tradingkingkoreacentral
       env: dev
       
@@ -44,7 +46,7 @@ jobs:
                 "location": "koreacentral",
                 "serverNumber": "01",
                 "issKey": ${{ secrets.ISS_KEY }},
-                "dockerUrl": ${{ env.DOCKER_USERNAME }}.azurecr.io/${{ env.DOCKER_USERNAME }}${{ env.env }}:latest,
+                "dockerUrl": ${{ env.DOCKER_URL }}/${{ env.DOCKER_IMAGE_NAME }}:latest,
                 "dockerUserName": ${{ env.DOCKER_USERNAME }},
                 "dockerPassword": ${{ secrets.ACR_PASSWORD }},
                 "sqlsrvId": "${{ secrets.SQLSRV_ID }}",
