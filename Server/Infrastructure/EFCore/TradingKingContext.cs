@@ -57,7 +57,7 @@ internal class TradingKingContext : DbContext, IEntityTypeConfiguration<User>, I
         builder.Property(e => e.Price);
 
         builder.HasOne(purchase => purchase.User)
-            .WithMany(user => user.Purchases)
+            .WithMany(user => user.Orders)
             .HasForeignKey(purchase => purchase.UserSeq);
 
         builder.Property<DateTime>("CreatedAt")

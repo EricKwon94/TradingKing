@@ -96,10 +96,14 @@ public partial class AssetViewModel : BaseViewModel
             Purchases.Add(purchse);
         }
 
+        if (Purchases.Count == 0)
+            return;
+
         try
         {
+            var codes = grouped.Where(e => e.TotalQuantity >= 0.0001).Select(x => x.Code);
             await _tickerApi.ConnectAsync(ct);
-            await _tickerApi.SendAsync(grouped.Select(x => x.Code), ct);
+            await _tickerApi.SendAsync(codes, ct);
             IsBusy = false;
             await foreach (var item in _tickerApi.ReceiveAsync(ct))
             {
@@ -112,6 +116,10 @@ public partial class AssetViewModel : BaseViewModel
         catch (OperationCanceledException)
         {
             _tickerApi.Dispose();
+        }
+        catch (Exception ex)
+        {
+            await _alert.DisplayAlertAsync("error", ex.Message, "ok", default);
         }
     }
 

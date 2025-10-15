@@ -2,6 +2,7 @@
 using Domain.Persistences;
 using Infrastructure.EFCore;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,6 +26,13 @@ internal class UserRepository : IUserRepository
     {
         return _users.AsNoTracking()
             .SingleOrDefaultAsync(e => e.Id == id && e.Password == encryptedPassword, ct);
+    }
+
+    public Task<User> GetUserWithOrderAsync(int seq, string code, CancellationToken ct)
+    {
+        return _users
+            .Include(e => e.Orders.Where(e => e.Code == code))
+            .SingleAsync(e => e.Seq == seq, cancellationToken: ct);
     }
 
     public void UpdateToken(User user, string token)
