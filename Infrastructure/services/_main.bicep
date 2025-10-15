@@ -26,6 +26,15 @@ module appService 'app-service.bicep' = {
   }
 }
 
+module signalR 'signalr.bicep' = {
+  name: 'dp-signalR'
+  params: {
+    env: env
+    location: location
+    serverNumber: serverNumber
+  }
+}
+
 module sqlServer 'sql-server.bicep' = {
   name: 'dp-sqlServer'
   params: {
@@ -41,6 +50,7 @@ module serviceLinker 'service-linker.bicep' = {
   name: 'dp-serviceLinker'
   params: {
     appServiceName: appService.outputs.appServiceName
+    signalrId: signalR.outputs.id
     sqldbId: sqlServer.outputs.sqldbId
     sqlsrvId: sqlsrvId
     sqlsrvPwd: sqlsrvPwd
