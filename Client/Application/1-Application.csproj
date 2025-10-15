@@ -16,7 +16,7 @@
 	</ItemGroup>
 	
 	<ItemGroup>
-		<Compile Include="..\..\Server\Application\Gateways\IChatHub.cs" Link="Gateways\Hubs\IChatHub.cs" />
+		<Compile Include="..\..\WebServer\Application\Gateways\IChatHub.cs" Link="Gateways\Hubs\IChatHub.cs" />
 	</ItemGroup>
 
 </Project>
