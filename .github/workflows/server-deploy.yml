@@ -16,8 +16,9 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DOCKER_REGISTRY: tradingking.azurecr.io
+      DOCKER_USERNAME: tradingkingkoreacentral
       SA_PASSWORD: Strongsanklfj2045!@$#%jsjS
+      env: dev
 
     services:
       sqlserver:
@@ -50,20 +51,17 @@ jobs:
         path: ./Server/**/TestResults/*.trx
         reporter: dotnet-trx
 
-# ========================================
-# 서버 비용 아끼려고 잠깐 닫을게요.
-# ========================================
-#    - name: Log in to Docker Hub
-#      uses: docker/login-action@v3
-#      with:
-#        registry: ${{ env.DOCKER_REGISTRY }}
-#        username: tradingking
-#        password: ${{ secrets.ACR_PASSWORD }}
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.DOCKER_USERNAME }}.azurecr.io
+        username: ${{ env.DOCKER_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
 
-#    - name: Build and Push Docker image
-#      uses: docker/build-push-action@v6
-#      with:
-#        context: ./Server
-#        file: ./Server/Host/Dockerfile
-#        tags: ${{ env.DOCKER_REGISTRY }}/tradingkingdev:latest
-#        push: true
+    - name: Build and Push Docker image
+      uses: docker/build-push-action@v6
+      with:
+        context: ./Server
+        file: ./Server/Host/Dockerfile
+        tags: ${{ env.DOCKER_USERNAME }}.azurecr.io/${{ env.DOCKER_USERNAME }}${{ env.env }}:latest
+        push: true

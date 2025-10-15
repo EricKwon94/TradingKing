@@ -1,13 +1,13 @@
 param env string
 param serverNumber string
 param location string = resourceGroup().location
-param registryUrl string
-param registryUserName string
+param dockerUrl string
+param dockerUserName string
 
 @secure()
 param issKey string
 @secure()
-param registryPassword string
+param dockerPassword string
 @secure()
 param sqlsrvId string
 @secure()
@@ -20,9 +20,9 @@ module appService 'app-service.bicep' = {
     location: location
     serverNumber: serverNumber
     issKey: issKey
-    registryUrl: registryUrl
-    registryUserName: registryUserName
-    registryPassword: registryPassword
+    dockerUrl: dockerUrl
+    dockerUserName: dockerUserName
+    dockerPassword: dockerPassword
   }
 }
 
