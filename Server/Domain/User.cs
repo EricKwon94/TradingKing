@@ -1,5 +1,6 @@
 ﻿using Domain.Exceptions;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Domain;
@@ -15,7 +16,15 @@ public class User
     public string Password { get; }
     public string? Jwt { get; set; }
 
-    public ICollection<Order> Purchases { get; } = [];
+    private readonly List<Order> _orders = [];
+    public IReadOnlyList<Order> Orders => _orders;
+
+#pragma warning disable CS8618
+    private User()
+    {
+
+    }
+#pragma warning restore CS8618
 
     /// <exception cref="InvalidIdException"></exception>
     /// <exception cref="InvalidPasswordException"></exception>
@@ -26,12 +35,49 @@ public class User
         if (!idValid)
             throw new InvalidIdException();
 
+        if (id.Contains("GM") || id.Contains("운영자"))
+            throw new InvalidIdException();
+
         if (password.Length < MIN_PASSWORD_LENGTH)
             throw new InvalidPasswordException();
 
         Id = id;
         Password = password;
 
-        Purchases.Add(new Order(Seq, Order.DEFAULT_CODE, 1, Order.DEFAULT_PRICE));
+        _orders.Add(new Order(Seq, Order.DEFAULT_CODE, 1, Order.DEFAULT_PRICE));
+    }
+
+    /// <exception cref="PriceTooLowException"></exception>
+    /// <exception cref="NotEnoughCashException"></exception>
+    public void BuyCoin(string code, double buyQuantity, double tickerPrice)
+    {
+        double price = buyQuantity * tickerPrice;
+        if (price < Order.MIN_ORDER_PRICE)
+            throw new PriceTooLowException();
+
+        double availableCash = Orders.Where(e => e.Code == Order.DEFAULT_CODE).Sum(e => e.Price);
+        if (availableCash < price)
+            throw new NotEnoughCashException();
+
+        var cryto = new Order(Seq, code, buyQuantity, tickerPrice);
+        var cash = new Order(Seq, Order.DEFAULT_CODE, 1, price * -1);
+        _orders.AddRange(cryto, cash);
+    }
+
+    /// <exception cref="PriceTooLowException"></exception>
+    /// <exception cref="NotEnoughCoinException"></exception>
+    public void SellCoin(string code, double sellQuantity, double tickerPrice)
+    {
+        double quantity = Orders.Where(e => e.Code == code).Sum(e => e.Quantity);
+        if (sellQuantity > quantity)
+            throw new NotEnoughCoinException();
+
+        double price = sellQuantity * tickerPrice;
+        if (price < Order.MIN_ORDER_PRICE)
+            throw new PriceTooLowException();
+
+        var cryto = new Order(Seq, code, sellQuantity * -1, tickerPrice);
+        var cash = new Order(Seq, Order.DEFAULT_CODE, 1, price);
+        _orders.AddRange(cryto, cash);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Domain.Exceptions;
 using FluentAssertions;
 using System;
+using System.Linq;
 
 namespace Domain.Tests;
 
@@ -36,6 +37,8 @@ public class UserTests
 
     [Theory]
     [InlineData("abc")]
+    [InlineData("GM12")]
+    [InlineData("운영자12")]
     [InlineData("abc@")]
     [InlineData("abcㄱ")]
     [InlineData("abc12345678")]
@@ -63,5 +66,94 @@ public class UserTests
     {
         Func<User> sut = () => new User("Id123", password);
         sut.Should().Throw<InvalidPasswordException>();
+    }
+
+    [Fact]
+    public void Buy_coin()
+    {
+        // arrange
+        string expectedCode = "KRW-DOGE";
+        double expectedQuantity = 100;
+        double expectedPrice = 300;
+        double expectedCash = 100_000_000 - expectedQuantity * expectedPrice;
+
+        User sut = new User("zxcxzs21", "asfhlkidsgvhl!");
+
+        // act
+        sut.BuyCoin(expectedCode, expectedQuantity, expectedPrice);
+
+        // assert
+        var cashes = sut.Orders.Where(e => e.Code == "KRW-CASH").ToList();
+        cashes.Count.Should().Be(2);
+        cashes.Sum(e => e.Price).Should().Be(expectedCash);
+
+        var doge = sut.Orders.Single(e => e.Code == "KRW-DOGE");
+        doge.Code.Should().Be(expectedCode);
+        doge.Quantity.Should().Be(expectedQuantity);
+        doge.Price.Should().Be(expectedPrice);
+    }
+
+    [Fact]
+    public void Can_not_buy_coin_if_not_enough_cash()
+    {
+        User sut = new User("zxcxzs21", "asfhlkidsgvhl!");
+        Action testCode = () => sut.BuyCoin("KRW-BTC", 1, 177_000_000);
+        Assert.Throws<NotEnoughCashException>(testCode);
+    }
+
+    [Fact]
+    public void Can_not_buy_coin_if_not_order_price_too_low()
+    {
+        User sut = new User("zxcxzs21", "asfhlkidsgvhl!");
+        Action testCode = () => sut.BuyCoin("KRW-DOGE", 1, 300);
+        Assert.Throws<PriceTooLowException>(testCode);
+    }
+
+    [Fact]
+    public void Sell_coin()
+    {
+        // arrange
+        string expectedCode = "KRW-DOGE";
+        double expectedRemainingQuantity = 2;
+        double expectedQuantity = 100;
+        double expectedPrice = 300;
+        double expectedCash = 100_000_000 - expectedRemainingQuantity * expectedPrice;
+
+        User sut = new User("zxcxzs21", "asfhlkidsgvhl!");
+        sut.BuyCoin(expectedCode, expectedQuantity + expectedRemainingQuantity, expectedPrice);
+
+        // act
+        sut.SellCoin(expectedCode, expectedQuantity, expectedPrice);
+
+        // assert
+        var cashes = sut.Orders.Where(e => e.Code == "KRW-CASH").ToList();
+        cashes.Count.Should().Be(3);
+        cashes.Sum(e => e.Price).Should().Be(expectedCash);
+
+        var doges = sut.Orders.Where(e => e.Code == "KRW-DOGE").ToList();
+        doges.Count.Should().Be(2);
+        doges[0].Code.Should().Be(expectedCode);
+        doges[0].Quantity.Should().Be(expectedQuantity + expectedRemainingQuantity);
+        doges[0].Price.Should().Be(expectedPrice);
+        doges[1].Code.Should().Be(expectedCode);
+        doges[1].Quantity.Should().Be(expectedQuantity * -1);
+        doges[1].Price.Should().Be(expectedPrice);
+    }
+
+    [Fact]
+    public void Can_not_sell_coin_if_not_enough_coin()
+    {
+        User sut = new User("zxcxzs21", "asfhlkidsgvhl!");
+        Action testCode = () => sut.SellCoin("KRW-BTC", 1, 177_000_000);
+        Assert.Throws<NotEnoughCoinException>(testCode);
+    }
+
+    [Fact]
+    public void Can_not_sell_coin_if_not_order_price_too_low()
+    {
+        User sut = new User("zxcxzs21", "asfhlkidsgvhl!");
+        sut.BuyCoin("KRW-DOGE", 100, 300);
+        Action testCode = () => sut.SellCoin("KRW-DOGE", 1, 300);
+        Assert.Throws<PriceTooLowException>(testCode);
     }
 }

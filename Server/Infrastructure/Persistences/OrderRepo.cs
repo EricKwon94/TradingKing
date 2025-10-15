@@ -25,13 +25,6 @@ internal class OrderRepo : IOrderRepo
             .ToListAsync(ct);
     }
 
-    public Task<List<Order>> GetAllAsync(int userSeq, string code, CancellationToken ct)
-    {
-        return _orders.AsNoTracking()
-            .Where(e => e.UserSeq == userSeq && e.Code == code)
-            .ToListAsync(ct);
-    }
-
     public async ValueTask AddAsync(Order purchase, CancellationToken ct)
     {
         await _orders.AddAsync(purchase, ct);
