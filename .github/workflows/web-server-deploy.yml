@@ -1,4 +1,4 @@
-name: Server Deploy
+name: WebServer Deploy
 
 on:
   workflow_dispatch:  
@@ -7,8 +7,8 @@ on:
       - master
       - dev
     paths:
-      - "Server/**"
-      - .github/workflows/server-deploy.yml
+      - "WebServer/**"
+      - .github/workflows/web-server-deploy.yml
 
 jobs:
   job1:
@@ -43,15 +43,15 @@ jobs:
 
     - name: Build and Test
       run: |
-        dotnet build ./Server -c Release
-        dotnet test ./Server -c Release --logger trx
+        dotnet build ./WebServer -c Release
+        dotnet test ./WebServer -c Release --logger trx
       
     - name: Publish Test Results
       uses: dorny/test-reporter@v2
       if: always()
       with:
         name: Tests
-        path: ./Server/**/TestResults/*.trx
+        path: ./WebServer/**/TestResults/*.trx
         reporter: dotnet-trx
 
     - name: Install EF Tool
@@ -62,8 +62,8 @@ jobs:
         --configuration Release
         --idempotent
         --output ${{ github.workspace }}/migrations.sql
-        --project ./Server/Infrastructure
-        --startup-project ./Server/Host
+        --project ./WebServer/Infrastructure
+        --startup-project ./WebServer/Host
 
     - name: Log in to Azure
       uses: azure/login@v2
@@ -86,7 +86,7 @@ jobs:
     - name: Build and Push Docker image
       uses: docker/build-push-action@v6
       with:
-        context: ./Server
-        file: ./Server/Host/Dockerfile
+        context: ./WebServer
+        file: ./WebServer/Host/Dockerfile
         tags: ${{ env.DOCKER_URL }}/${{ env.DOCKER_IMAGE_NAME }}:latest
         push: true

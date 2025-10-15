@@ -1,7 +1,7 @@
 version: 2
 updates:
   - package-ecosystem: "nuget"
-    directory: "Server"
+    directory: "WebServer"
     schedule:
       interval: "weekly"
     groups:
