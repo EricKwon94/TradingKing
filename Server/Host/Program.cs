@@ -27,6 +27,7 @@ public class Program
             .AddSignalR().AddMessagePackProtocol();
 
 #if RELEASE
+        if (!builder.Environment.IsEnvironment("Test"))
             signalRBuilder.AddAzureSignalR();
 #endif
 
