@@ -28,18 +28,17 @@ resource sqlServer 'Microsoft.Sql/servers@2024-11-01-preview' = {
       startIpAddress: '0.0.0.0'
     }
   }
+
+  resource sqlDB 'databases' = {
+    name: 'TradingKing'
+    location: location
+    sku: {
+      name: 'Basic'
+    }
+    properties: {
+      requestedBackupStorageRedundancy: 'Local'
+    }
+  }
 }
 
-resource sqlDB 'Microsoft.Sql/servers/databases@2024-11-01-preview' = {
-  name: 'TradingKing'
-  parent: sqlServer
-  location: location
-  sku: {
-    name: 'Basic'
-  }
-  properties: {
-    requestedBackupStorageRedundancy: 'Local'
-  }
-}
-
-output sqldbId string = sqlDB.id
+output sqldbId string = sqlServer::sqlDB.id
