@@ -2,11 +2,13 @@ using Application;
 using Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Presentaion.Hubs;
 using System;
 using System.Text;
 using System.Threading.RateLimiting;
@@ -20,6 +22,14 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+
+        ISignalRServerBuilder signalRBuilder = builder.Services
+            .AddSignalR().AddMessagePackProtocol();
+
+#if RELEASE
+        if (!builder.Environment.IsEnvironment("Test"))
+            signalRBuilder.AddAzureSignalR();
+#endif
 
         builder.Services.AddControllers();
 
@@ -96,13 +106,14 @@ public class Program
 
         if (app.Environment.IsDevelopment())
         {
-            app.UseSwagger()
-                .UseSwaggerUI();
+            app.UseSwagger().UseSwaggerUI();
         }
 
         app.UseHttpsRedirection();
-        app.UseAuthentication()
-            .UseAuthorization();
+        app.UseAuthentication().UseAuthorization();
+
+        app.MapHub<ChatHub>("/chat")
+            .RequireRateLimiting(RATE_LIMIT_POLICY);
 
         app.MapControllers()
             .RequireRateLimiting(RATE_LIMIT_POLICY);
