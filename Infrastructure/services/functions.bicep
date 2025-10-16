@@ -93,6 +93,7 @@ resource site2 'Microsoft.Web/sites@2024-11-01' = {
       DEPLOYMENT_STORAGE_CONNECTION_STRING: saCS
       SqlHubName: 'SqlTrigger'
       TimerHubName: 'TimerTrigger'
+      EventHub: eventHubCs
     }
   }
 
@@ -102,10 +103,6 @@ resource site2 'Microsoft.Web/sites@2024-11-01' = {
       TradingKing: {
         value: 'Data Source=${sqlsrvdn};Initial Catalog=TradingKing;User ID=${sqlsrvId};Password=${sqlsrvPwd};'
         type: 'SQLAzure'
-      }
-      EventHub: {
-        value: eventHubCs
-        type: 'EventHub'
       }
     }
   }
