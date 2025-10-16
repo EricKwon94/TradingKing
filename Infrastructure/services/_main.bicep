@@ -85,3 +85,12 @@ module func 'functions.bicep' = {
     saName: sa.outputs.name
   }
 }
+
+module eventHub 'eventhub.bicep' = {
+  name: 'dp-eventHub'
+  params: {
+    env: env
+    location: location
+    serverNumber: serverNumber
+  }
+}
