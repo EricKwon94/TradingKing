@@ -64,6 +64,7 @@ public partial class RegisterViewModel : BaseViewModel
     {
         var body = new RegisterReq(UserId, UserPassword);
         bool succ = false;
+        IsBusy = true;
         try
         {
             await _accountApi.RegisterAsync(body, ct);
@@ -90,6 +91,7 @@ public partial class RegisterViewModel : BaseViewModel
             await _alert.DisplayAlertAsync("회원가입", "가입성공", "ok", ct);
             await _navigationService.GoToAsync("..", ct);
         }
+        IsBusy = false;
     }
 
     private bool CanRegister()

@@ -22,3 +22,5 @@ resource eventHub 'Microsoft.EventHub/namespaces@2025-05-01-preview' = {
     }
   }
 }
+
+output name string = eventHub.name

@@ -4,6 +4,7 @@ param serverNumber string
 param deploymentStorageContainerName string
 param blob string
 param saName string
+param eventHubName string
 param sqlsrvdn string
 
 @secure()
@@ -15,7 +16,12 @@ resource sa 'Microsoft.Storage/storageAccounts@2025-01-01' existing = {
   name: saName
 }
 
+resource eventHub 'Microsoft.EventHub/namespaces@2025-05-01-preview' existing = {
+  name: eventHubName
+}
+
 var saCS string = 'DefaultEndpointsProtocol=https;AccountName=${sa.name};AccountKey=${listKeys(sa.id, sa.apiVersion).keys[0].value};EndpointSuffix=${environment().suffixes.storage}'
+var eventHubCs string = listKeys(eventHub.id, eventHub.apiVersion).primaryConnectionString
 
 resource appServicePlan2 'Microsoft.Web/serverfarms@2024-11-01' = {
   name: 'functk-${env}-${location}-${serverNumber}'
@@ -85,6 +91,8 @@ resource site2 'Microsoft.Web/sites@2024-11-01' = {
     properties: {
       AzureWebJobsStorage: saCS
       DEPLOYMENT_STORAGE_CONNECTION_STRING: saCS
+      SqlHubName: 'SqlTrigger'
+      TimerHubName: 'TimerTrigger'
     }
   }
 
@@ -94,6 +102,10 @@ resource site2 'Microsoft.Web/sites@2024-11-01' = {
       TradingKing: {
         value: 'Data Source=${sqlsrvdn};Initial Catalog=TradingKing;User ID=${sqlsrvId};Password=${sqlsrvPwd};'
         type: 'SQLAzure'
+      }
+      EventHub: {
+        value: eventHubCs
+        type: 'EventHub'
       }
     }
   }

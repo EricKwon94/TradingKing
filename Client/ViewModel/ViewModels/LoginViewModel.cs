@@ -69,6 +69,7 @@ public partial class LoginViewModel : BaseViewModel
     {
         var body = new LoginReq(UserId, UserPassword);
         string? jwt = null;
+        IsBusy = true;
         try
         {
             jwt = await _accountApi.LoginAsync(body, ct);
@@ -91,6 +92,7 @@ public partial class LoginViewModel : BaseViewModel
             };
             await _navigationService.GoToAsync("//main", parameters, ct);
         }
+        IsBusy = false;
     }
 
     [RelayCommand]
