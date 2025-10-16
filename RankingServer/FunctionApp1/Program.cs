@@ -1,6 +1,7 @@
 using Azure.Messaging.EventHubs.Producer;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -8,7 +9,7 @@ var builder = FunctionsApplication.CreateBuilder(args);
 
 builder.ConfigureFunctionsWebApplication();
 
-string eventHubCs = builder.Configuration["EventHub"]!;
+string eventHubCs = builder.Configuration.GetConnectionString("EventHub")!;
 string sqlHubName = builder.Configuration["SqlHubName"]!;
 string timerHubName = builder.Configuration["TimerHubName"]!;
 
