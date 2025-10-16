@@ -4,7 +4,7 @@ param serverNumber string
 param deploymentStorageContainerName string
 param blob string
 param saName string
-param eventHubName string
+param eventHubRuleName string
 param sqlsrvdn string
 
 @secure()
@@ -16,12 +16,12 @@ resource sa 'Microsoft.Storage/storageAccounts@2025-01-01' existing = {
   name: saName
 }
 
-resource eventHub 'Microsoft.EventHub/namespaces@2025-05-01-preview' existing = {
-  name: eventHubName
+resource eventHubRule 'Microsoft.EventHub/namespaces/eventhubs/authorizationRules@2025-05-01-preview' existing = {
+  name: eventHubRuleName
 }
 
 var saCS string = 'DefaultEndpointsProtocol=https;AccountName=${sa.name};AccountKey=${listKeys(sa.id, sa.apiVersion).keys[0].value};EndpointSuffix=${environment().suffixes.storage}'
-var eventHubCs string = listKeys(eventHub.id, eventHub.apiVersion).primaryConnectionString
+var eventHubCs string = eventHubRule.listkeys().primaryConnectionString
 
 resource appServicePlan2 'Microsoft.Web/serverfarms@2024-11-01' = {
   name: 'functk-${env}-${location}-${serverNumber}'

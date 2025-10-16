@@ -10,6 +10,17 @@ resource eventHub 'Microsoft.EventHub/namespaces@2025-05-01-preview' = {
     capacity: 1
   }
 
+  resource authRules 'authorizationRules' = {
+    name: 'RootManageSharedAccessKey'
+    properties: {
+      rights: [
+        'Listen'
+        'Manage'
+        'Send'
+      ]
+    }
+  }
+
   resource sqltrigger 'eventhubs' = {
     name: 'sqltrigger'
     properties: {
@@ -23,4 +34,4 @@ resource eventHub 'Microsoft.EventHub/namespaces@2025-05-01-preview' = {
   }
 }
 
-output name string = eventHub.name
+output ruleName string = eventHub::authRules.name
