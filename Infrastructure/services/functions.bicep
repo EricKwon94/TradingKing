@@ -86,8 +86,8 @@ resource site2 'Microsoft.Web/sites@2024-11-01' = {
     properties: {
       AzureWebJobsStorage: saCS
       DEPLOYMENT_STORAGE_CONNECTION_STRING: saCS
-      SqlHubName: 'SqlTrigger'
-      TimerHubName: 'TimerTrigger'
+      SqlHubName: 'sqltrigger'
+      TimerHubName: 'timertrigger'
     }
   }
 
