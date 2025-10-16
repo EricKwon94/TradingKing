@@ -4,7 +4,7 @@ param serverNumber string
 param deploymentStorageContainerName string
 param blob string
 
-resource appServicePlan 'Microsoft.Web/serverfarms@2024-11-01' = {
+resource appServicePlan2 'Microsoft.Web/serverfarms@2024-11-01' = {
   name: 'func-${env}-${location}-${serverNumber}'
   location: location
   kind: 'functionapp'
@@ -22,7 +22,7 @@ resource asd 'Microsoft.Web/sites@2024-11-01' = {
   location: location
   kind: 'functionapp,linux'
   properties: {
-    serverFarmId: appServicePlan.id
+    serverFarmId: appServicePlan2.id
     enabled: true
     reserved: true
     httpsOnly: true
