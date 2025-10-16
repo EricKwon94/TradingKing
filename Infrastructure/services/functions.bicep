@@ -4,6 +4,11 @@ param serverNumber string
 param deploymentStorageContainerName string
 param blob string
 
+@secure()
+param sqlsrvId string
+@secure()
+param sqlsrvPwd string
+
 resource appServicePlan2 'Microsoft.Web/serverfarms@2024-11-01' = {
   name: 'functk-${env}-${location}-${serverNumber}'
   location: location
@@ -29,6 +34,10 @@ resource site2 'Microsoft.Web/sites@2024-11-01' = {
     httpsOnly: true
     publicNetworkAccess: 'Enabled'
     keyVaultReferenceIdentity: 'SystemAssigned'
+    containerSize: 1536
+    siteConfig: {
+      functionAppScaleLimit: 100
+    }
     functionAppConfig: {
       deployment: {
         storage: {
@@ -48,6 +57,15 @@ resource site2 'Microsoft.Web/sites@2024-11-01' = {
         maximumInstanceCount: 100
         instanceMemoryMB: 2048
       }
+    }
+  }
+
+  resource config 'config' = {
+    name: 'appsettings'
+    properties: {
+      AzureWebJobsStorage: ''
+      DEPLOYMENT_STORAGE_CONNECTION_STRING: ''
+      TradingKing: 'Data Source=tradingking-dev-koreacentral-01.database.windows.net;Initial Catalog=TradingKing;User ID=${sqlsrvId};Password=${sqlsrvPwd};'
     }
   }
 }
