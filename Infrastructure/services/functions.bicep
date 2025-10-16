@@ -4,7 +4,7 @@ param serverNumber string
 param deploymentStorageContainerName string
 param blob string
 param saName string
-param eventHubRuleName string
+param eventHubCs string
 param sqlsrvdn string
 
 @secure()
@@ -16,12 +16,7 @@ resource sa 'Microsoft.Storage/storageAccounts@2025-01-01' existing = {
   name: saName
 }
 
-resource eventHubRule 'Microsoft.EventHub/namespaces/eventhubs/authorizationRules@2025-05-01-preview' existing = {
-  name: eventHubRuleName
-}
-
 var saCS string = 'DefaultEndpointsProtocol=https;AccountName=${sa.name};AccountKey=${listKeys(sa.id, sa.apiVersion).keys[0].value};EndpointSuffix=${environment().suffixes.storage}'
-var eventHubCs string = eventHubRule.listkeys().primaryConnectionString
 
 resource appServicePlan2 'Microsoft.Web/serverfarms@2024-11-01' = {
   name: 'functk-${env}-${location}-${serverNumber}'
@@ -93,7 +88,6 @@ resource site2 'Microsoft.Web/sites@2024-11-01' = {
       DEPLOYMENT_STORAGE_CONNECTION_STRING: saCS
       SqlHubName: 'SqlTrigger'
       TimerHubName: 'TimerTrigger'
-      EventHub: eventHubCs
     }
   }
 
@@ -103,6 +97,10 @@ resource site2 'Microsoft.Web/sites@2024-11-01' = {
       TradingKing: {
         value: 'Data Source=${sqlsrvdn};Initial Catalog=TradingKing;User ID=${sqlsrvId};Password=${sqlsrvPwd};'
         type: 'SQLAzure'
+      }
+      EventHub:{
+        value: eventHubCs
+        type: 'EventHub'
       }
     }
   }

@@ -10,7 +10,7 @@ resource eventHub 'Microsoft.EventHub/namespaces@2025-05-01-preview' = {
     capacity: 1
   }
 
-  /* resource authRules 'authorizationRules' = {
+  resource authRules 'authorizationRules' = {
     name: 'RootManageSharedAccessKey'
     properties: {
       rights: [
@@ -19,7 +19,7 @@ resource eventHub 'Microsoft.EventHub/namespaces@2025-05-01-preview' = {
         'Send'
       ]
     }
-  } */
+  }
 
   resource sqltrigger 'eventhubs' = {
     name: 'sqltrigger'
@@ -34,16 +34,4 @@ resource eventHub 'Microsoft.EventHub/namespaces@2025-05-01-preview' = {
   }
 }
 
-resource asd 'Microsoft.EventHub/namespaces/authorizationRules@2025-05-01-preview' = {
-  parent: eventHub
-  name: 'RootManageSharedAccessKey'
-  properties: {
-    rights: [
-      'Listen'
-      'Manage'
-      'Send'
-    ]
-  }
-}
-
-output ruleName string = asd.name
+output cs string = eventHub::authRules.listkeys().primaryConnectionString

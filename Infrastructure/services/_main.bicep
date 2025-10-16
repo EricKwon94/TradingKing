@@ -83,7 +83,7 @@ module func 'functions.bicep' = {
     sqlsrvId: sqlsrvId
     sqlsrvPwd: sqlsrvPwd
     saName: sa.outputs.name
-    eventHubRuleName : eventHub.outputs.ruleName
+    eventHubCs : eventHub.outputs.cs
   }
 }
 
