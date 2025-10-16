@@ -7,7 +7,7 @@ on:
       - dev
     paths:
       - "WebServer/**"
-      - .github/workflows/server-ci.yml
+      - .github/workflows/web-server-ci.yml
 
 jobs:
   job1:

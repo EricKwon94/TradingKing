@@ -1,0 +1,47 @@
+name: RankingServer Deploy
+
+on:
+  workflow_dispatch:  
+  push:
+    branches:
+      - master
+      - dev
+    paths:
+      - "RankingServer/RankingServer/**"
+      - .github/workflows/ranking-server-deploy.yml
+
+jobs:
+  job1:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    env:
+      DOCKER_IMAGE_NAME: rankingserver-dev
+      DOCKER_URL: tradingkingkoreacentral.azurecr.io
+      DOCKER_USERNAME: tradingkingkoreacentral
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+    
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: '9.x'
+
+    - name: Build
+      run: dotnet build ./RankingServer -c Release
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.DOCKER_URL }}
+        username: ${{ env.DOCKER_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
+
+    - name: Build and Push Docker image
+      uses: docker/build-push-action@v6
+      with:
+        context: ./RankingServer
+        file: ./RankingServer/RankingServer/Dockerfile
+        tags: ${{ env.DOCKER_URL }}/${{ env.DOCKER_IMAGE_NAME }}:latest
+        push: true

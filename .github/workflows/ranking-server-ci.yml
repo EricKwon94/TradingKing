@@ -1,0 +1,27 @@
+name: RankingServer CI
+
+on:
+  pull_request:
+    branches:
+      - master
+      - dev
+    paths:
+      - "RankingServer/**"
+      - .github/workflows/ranking-server-ci.yml
+
+jobs:
+  job1:
+    name: CI
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+    
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: '9.x'
+
+    - name: Build
+      run: dotnet build ./RankingServer -c Release
