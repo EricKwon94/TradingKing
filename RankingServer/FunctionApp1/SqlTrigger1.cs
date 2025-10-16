@@ -33,6 +33,7 @@ public class SqlTrigger1
 
         foreach (SqlChange<Order> change in changes)
         {
+            _logger.LogInformation("{item}", change.Item);
             var data = new EventData(JsonSerializer.Serialize(change.Item));
             batch.TryAdd(data);
         }
