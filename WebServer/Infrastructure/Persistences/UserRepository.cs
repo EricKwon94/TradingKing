@@ -28,11 +28,11 @@ internal class UserRepository : IUserRepository
             .SingleOrDefaultAsync(e => e.Id == id && e.Password == encryptedPassword, ct);
     }
 
-    public Task<User> GetUserWithOrderAsync(int seq, string code, CancellationToken ct)
+    public Task<User> GetUserWithOrderAsync(string id, string code, CancellationToken ct)
     {
         return _users
             .Include(e => e.Orders.Where(e => e.Code == code))
-            .SingleAsync(e => e.Seq == seq, cancellationToken: ct);
+            .SingleAsync(e => e.Id == id, cancellationToken: ct);
     }
 
     public void UpdateToken(User user, string token)

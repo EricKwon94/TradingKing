@@ -34,17 +34,17 @@ public class OrderServiceTests : IClassFixture<TestDatabaseFixture>
         var sut = CreateService(expectedCode, expectedPrice, context);
 
         // act
-        await sut.BuyAsync(user.Seq, req, default);
+        await sut.BuyAsync(user.Id, req, default);
 
         // assert
         context.ChangeTracker.Clear();
 
         var cashes = await context.Orders.AsNoTracking()
-            .Where(e => e.UserSeq == user.Seq && e.Code == "KRW-CASH")
+            .Where(e => e.UserId == user.Id && e.Code == "KRW-CASH")
             .ToListAsync();
-        cashes.Sum(e => e.Price).Should().Be(expectedCash);
+        cashes.Sum(e => e.Quantity).Should().Be(expectedCash);
 
-        var doge = await context.Orders.AsNoTracking().SingleAsync(e => e.UserSeq == user.Seq && e.Code == expectedCode);
+        var doge = await context.Orders.AsNoTracking().SingleAsync(e => e.UserId == user.Id && e.Code == expectedCode);
         doge.Code.Should().Be(expectedCode);
         doge.Quantity.Should().Be(expectedQuantity);
         doge.Price.Should().Be(expectedPrice);
@@ -65,22 +65,22 @@ public class OrderServiceTests : IClassFixture<TestDatabaseFixture>
         var expectedCash = 100_000_000 - (buyReq.Quantity - sellReq.Quantity) * price;
 
         var sut = CreateService(code, price, context);
-        await sut.BuyAsync(user.Seq, buyReq, default);
+        await sut.BuyAsync(user.Id, buyReq, default);
         context.ChangeTracker.Clear();
 
         // act
-        await sut.SellAsync(user.Seq, sellReq, default);
+        await sut.SellAsync(user.Id, sellReq, default);
 
         // assert
         context.ChangeTracker.Clear();
 
         var cashes = await context.Orders.AsNoTracking()
-            .Where(e => e.UserSeq == user.Seq && e.Code == "KRW-CASH")
+            .Where(e => e.UserId == user.Id && e.Code == "KRW-CASH")
             .ToListAsync();
-        cashes.Sum(e => e.Price).Should().Be(expectedCash);
+        cashes.Sum(e => e.Quantity).Should().Be(expectedCash);
 
         var doges = await context.Orders.AsNoTracking()
-            .Where(e => e.UserSeq == user.Seq && e.Code == code)
+            .Where(e => e.UserId == user.Id && e.Code == code)
             .ToListAsync();
         doges.Count.Should().Be(2);
         doges.Sum(e => e.Quantity).Should().Be(expectedRemainQuantity);

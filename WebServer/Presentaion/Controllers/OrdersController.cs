@@ -33,17 +33,17 @@ public class OrdersController : ControllerBase
     [HttpGet]
     public Task<IEnumerable<OrderService.OrderRes>> GetAsync(CancellationToken ct)
     {
-        int userSeq = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        return _orderService.GetAllAsync(userSeq, ct);
+        string userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        return _orderService.GetAllAsync(userId, ct);
     }
 
     [HttpPost("buy")]
     public async Task<ActionResult> BuyAsync(OrderService.OrderReq req, CancellationToken ct)
     {
-        int userSeq = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        string userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         try
         {
-            await _orderService.BuyAsync(userSeq, req, ct);
+            await _orderService.BuyAsync(userId, req, ct);
         }
         catch (DomainException e)
         {
@@ -56,10 +56,10 @@ public class OrdersController : ControllerBase
     [HttpPost("sell")]
     public async Task<ActionResult> SellAsync(OrderService.OrderReq req, CancellationToken ct)
     {
-        int userSeq = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        string userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         try
         {
-            await _orderService.SellAsync(userSeq, req, ct);
+            await _orderService.SellAsync(userId, req, ct);
         }
         catch (DomainException e)
         {

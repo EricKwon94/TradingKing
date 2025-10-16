@@ -9,13 +9,13 @@ namespace Common;
 
 public class TokenGenerator
 {
-    public string CreateJwt(string identifier, string issKey, string iss, string aud)
+    public string CreateJwt(string userId, string issKey, string iss, string aud)
     {
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(issKey));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
         IEnumerable<Claim> claims = [
-            new Claim(ClaimTypes.NameIdentifier, identifier, ClaimValueTypes.Integer),
+            new Claim(ClaimTypes.NameIdentifier, userId),
             new Claim(ClaimTypes.Role, "User"),
             new Claim(ClaimTypes.Hash, Random.Shared.Next().ToString()),
             ];

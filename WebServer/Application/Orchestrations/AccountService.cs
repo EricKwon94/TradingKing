@@ -56,7 +56,7 @@ public class AccountService
         if (user == null)
             return null;
 
-        string jwt = _tokenGenerator.CreateJwt(user.Seq.ToString(), issKey, iss, aud);
+        string jwt = _tokenGenerator.CreateJwt(id, issKey, iss, aud);
         _userRepository.UpdateToken(user, jwt);
         await _transaction.SaveChangesAsync(ct);
         return jwt;

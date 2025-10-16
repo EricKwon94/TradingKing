@@ -85,7 +85,7 @@ public class UserTests
         // assert
         var cashes = sut.Orders.Where(e => e.Code == "KRW-CASH").ToList();
         cashes.Count.Should().Be(2);
-        cashes.Sum(e => e.Price).Should().Be(expectedCash);
+        cashes.Sum(e => e.Quantity).Should().Be(expectedCash);
 
         var doge = sut.Orders.Single(e => e.Code == "KRW-DOGE");
         doge.Code.Should().Be(expectedCode);
@@ -128,7 +128,7 @@ public class UserTests
         // assert
         var cashes = sut.Orders.Where(e => e.Code == "KRW-CASH").ToList();
         cashes.Count.Should().Be(3);
-        cashes.Sum(e => e.Price).Should().Be(expectedCash);
+        cashes.Sum(e => e.Quantity).Should().Be(expectedCash);
 
         var doges = sut.Orders.Where(e => e.Code == "KRW-DOGE").ToList();
         doges.Count.Should().Be(2);
