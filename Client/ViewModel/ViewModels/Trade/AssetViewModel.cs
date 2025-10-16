@@ -69,7 +69,7 @@ public partial class AssetViewModel : BaseViewModel
             return;
 
         IEnumerable<IOrderApi.OrderRes> orders = await _orderApi.GetAllAsync(ct);
-        AvailableCash = Convert.ToInt64(orders.Where(e => e.Code == "KRW-CASH").Sum(e => e.Price));
+        AvailableCash = Convert.ToInt64(orders.Where(e => e.Code == "KRW-CASH").Sum(e => e.Quantity));
 
         var grouped = orders
             .Where(e => e.Code != "KRW-CASH")
