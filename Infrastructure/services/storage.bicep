@@ -4,7 +4,7 @@ param serverNumber string
 param deploymentStorageContainerName string
 
 resource sa 'Microsoft.Storage/storageAccounts@2025-01-01' = {
-  name: 'tradingking${env}${location}${serverNumber}'
+  name: 'tki${env}${location}${serverNumber}'
   location: location
   sku: {
     name: 'Standard_LRS'
