@@ -28,5 +28,8 @@ resource eventHub 'Microsoft.EventHub/namespaces@2025-05-01-preview' = {
 
   resource sqltrigger 'eventhubs' = {
     name: 'sqltrigger'
+    properties: {
+      messageRetentionInDays: 1
+    }
   }
 }
