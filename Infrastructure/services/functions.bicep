@@ -15,7 +15,7 @@ resource sa 'Microsoft.Storage/storageAccounts@2025-01-01' existing = {
   name: saName
 }
 
-var s string ='DefaultEndpointsProtocol=https;AccountName=${sa.name};AccountKey=${listKeys(sa.id, sa.apiVersion).keys[0].value};EndpointSuffix=${environment().suffixes.storage}'
+var saCS string = 'DefaultEndpointsProtocol=https;AccountName=${sa.name};AccountKey=${listKeys(sa.id, sa.apiVersion).keys[0].value};EndpointSuffix=${environment().suffixes.storage}'
 
 resource appServicePlan2 'Microsoft.Web/serverfarms@2024-11-01' = {
   name: 'functk-${env}-${location}-${serverNumber}'
@@ -68,12 +68,33 @@ resource site2 'Microsoft.Web/sites@2024-11-01' = {
     }
   }
 
+  resource configWeb 'config' = {
+    name: 'web'
+    properties: {
+      cors: {
+        allowedOrigins: [
+          'https://portal.azure.com'
+        ]
+        supportCredentials: false
+      }
+    }
+  }
+
   resource config 'config' = {
     name: 'appsettings'
     properties: {
-      AzureWebJobsStorage: s
-      DEPLOYMENT_STORAGE_CONNECTION_STRING: s
-      TradingKing: 'Data Source=${sqlsrvdn};Initial Catalog=TradingKing;User ID=${sqlsrvId};Password=${sqlsrvPwd};'
+      AzureWebJobsStorage: saCS
+      DEPLOYMENT_STORAGE_CONNECTION_STRING: saCS
+    }
+  }
+
+  resource configCs 'config' = {
+    name: 'connectionstrings'
+    properties: {
+      TradingKing: {
+        value: 'Data Source=${sqlsrvdn};Initial Catalog=TradingKing;User ID=${sqlsrvId};Password=${sqlsrvPwd};'
+        type: 'SQLAzure'
+      }
     }
   }
 }

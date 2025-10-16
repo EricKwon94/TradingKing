@@ -1,5 +1,5 @@
-param env string
-param serverNumber string
+//param env string
+//param serverNumber string
 param location string = resourceGroup().location
 
 resource cr 'Microsoft.ContainerRegistry/registries@2025-04-01' = {
