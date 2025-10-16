@@ -3,11 +3,19 @@ param location string
 param serverNumber string
 param deploymentStorageContainerName string
 param blob string
+param saName string
+param sqlsrvdn string
 
 @secure()
 param sqlsrvId string
 @secure()
 param sqlsrvPwd string
+
+resource sa 'Microsoft.Storage/storageAccounts@2025-01-01' existing = {
+  name: saName
+}
+
+var s string ='DefaultEndpointsProtocol=https;AccountName=${sa.name};AccountKey=${listKeys(sa.id, sa.apiVersion).keys[0].value};EndpointSuffix=${environment().suffixes.storage}'
 
 resource appServicePlan2 'Microsoft.Web/serverfarms@2024-11-01' = {
   name: 'functk-${env}-${location}-${serverNumber}'
@@ -63,9 +71,9 @@ resource site2 'Microsoft.Web/sites@2024-11-01' = {
   resource config 'config' = {
     name: 'appsettings'
     properties: {
-      AzureWebJobsStorage: ''
-      DEPLOYMENT_STORAGE_CONNECTION_STRING: ''
-      TradingKing: 'Data Source=tradingking-dev-koreacentral-01.database.windows.net;Initial Catalog=TradingKing;User ID=${sqlsrvId};Password=${sqlsrvPwd};'
+      AzureWebJobsStorage: s
+      DEPLOYMENT_STORAGE_CONNECTION_STRING: s
+      TradingKing: 'Data Source=${sqlsrvdn};Initial Catalog=TradingKing;User ID=${sqlsrvId};Password=${sqlsrvPwd};'
     }
   }
 }

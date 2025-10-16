@@ -93,4 +93,4 @@ resource sa 'Microsoft.Storage/storageAccounts@2025-01-01' = {
 }
 
 output blob string = sa.properties.primaryEndpoints.blob
-output cs string = 'DefaultEndpointsProtocol=https;AccountName=${sa.name};AccountKey=${listKeys(sa.id, sa.apiVersion).keys[0].value};EndpointSuffix=${environment().suffixes.storage}'
+output name string = sa.name

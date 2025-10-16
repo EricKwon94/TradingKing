@@ -42,3 +42,4 @@ resource sqlServer 'Microsoft.Sql/servers@2024-11-01-preview' = {
 }
 
 output sqldbId string = sqlServer::sqlDB.id
+output domainName string = sqlServer.properties.fullyQualifiedDomainName

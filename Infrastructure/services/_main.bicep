@@ -79,7 +79,9 @@ module func 'functions.bicep' = {
     serverNumber: serverNumber
     deploymentStorageContainerName: deploymentStorageContainerName
     blob: sa.outputs.blob
+    sqlsrvdn: sqlServer.outputs.domainName
     sqlsrvId: sqlsrvId
     sqlsrvPwd: sqlsrvPwd
+    saName: sa.outputs.name
   }
 }
