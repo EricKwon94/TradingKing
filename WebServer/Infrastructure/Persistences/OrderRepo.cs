@@ -18,10 +18,10 @@ internal class OrderRepo : IOrderRepo
         _orders = context.Orders;
     }
 
-    public Task<List<Order>> GetAllAsync(int userSeq, CancellationToken ct)
+    public Task<List<Order>> GetAllAsync(string userId, CancellationToken ct)
     {
         return _orders.AsNoTracking()
-            .Where(e => e.UserSeq == userSeq)
+            .Where(e => e.UserId == userId)
             .ToListAsync(ct);
     }
 

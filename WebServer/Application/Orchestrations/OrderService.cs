@@ -29,20 +29,20 @@ public class OrderService
         return Order.MIN_ORDER_PRICE;
     }
 
-    public async Task<IEnumerable<OrderRes>> GetAllAsync(int userSeq, CancellationToken ct)
+    public async Task<IEnumerable<OrderRes>> GetAllAsync(string userId, CancellationToken ct)
     {
-        var orders = await _orderRepo.GetAllAsync(userSeq, ct);
+        var orders = await _orderRepo.GetAllAsync(userId, ct);
         return orders.Select(e => new OrderRes(e.Code, e.Quantity, e.Price));
     }
 
     /// <exception cref="PriceTooLowException"></exception>
     /// <exception cref="NotEnoughCashException"></exception>
-    public async Task BuyAsync(int userSeq, OrderReq req, CancellationToken ct)
+    public async Task BuyAsync(string userId, OrderReq req, CancellationToken ct)
     {
         var tickers = await _exchangeApi.GetTickerAsync(req.Code, ct);
         var ticker = tickers.Single();
 
-        User user = await _userRepo.GetUserWithOrderAsync(userSeq, Order.DEFAULT_CODE, ct);
+        User user = await _userRepo.GetUserWithOrderAsync(userId, Order.DEFAULT_CODE, ct);
         user.BuyCoin(req.Code, req.Quantity, ticker.trade_price);
 
         await _transaction.SaveChangesAsync(ct);
@@ -50,12 +50,12 @@ public class OrderService
 
     /// <exception cref="PriceTooLowException"></exception>
     /// <exception cref="NotEnoughCoinException"></exception>
-    public async Task SellAsync(int userSeq, OrderReq req, CancellationToken ct)
+    public async Task SellAsync(string userId, OrderReq req, CancellationToken ct)
     {
         var tickers = await _exchangeApi.GetTickerAsync(req.Code, ct);
         var ticker = tickers.Single();
 
-        User user = await _userRepo.GetUserWithOrderAsync(userSeq, req.Code, ct);
+        User user = await _userRepo.GetUserWithOrderAsync(userId, req.Code, ct);
         user.SellCoin(req.Code, req.Quantity, ticker.trade_price);
 
         await _transaction.SaveChangesAsync(ct);

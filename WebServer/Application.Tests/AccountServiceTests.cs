@@ -39,10 +39,10 @@ public class AccountServiceTests : IClassFixture<TestDatabaseFixture>
         user.Password.Should().Be(expectedPwd);
         user.Jwt.Should().BeNull();
 
-        var order = await context.Orders.AsNoTracking().SingleAsync(e => e.UserSeq == user.Seq);
+        var order = await context.Orders.AsNoTracking().SingleAsync(e => e.UserId == user.Id);
         order.Code.Should().Be("KRW-CASH");
-        order.Price.Should().Be(100_000_000);
-        order.Quantity.Should().Be(1);
+        order.Quantity.Should().Be(100_000_000);
+        order.Price.Should().Be(1);
     }
 
     [Fact]
@@ -56,6 +56,7 @@ public class AccountServiceTests : IClassFixture<TestDatabaseFixture>
         var sut = CreateAccountService(context);
         bool r = await sut.RegisterAsync(id, pwd, default);
         Assert.True(r);
+        context.ChangeTracker.Clear();
 
         // act
         bool result = await sut.RegisterAsync(id, pwd, default);

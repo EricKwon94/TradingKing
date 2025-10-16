@@ -23,9 +23,7 @@ internal class TradingKingContext : DbContext, IEntityTypeConfiguration<User>, I
 
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        builder.HasKey(e => e.Seq);
-
-        builder.HasIndex(e => e.Id).IsUnique();
+        builder.HasKey(e => e.Id);
 
         builder.Property(e => e.Id)
             .HasMaxLength(User.MAX_ID_LENGTH)
@@ -46,9 +44,10 @@ internal class TradingKingContext : DbContext, IEntityTypeConfiguration<User>, I
 
     public void Configure(EntityTypeBuilder<Order> builder)
     {
-        builder.Property<Guid>("Id")
+        builder.HasKey(e => e.Id);
+
+        builder.Property(e => e.Id)
             .HasDefaultValueSql("newid()");
-        builder.HasKey("Id");
 
         builder.Property(e => e.Code)
             .HasMaxLength(20)
@@ -56,9 +55,9 @@ internal class TradingKingContext : DbContext, IEntityTypeConfiguration<User>, I
         builder.Property(e => e.Quantity);
         builder.Property(e => e.Price);
 
-        builder.HasOne(purchase => purchase.User)
+        builder.HasOne(oder => oder.User)
             .WithMany(user => user.Orders)
-            .HasForeignKey(purchase => purchase.UserSeq);
+            .HasForeignKey(oder => oder.UserId);
 
         builder.Property<DateTime>("CreatedAt")
             .HasDefaultValueSql("getutcdate()");

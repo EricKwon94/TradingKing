@@ -24,9 +24,9 @@ namespace Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Purchases", x => x.Id);
+                    table.PrimaryKey("PK_Orders", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Purchases_Users_UserSeq",
+                        name: "FK_Orders_Users_UserSeq",
                         column: x => x.UserSeq,
                         principalTable: "Users",
                         principalColumn: "Seq",
@@ -34,7 +34,7 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Purchases_UserSeq",
+                name: "IX_Orders_UserSeq",
                 table: "Purchases",
                 column: "UserSeq");
         }

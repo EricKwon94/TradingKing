@@ -5,13 +5,12 @@ using System.Text.RegularExpressions;
 
 namespace Domain;
 
-public class User
+public class User : IEntity<string>
 {
     public const int MIN_ID_LENGTH = 4;
     public const int MAX_ID_LENGTH = 10;
     public const int MIN_PASSWORD_LENGTH = 6;
 
-    public int Seq { get; }
     public string Id { get; }
     public string Password { get; }
     public string? Jwt { get; set; }
@@ -44,7 +43,7 @@ public class User
         Id = id;
         Password = password;
 
-        _orders.Add(new Order(Seq, Order.DEFAULT_CODE, 1, Order.DEFAULT_PRICE));
+        _orders.Add(new Order(Id, Order.DEFAULT_CODE, Order.DEFAULT_PRICE, 1));
     }
 
     /// <exception cref="PriceTooLowException"></exception>
@@ -55,12 +54,12 @@ public class User
         if (price < Order.MIN_ORDER_PRICE)
             throw new PriceTooLowException();
 
-        double availableCash = Orders.Where(e => e.Code == Order.DEFAULT_CODE).Sum(e => e.Price);
+        double availableCash = Orders.Where(e => e.Code == Order.DEFAULT_CODE).Sum(e => e.Quantity);
         if (availableCash < price)
             throw new NotEnoughCashException();
 
-        var cryto = new Order(Seq, code, buyQuantity, tickerPrice);
-        var cash = new Order(Seq, Order.DEFAULT_CODE, 1, price * -1);
+        var cryto = new Order(Id, code, buyQuantity, tickerPrice);
+        var cash = new Order(Id, Order.DEFAULT_CODE, price * -1, 1);
         _orders.AddRange(cryto, cash);
     }
 
@@ -76,8 +75,8 @@ public class User
         if (price < Order.MIN_ORDER_PRICE)
             throw new PriceTooLowException();
 
-        var cryto = new Order(Seq, code, sellQuantity * -1, tickerPrice);
-        var cash = new Order(Seq, Order.DEFAULT_CODE, 1, price);
+        var cryto = new Order(Id, code, sellQuantity * -1, tickerPrice);
+        var cash = new Order(Id, Order.DEFAULT_CODE, price, 1);
         _orders.AddRange(cryto, cash);
     }
 }
