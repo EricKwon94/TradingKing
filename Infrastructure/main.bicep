@@ -25,8 +25,7 @@ module shared 'services/_shared.bicep' = {
   name: 'dp-shared'
   scope: rgShared
   params:{
-    env: env
-    serverNumber: serverNumber
+    
   }
 }
 

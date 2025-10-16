@@ -13,6 +13,10 @@ param sqlsrvId string
 @secure()
 param sqlsrvPwd string
 
+param resourceToken string = toLower(uniqueString(subscription().id, location))
+param appName string = 'func-${resourceToken}'
+var deploymentStorageContainerName = 'app-package-${take(appName, 32)}-${take(resourceToken, 7)}'
+
 module appService 'app-service.bicep' = {
   name: 'dp-appService'
   params: {
@@ -54,5 +58,30 @@ module serviceLinker 'service-linker.bicep' = {
     sqldbId: sqlServer.outputs.sqldbId
     sqlsrvId: sqlsrvId
     sqlsrvPwd: sqlsrvPwd
+  }
+}
+
+module sa 'storage.bicep' = {
+  name: 'dp-storage'
+  params: {
+    env: env
+    location: location
+    serverNumber: serverNumber
+    deploymentStorageContainerName: deploymentStorageContainerName
+  }
+}
+
+module func 'functions.bicep' = {
+  name: 'dp-functions'
+  params: {
+    env: env
+    location: location
+    serverNumber: serverNumber
+    deploymentStorageContainerName: deploymentStorageContainerName
+    blob: sa.outputs.blob
+    sqlsrvdn: sqlServer.outputs.domainName
+    sqlsrvId: sqlsrvId
+    sqlsrvPwd: sqlsrvPwd
+    saName: sa.outputs.name
   }
 }
