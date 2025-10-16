@@ -5,7 +5,7 @@ param deploymentStorageContainerName string
 param blob string
 
 resource appServicePlan2 'Microsoft.Web/serverfarms@2024-11-01' = {
-  name: 'func-${env}-${location}-${serverNumber}'
+  name: 'functk-${env}-${location}-${serverNumber}'
   location: location
   kind: 'functionapp'
   sku: {
@@ -14,11 +14,12 @@ resource appServicePlan2 'Microsoft.Web/serverfarms@2024-11-01' = {
   }
   properties: {
     reserved: true
+    maximumElasticWorkerCount: 1
   }
 }
 
-resource asd 'Microsoft.Web/sites@2024-11-01' = {
-  name: 'tradingking-${env}-${location}-${serverNumber}'
+resource site2 'Microsoft.Web/sites@2024-11-01' = {
+  name: 'functk-${env}-${location}-${serverNumber}'
   location: location
   kind: 'functionapp,linux'
   properties: {

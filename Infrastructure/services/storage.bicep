@@ -15,6 +15,7 @@ resource sa 'Microsoft.Storage/storageAccounts@2025-01-01' = {
     publicNetworkAccess: 'Enabled'
     allowSharedKeyAccess: true
     largeFileSharesState: 'Enabled'
+    minimumTlsVersion: 'TLS1_2'
     supportsHttpsTrafficOnly: true
     networkAcls: {
       bypass: 'AzureServices'
@@ -38,6 +39,17 @@ resource sa 'Microsoft.Storage/storageAccounts@2025-01-01' = {
 
   resource blob 'blobServices' = {
     name: 'default'
+    properties: {
+      containerDeleteRetentionPolicy: {
+        enabled: true
+        days: 7
+      }
+      deleteRetentionPolicy: {
+        allowPermanentDelete: false
+        enabled: true
+        days: 7
+      }
+    }
 
     resource container 'containers' = {
       name: deploymentStorageContainerName
@@ -49,6 +61,12 @@ resource sa 'Microsoft.Storage/storageAccounts@2025-01-01' = {
 
   resource file 'fileServices' = {
     name: 'default'
+    properties: {
+      shareDeleteRetentionPolicy: {
+        enabled: true
+        days: 7
+      }
+    }
   }
 
   resource q 'queueServices' = {
