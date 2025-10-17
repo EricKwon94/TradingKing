@@ -20,7 +20,7 @@ public class TimerTrigger1
 
     [Function("TimerTrigger1")]
     public void Run(
-      [TimerTrigger("*/10 * * * * *")] TimerInfo myTimer, FunctionContext context)
+      [TimerTrigger("*/50 * * * * *")] TimerInfo myTimer, FunctionContext context)
     {
         string? eventHubCs = _config["EventHub"];
         string? tradingking = _config.GetConnectionString("TradingKing");
