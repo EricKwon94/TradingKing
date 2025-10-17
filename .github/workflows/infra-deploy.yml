@@ -16,7 +16,9 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DOCKER_IMAGE_NAME: webserver-dev
+      DOCKER_WEB_SERVER_IMAGE_NAME: webserver-dev
+      DOCKER_RANK_SERVER_IMAGE_NAME: rankingserver-dev
+      DOCKER_FUNC_SERVER_IMAGE_NAME: functions-dev
       DOCKER_URL: tradingkingkoreacentral.azurecr.io
       DOCKER_USERNAME: tradingkingkoreacentral
       env: dev
@@ -46,7 +48,10 @@ jobs:
                 "location": "koreacentral",
                 "serverNumber": "01",
                 "issKey": ${{ secrets.ISS_KEY }},
-                "dockerUrl": ${{ env.DOCKER_URL }}/${{ env.DOCKER_IMAGE_NAME }}:latest,
+                "dockerWebServerImageName": ${{ env.DOCKER_WEB_SERVER_IMAGE_NAME }},
+                "dockerRankServerImageName": ${{ env.DOCKER_RANK_SERVER_IMAGE_NAME }},
+                "dockerFuncServerImageName": ${{ env.DOCKER_FUNC_SERVER_IMAGE_NAME }},
+                "dockerUrl": ${{ env.DOCKER_URL }},
                 "dockerUserName": ${{ env.DOCKER_USERNAME }},
                 "dockerPassword": ${{ secrets.ACR_PASSWORD }},
                 "sqlsrvId": "${{ secrets.SQLSRV_ID }}",

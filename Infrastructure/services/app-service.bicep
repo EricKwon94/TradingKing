@@ -1,6 +1,8 @@
 param env string
 param location string
 param serverNumber string
+
+param dockerWebServerImageName string
 param dockerUrl string
 param dockerUserName string
 
@@ -61,7 +63,7 @@ resource appService 'Microsoft.Web/sites@2024-11-01' = {
   resource siteContainer 'sitecontainers' = {
     name: 'main'
     properties: {
-      image: dockerUrl
+      image: '${dockerUrl}/${dockerWebServerImageName}:latest'
       targetPort: '8080'
       isMain: true
       startUpCommand: ''

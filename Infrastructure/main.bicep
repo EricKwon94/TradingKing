@@ -3,6 +3,10 @@ targetScope = 'subscription'
 param env string
 param location string
 param serverNumber string
+
+param dockerWebServerImageName string
+param dockerRankServerImageName string
+param dockerFuncServerImageName string
 param dockerUrl string
 param dockerUserName string
 
@@ -42,6 +46,9 @@ module app 'services/_main.bicep' = {
     env: env
     serverNumber: serverNumber
     issKey: issKey
+    dockerWebServerImageName: dockerWebServerImageName
+    dockerRankServerImageName: dockerRankServerImageName
+    dockerFuncServerImageName: dockerFuncServerImageName
     dockerUrl: dockerUrl
     dockerUserName: dockerUserName
     dockerPassword: dockerPassword
