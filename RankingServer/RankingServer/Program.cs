@@ -1,5 +1,7 @@
 using Azure.Messaging.ServiceBus;
 using Microsoft.EntityFrameworkCore;
+using Refit;
+using Shared;
 
 namespace RankingServer;
 
@@ -34,6 +36,9 @@ public class Program
             var client = p.GetRequiredService<ServiceBusClient>();
             return client.CreateReceiver(rankQueueName);
         });
+
+        var upbitApi = RestService.For<IExchangeApi>("https://api.upbit.com");
+        builder.Services.AddSingleton(upbitApi);
 
         var host = builder.Build();
         host.Run();

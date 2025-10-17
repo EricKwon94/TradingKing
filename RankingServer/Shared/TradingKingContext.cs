@@ -1,9 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Shared;
 
-namespace RankingServer;
+namespace Shared;
 
-internal class TradingKingContext : DbContext
+public class TradingKingContext : DbContext
 {
     public DbSet<OrderModel> Orders { get; private set; }
 
