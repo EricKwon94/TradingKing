@@ -1,6 +1,7 @@
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace FunctionApp1;
 
@@ -22,18 +23,8 @@ public class TimerTrigger1
     public void Run(
       [TimerTrigger("*/50 * * * * *")] TimerInfo myTimer, FunctionContext context)
     {
-        string? eventHubCs = _config["EventHub"];
-        string? tradingking = _config.GetConnectionString("TradingKing");
-        string? sqlHubName = _config["SqlHubName"];
-        string? timerHubName = _config["TimerHubName"];
-
-        _logger.LogInformation("cs: {cs}", eventHubCs);
-        _logger.LogInformation("tradingking: {tradingking}", tradingking);
-        _logger.LogInformation("name1: {sqlHubName}", sqlHubName);
-        _logger.LogInformation("name2: {timerHubName}", timerHubName);
-
-        /*_logger.LogInformation("타이머트리거 {time}", DateTime.UtcNow);
-
+        _logger.LogInformation("타이머트리거 {time}", DateTime.UtcNow);
+        /*
         await using EventHubProducerClient hub = _hubFactory.CreateSqlHub();
 
         EventDataBatch batch = await hub.CreateBatchAsync(context.CancellationToken);
