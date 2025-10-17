@@ -1,4 +1,4 @@
-using Azure.Messaging.EventHubs.Producer;
+using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,38 +8,19 @@ var builder = FunctionsApplication.CreateBuilder(args);
 
 builder.ConfigureFunctionsWebApplication();
 
-string eventHubCs = builder.Configuration["EventHub"]!;
-string sqlHubName = builder.Configuration["SqlHubName"]!;
-string timerHubName = builder.Configuration["TimerHubName"]!;
+string serviceBusCs = builder.Configuration["ServiceBus"]!;
+string orderQueueName = builder.Configuration["OrderQueueName"]!;
+string rankQueueName = builder.Configuration["RankQueueName"]!;
 
-builder.Services.AddSingleton((p) => new EventHubFactory(eventHubCs, sqlHubName, timerHubName));
+builder.Services.AddSingleton(p => new ServiceBusClient(serviceBusCs));
+builder.Services.AddSingleton(p =>
+{
+    var client = p.GetRequiredService<ServiceBusClient>();
+    return client.CreateSender(orderQueueName);
+});
 
 builder.Services
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();
 
 builder.Build().Run();
-
-public class EventHubFactory
-{
-    private readonly string _eventHubCs;
-    private readonly string _sqlHubName;
-    private readonly string _timerHubName;
-
-    public EventHubFactory(string eventHubCs, string sqlHubName, string timerHubName)
-    {
-        _eventHubCs = eventHubCs;
-        _sqlHubName = sqlHubName;
-        _timerHubName = timerHubName;
-    }
-
-    public EventHubProducerClient CreateSqlHub()
-    {
-        return new EventHubProducerClient(_eventHubCs, _sqlHubName);
-    }
-
-    public EventHubProducerClient CreateTimerHub()
-    {
-        return new EventHubProducerClient(_eventHubCs, _timerHubName);
-    }
-}

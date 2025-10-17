@@ -74,8 +74,8 @@ module sa 'storage.bicep' = {
 }
 */
 
-module eventHub 'eventhub.bicep' = {
-  name: 'dp-eventHub'
+module serviceBus 'servicebus.bicep' = {
+  name: 'dp-serviceBus'
   params: {
     env: env
     location: location
@@ -89,7 +89,7 @@ module ca 'container-apps.bicep' = {
     env: env
     location: location
     serverNumber: serverNumber
-    eventHubCs: eventHub.outputs.cs
+    serviceBusCs: serviceBus.outputs.cs
     sqlsrvdn: sqlServer.outputs.domainName
     sqlsrvId: sqlsrvId
     sqlsrvPwd: sqlsrvPwd
