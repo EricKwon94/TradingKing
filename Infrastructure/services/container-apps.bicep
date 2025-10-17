@@ -8,6 +8,7 @@ param sqlsrvdn string
 param dockerRankServerImageName string
 param dockerFuncServerImageName string
 param dockerUrl string
+param dockerUserName string
 
 @secure()
 param sqlsrvId string
@@ -35,12 +36,14 @@ resource caFunc 'Microsoft.App/containerApps@2025-02-02-preview' = {
   kind: 'functionapp'
   properties: {
     managedEnvironmentId: cae.id
+    environmentId: cae.id
     workloadProfileName: 'Consumption'
     configuration: {
       activeRevisionsMode: 'Single'
       registries: [
         {
           server: dockerUrl
+          username: dockerUserName
           identity: 'system-environment'
         }
       ]
@@ -48,7 +51,7 @@ resource caFunc 'Microsoft.App/containerApps@2025-02-02-preview' = {
     template: {
       containers: [
         {
-          name: cae.name
+          name: 'tkfunc'      
           image: '${dockerUrl}/${dockerFuncServerImageName}:latest'
           imageType: 'ContainerImage'
           env:[
