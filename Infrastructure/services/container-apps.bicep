@@ -71,7 +71,7 @@ resource caFunc 'Microsoft.App/containerApps@2025-02-02-preview' = {
           ]
           resources: {
             cpu: json('0.25')
-            memory: '1Gi'
+            memory: '0.5Gi'
           }
         }
       ]
@@ -83,9 +83,6 @@ resource caRanking 'Microsoft.App/containerApps@2025-02-02-preview' = {
   name: 'tradingking-${env}-${location}-${serverNumber}'
   location: location
   kind: 'containerapps'
-  identity: {
-    type: 'None'
-  }
   properties:{
     managedEnvironmentId: cae.id
     workloadProfileName: 'Consumption'
