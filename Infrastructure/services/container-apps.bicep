@@ -43,7 +43,7 @@ resource caFunc 'Microsoft.App/containerApps@2025-02-02-preview' = {
       activeRevisionsMode: 'Single'
       secrets:[
         {
-          name: 'dockerPassword'
+          name: 'docker-password'
           value: dockerPassword
         }
       ]
@@ -51,7 +51,7 @@ resource caFunc 'Microsoft.App/containerApps@2025-02-02-preview' = {
         {
           server: dockerUrl
           username: dockerUserName
-          passwordSecretRef:'dockerPassword'
+          passwordSecretRef:'docker-password'
         }
       ]
     }
