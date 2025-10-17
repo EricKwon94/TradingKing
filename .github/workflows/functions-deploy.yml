@@ -16,7 +16,9 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      FUNCTIONAPP_NAME : functk-dev-koreacentral-01
+      DOCKER_IMAGE_NAME: rankingserver-dev
+      DOCKER_URL: tradingkingkoreacentral.azurecr.io
+      DOCKER_USERNAME: tradingkingkoreacentral
     
     steps:
     - name: Checkout code
@@ -27,16 +29,19 @@ jobs:
       with:
         dotnet-version: '9.x'
 
-    - name: Publish
-      run: dotnet publish ./RankingServer/FunctionApp1 -c Release -o publish_output
+    - name: Build
+      run: dotnet build ./RankingServer -c Release
 
-    - name: Log in to Azure
-      uses: azure/login@v2
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
       with:
-        creds: ${{ secrets.AZURE_CREDS }}
+        registry: ${{ env.DOCKER_URL }}
+        username: ${{ env.DOCKER_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
 
-    - name: Deploy to Azure Function App
-      uses: azure/functions-action@v1
+    - name: Build and Push Docker image
+      uses: docker/build-push-action@v6
       with:
-        app-name: ${{ env.FUNCTIONAPP_NAME }}
-        package: ./publish_output
+        context: ./RankingServer
+        file: ./RankingServer/FunctionApp1/Dockerfile
+        tags: ${{ env.DOCKER_URL }}/${{ env.DOCKER_IMAGE_NAME }}:latest
