@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DOCKER_IMAGE_NAME: rankingserver-dev
+      DOCKER_IMAGE_NAME: functions-dev
       DOCKER_URL: tradingkingkoreacentral.azurecr.io
       DOCKER_USERNAME: tradingkingkoreacentral
     
