@@ -17,9 +17,9 @@ public class TimerTrigger1
     }
 
 
-    [Function("TimerTrigger1")]
+    //[Function("TimerTrigger1")]
     public void Run(
-      [TimerTrigger("*/5 * * * * *")] TimerInfo myTimer, FunctionContext context)
+      [TimerTrigger("*/50 * * * * *")] TimerInfo myTimer, FunctionContext context)
     {
         _logger.LogInformation("타이머트리거 {time}", DateTime.UtcNow);
     }
