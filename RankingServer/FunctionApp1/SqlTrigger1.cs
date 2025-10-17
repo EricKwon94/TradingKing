@@ -21,7 +21,7 @@ public class SqlTrigger1
     }
 
     // Visit https://aka.ms/sqltrigger to learn how to use this trigger binding
-    //[Function("SqlTrigger1")]
+    [Function("SqlTrigger1")]
     public async Task Run(
         [SqlTrigger("[dbo].[Orders]", "TradingKing")] IReadOnlyList<SqlChange<OrderModel>> changes,
             FunctionContext context)
