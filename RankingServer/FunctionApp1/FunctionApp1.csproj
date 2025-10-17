@@ -21,7 +21,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\WebServer\Infrastructure\3-Infrastructure.csproj" />
+	  <ProjectReference Include="..\Shared\1-Shared.csproj" />
 	</ItemGroup>
 
 </Project>

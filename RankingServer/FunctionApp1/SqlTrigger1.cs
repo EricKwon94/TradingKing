@@ -1,8 +1,8 @@
 using Azure.Messaging.ServiceBus;
-using Infrastructure.EFCore;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Extensions.Sql;
 using Microsoft.Extensions.Logging;
+using Shared;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
