@@ -1,5 +1,6 @@
 using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 
@@ -10,7 +11,7 @@ public class TimerTrigger1
     private readonly ILogger _logger;
     private readonly ServiceBusSender _sender;
 
-    public TimerTrigger1(ILoggerFactory loggerFactory, ServiceBusSender sender)
+    public TimerTrigger1(ILoggerFactory loggerFactory, [FromKeyedServices("rank")] ServiceBusSender sender)
     {
         _logger = loggerFactory.CreateLogger<TimerTrigger1>();
         _sender = sender;

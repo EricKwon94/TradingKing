@@ -41,7 +41,7 @@ resource caFunc 'Microsoft.App/containerApps@2025-02-02-preview' = {
     workloadProfileName: 'Consumption'
     configuration: {
       activeRevisionsMode: 'Single'
-      secrets:[
+      secrets: [
         {
           name: 'docker-password'
           value: dockerPassword
@@ -51,17 +51,17 @@ resource caFunc 'Microsoft.App/containerApps@2025-02-02-preview' = {
         {
           server: dockerUrl
           username: dockerUserName
-          passwordSecretRef:'docker-password'
+          passwordSecretRef: 'docker-password'
         }
       ]
     }
     template: {
       containers: [
         {
-          name: 'tkfunc'      
+          name: 'tkfunc'
           image: '${dockerUrl}/${dockerFuncServerImageName}:latest'
           imageType: 'ContainerImage'
-          env:[
+          env: [
             {
               name: 'OrderQueueName'
               value: 'order'
@@ -88,14 +88,60 @@ resource caFunc 'Microsoft.App/containerApps@2025-02-02-preview' = {
     }
   }
 }
-/*
+
 resource caRanking 'Microsoft.App/containerApps@2025-02-02-preview' = {
-  name: 'tradingking-${env}-${location}-${serverNumber}'
+  name: 'tkrank-${env}-${location}-${serverNumber}'
   location: location
   kind: 'containerapps'
-  properties:{
-    managedEnvironmentId: cae.id
+  properties: {
+    environmentId: cae.id
     workloadProfileName: 'Consumption'
+    configuration: {
+      activeRevisionsMode: 'Single'
+      secrets: [
+        {
+          name: 'docker-password'
+          value: dockerPassword
+        }
+      ]
+      registries: [
+        {
+          server: dockerUrl
+          username: dockerUserName
+          passwordSecretRef: 'docker-password'
+        }
+      ]
+    }
+    template: {
+      containers: [
+        {
+          name: 'tkfunc'
+          image: '${dockerUrl}/${dockerRankServerImageName}:latest'
+          imageType: 'ContainerImage'
+          env: [
+            {
+              name: 'OrderQueueName'
+              value: 'order'
+            }
+            {
+              name: 'RankQueueName'
+              value: 'rank'
+            }
+            {
+              name: 'ServiceBus'
+              value: serviceBusCs
+            }
+            {
+              name: 'ConnectionStrings__TradingKing'
+              value: 'Data Source=${sqlsrvdn};Initial Catalog=TradingKing;User ID=${sqlsrvId};Password=${sqlsrvPwd};'
+            }
+          ]
+          resources: {
+            cpu: json('0.25')
+            memory: '0.5Gi'
+          }
+        }
+      ]
+    }
   }
 }
-*/
