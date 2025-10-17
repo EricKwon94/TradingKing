@@ -45,3 +45,4 @@ jobs:
         context: ./RankingServer
         file: ./RankingServer/FunctionApp1/Dockerfile
         tags: ${{ env.DOCKER_URL }}/${{ env.DOCKER_IMAGE_NAME }}:latest
+        push: true
