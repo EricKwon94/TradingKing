@@ -14,6 +14,8 @@ param dockerUserName string
 param sqlsrvId string
 @secure()
 param sqlsrvPwd string
+@secure()
+param dockerPassword string
 
 resource cae 'Microsoft.App/managedEnvironments@2025-02-02-preview' = {
   name: 'tradingking-${env}-${location}-${serverNumber}'
@@ -39,10 +41,17 @@ resource caFunc 'Microsoft.App/containerApps@2025-02-02-preview' = {
     workloadProfileName: 'Consumption'
     configuration: {
       activeRevisionsMode: 'Single'
+      secrets:[
+        {
+          name: 'dockerPassword'
+          value: dockerPassword
+        }
+      ]
       registries: [
         {
           server: dockerUrl
           username: dockerUserName
+          passwordSecretRef:'dockerPassword'
         }
       ]
     }

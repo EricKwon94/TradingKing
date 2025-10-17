@@ -97,6 +97,7 @@ module ca 'container-apps.bicep' = {
     dockerFuncServerImageName: dockerFuncServerImageName
     dockerUrl: dockerUrl
     dockerUserName: dockerUserName
+    dockerPassword: dockerPassword
   }
 }
 
