@@ -2,7 +2,7 @@ param env string
 param location string
 param serverNumber string
 
-param eventHubCs string
+param serviceBusCs string
 param sqlsrvdn string
 
 param dockerRankServerImageName string
@@ -63,16 +63,16 @@ resource caFunc 'Microsoft.App/containerApps@2025-02-02-preview' = {
           imageType: 'ContainerImage'
           env:[
             {
-              name: 'SqlHubName'
-              value: 'sqltrigger'
+              name: 'OrderQueueName'
+              value: 'order'
             }
             {
-              name: 'TimerHubName'
-              value: 'timertrigger'
+              name: 'RankQueueName'
+              value: 'rank'
             }
             {
-              name: 'EventHub'
-              value: eventHubCs
+              name: 'ServiceBus'
+              value: serviceBusCs
             }
             {
               name: 'ConnectionStrings__TradingKing'
