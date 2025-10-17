@@ -13,10 +13,16 @@ string orderQueueName = builder.Configuration["OrderQueueName"]!;
 string rankQueueName = builder.Configuration["RankQueueName"]!;
 
 builder.Services.AddSingleton(p => new ServiceBusClient(serviceBusCs));
-builder.Services.AddSingleton(p =>
+
+builder.Services.AddKeyedSingleton("order", (p, key) =>
 {
     var client = p.GetRequiredService<ServiceBusClient>();
     return client.CreateSender(orderQueueName);
+});
+builder.Services.AddKeyedSingleton("rank", (p, key) =>
+{
+    var client = p.GetRequiredService<ServiceBusClient>();
+    return client.CreateSender(rankQueueName);
 });
 
 builder.Services

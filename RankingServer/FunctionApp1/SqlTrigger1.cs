@@ -1,6 +1,7 @@
 using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Extensions.Sql;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Shared;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ public class SqlTrigger1
     private readonly ILogger _logger;
     private readonly ServiceBusSender _sender;
 
-    public SqlTrigger1(ILoggerFactory loggerFactory, ServiceBusSender sender)
+    public SqlTrigger1(ILoggerFactory loggerFactory, [FromKeyedServices("order")] ServiceBusSender sender)
     {
         _logger = loggerFactory.CreateLogger<SqlTrigger1>();
         _sender = sender;
