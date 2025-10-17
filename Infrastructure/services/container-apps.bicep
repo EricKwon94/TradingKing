@@ -35,7 +35,6 @@ resource caFunc 'Microsoft.App/containerApps@2025-02-02-preview' = {
   location: location
   kind: 'functionapp'
   properties: {
-    managedEnvironmentId: cae.id
     environmentId: cae.id
     workloadProfileName: 'Consumption'
     configuration: {
@@ -44,7 +43,6 @@ resource caFunc 'Microsoft.App/containerApps@2025-02-02-preview' = {
         {
           server: dockerUrl
           username: dockerUserName
-          identity: 'system-environment'
         }
       ]
     }
