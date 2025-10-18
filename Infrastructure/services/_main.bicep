@@ -17,17 +17,21 @@ param sqlsrvId string
 @secure()
 param sqlsrvPwd string
 
-module appService 'app-service.bicep' = {
-  name: 'dp-appService'
+module serviceBus 'servicebus.bicep' = {
+  name: 'dp-serviceBus'
   params: {
     env: env
     location: location
     serverNumber: serverNumber
-    issKey: issKey
-    dockerWebServerImageName: dockerWebServerImageName
-    dockerUrl: dockerUrl
-    dockerUserName: dockerUserName
-    dockerPassword: dockerPassword
+  }
+}
+
+module redis 'redis.bicep' = {
+  name: 'dp-redis'
+  params: {
+    env: env
+    location: location
+    serverNumber: serverNumber
   }
 }
 
@@ -51,6 +55,20 @@ module sqlServer 'sql-server.bicep' = {
   }
 }
 
+module appService 'app-service.bicep' = {
+  name: 'dp-appService'
+  params: {
+    env: env
+    location: location
+    serverNumber: serverNumber
+    issKey: issKey
+    dockerWebServerImageName: dockerWebServerImageName
+    dockerUrl: dockerUrl
+    dockerUserName: dockerUserName
+    dockerPassword: dockerPassword
+  }
+}
+
 module serviceLinker 'service-linker.bicep' = {
   name: 'dp-serviceLinker'
   params: {
@@ -59,6 +77,7 @@ module serviceLinker 'service-linker.bicep' = {
     sqldbId: sqlServer.outputs.sqldbId
     sqlsrvId: sqlsrvId
     sqlsrvPwd: sqlsrvPwd
+    redisId: redis.outputs.id
   }
 }
 
@@ -73,24 +92,6 @@ module sa 'storage.bicep' = {
   }
 }
 */
-
-module serviceBus 'servicebus.bicep' = {
-  name: 'dp-serviceBus'
-  params: {
-    env: env
-    location: location
-    serverNumber: serverNumber
-  }
-}
-
-module redis 'redis.bicep' = {
-  name: 'dp-redis'
-  params: {
-    env: env
-    location: location
-    serverNumber: serverNumber
-  }
-}
 
 module ca 'container-apps.bicep' = {
   name: 'dp-ca'

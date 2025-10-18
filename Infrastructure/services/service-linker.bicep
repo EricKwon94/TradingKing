@@ -1,6 +1,7 @@
 param appServiceName string
 param signalrId string
 param sqldbId string
+param redisId string
 @secure()
 param sqlsrvId string
 @secure()
@@ -53,6 +54,24 @@ resource serviceLinkerSql 'Microsoft.ServiceLinker/linkers@2024-07-01-preview' =
     configurationInfo: {
       customizedKeys: {
         AZURE_SQL_CONNECTIONSTRING: 'TradingKing'
+      }
+    }
+  }
+}
+
+resource serviceLinkerRedis 'Microsoft.ServiceLinker/linkers@2024-07-01-preview' = {
+  name: 'redis_b502c'
+  scope: appService
+  properties:{
+    clientType: 'dotnet'
+    targetService: {
+      type: 'AzureResource'
+      id: redisId
+    }
+    authInfo: {
+      authType: 'secret'
+      secretInfo: {
+        secretType: 'rawValue'
       }
     }
   }

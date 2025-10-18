@@ -19,3 +19,4 @@ resource redis 'Microsoft.Cache/redis@2024-11-01' = {
 
 var v string = '${redis.properties.hostName}:6380,password=${redis.listKeys().primaryKey},ssl=True,abortConnect=False'
 output cs string = v
+output id string = redis.id
