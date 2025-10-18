@@ -72,6 +72,7 @@ internal class Worker : BackgroundService
         try
         {
             tickers = await _exchangeApi.GetTickerAsync(_codes, ct);
+            _logger.LogInformation("Called upbit ticker");
         }
         catch (Exception ex)
         {
@@ -110,7 +111,8 @@ internal class Worker : BackgroundService
         {
             entries[i++] = new SortedSetEntry(asset.Key, asset.Value);
         }
-        await _redis.SortedSetAddAsync("ranking", entries);
+        long addedCount = await _redis.SortedSetAddAsync("ranking", entries);
+        _logger.LogInformation("유저 {count}명 추가됨", addedCount);
     }
 
     private async Task InitAsync(CancellationToken ct)
