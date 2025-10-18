@@ -24,7 +24,7 @@ public static class InfrastructureExtensions
 #if DEBUG
                 opt.UseSqlServer(sqlserverCs);
 #else
-                opt.UseAzureSql(connectionString);
+                opt.UseAzureSql(sqlserverCs);
 #endif
             })
             .AddSingleton(p => ConnectionMultiplexer.Connect(redisCs))
