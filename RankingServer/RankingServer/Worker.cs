@@ -1,6 +1,7 @@
 using Azure.Messaging.ServiceBus;
 using Microsoft.EntityFrameworkCore;
 using Shared;
+using StackExchange.Redis;
 using System.Collections.Concurrent;
 using System.Text.Json;
 
@@ -13,6 +14,7 @@ internal class Worker : BackgroundService
 
     private readonly ILogger<Worker> _logger;
     private readonly TradingKingContext _context;
+    private readonly IDatabase _redis;
     private readonly ServiceBusReceiver _orderReceiver;
     private readonly ServiceBusReceiver _rankReceiver;
     private readonly IExchangeApi _exchangeApi;
@@ -22,13 +24,14 @@ internal class Worker : BackgroundService
     private HashSet<string> _codes = null!;
 
     public Worker(
-        ILogger<Worker> logger, TradingKingContext context,
+        ILogger<Worker> logger, TradingKingContext context, IDatabase redis,
         [FromKeyedServices("order")] ServiceBusReceiver orderReceiver,
         [FromKeyedServices("rank")] ServiceBusReceiver rankReceiver,
         IExchangeApi exchangeApi)
     {
         _logger = logger;
         _context = context;
+        _redis = redis;
         _orderReceiver = orderReceiver;
         _rankReceiver = rankReceiver;
         _exchangeApi = exchangeApi;
@@ -42,12 +45,14 @@ internal class Worker : BackgroundService
 
         await foreach (ServiceBusReceivedMessage item in _orderReceiver.ReceiveMessagesAsync(ct))
         {
-            var order = JsonSerializer.Deserialize<OrderModel>(item.Body)!;
-            _logger.LogInformation("{order}", order);
             await _orderReceiver.CompleteMessageAsync(item, ct);
+
+            var order = JsonSerializer.Deserialize<OrderModel>(item.Body)!;
 
             if (_orders.Add(order))
             {
+                _logger.LogInformation("{order}", order);
+
                 if (order.Code != DEFAULT_CASH)
                     _codes.Add(order.Code);
 
@@ -63,11 +68,18 @@ internal class Worker : BackgroundService
     private async void TimerElapsed(object? state)
     {
         CancellationToken ct = (CancellationToken)state!;
-
-        var tickers = await _exchangeApi.GetTickerAsync(_codes, ct);
+        IEnumerable<IExchangeApi.TickerRes> tickers;
+        try
+        {
+            tickers = await _exchangeApi.GetTickerAsync(_codes, ct);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "");
+            return;
+        }
 
         Dictionary<string, double> totalAssets = [];
-
         foreach (var item in _userAssets)
         {
             string[] split = item.Key.Split('|');
@@ -92,11 +104,13 @@ internal class Worker : BackgroundService
             }
         }
 
-        foreach (var v in totalAssets)
+        int i = 0;
+        SortedSetEntry[] entries = new SortedSetEntry[totalAssets.Count];
+        foreach (var asset in totalAssets)
         {
-            Console.WriteLine($"{v.Key}: {v.Value}");
+            entries[i++] = new SortedSetEntry(asset.Key, asset.Value);
         }
-        Console.WriteLine();
+        await _redis.SortedSetAddAsync("ranking", entries);
     }
 
     private async Task InitAsync(CancellationToken ct)

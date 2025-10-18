@@ -2,6 +2,7 @@ using Azure.Messaging.ServiceBus;
 using Microsoft.EntityFrameworkCore;
 using Refit;
 using Shared;
+using StackExchange.Redis;
 
 namespace RankingServer;
 
@@ -22,8 +23,16 @@ public class Program
         }, ServiceLifetime.Transient, ServiceLifetime.Transient);
 
         string serviceBusCs = builder.Configuration["ServiceBus"]!;
+        string redisCs = builder.Configuration["redis"]!;
         string orderQueueName = builder.Configuration["OrderQueueName"]!;
         string rankQueueName = builder.Configuration["RankQueueName"]!;
+
+        builder.Services.AddSingleton(p => ConnectionMultiplexer.Connect(redisCs));
+        builder.Services.AddSingleton(p =>
+        {
+            var redis = p.GetRequiredService<ConnectionMultiplexer>();
+            return redis.GetDatabase();
+        });
 
         builder.Services.AddSingleton(p => new ServiceBusClient(serviceBusCs));
         builder.Services.AddKeyedSingleton("order", (p, key) =>
