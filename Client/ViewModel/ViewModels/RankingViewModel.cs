@@ -10,12 +10,12 @@ namespace ViewModel.ViewModels;
 public partial class RankingViewModel : BaseViewModel
 {
     private readonly ILogger<RankingViewModel> _logger;
-    private readonly IChatApi _chat;
+    private readonly IRankingApi _ranking;
 
-    public RankingViewModel(ILogger<RankingViewModel> logger, IChatApi chat)
+    public RankingViewModel(ILogger<RankingViewModel> logger, IRankingApi ranking)
     {
         _logger = logger;
-        _chat = chat;
+        _ranking = ranking;
     }
 
     public override async Task OnAppearingAsync(CancellationToken ct)
@@ -23,22 +23,28 @@ public partial class RankingViewModel : BaseViewModel
         if (ct.IsCancellationRequested)
             return;
 
-        await _chat.StartAsync(ct);
-        IDisposable disposable = _chat.ReceiveMessage((name, msg) =>
+        await _ranking.StartAsync(ct);
+        try
         {
-            _logger.LogInformation("{name}: {msg}", name, msg);
-            return Task.CompletedTask;
-        });
+            await foreach (var ranks in _ranking.GetRank(0, -1, ct))
+            {
+                foreach (var rank in ranks)
+                {
+                    _logger.LogInformation("{id}: {score}", rank.Key, rank.Value);
+                }
+            }
+        }
+        catch (OperationCanceledException) { }
     }
 
     public override async void OnDisappearing()
     {
-        await _chat.DisposeAsync();
+        await _ranking.DisposeAsync();
     }
 
     [RelayCommand]
     public Task InvokeAsync(CancellationToken ct)
     {
-        return _chat.Echo("asd", "msg");
+        return Task.CompletedTask;
     }
 }

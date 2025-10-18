@@ -22,6 +22,11 @@ public static class InfrastructureExtensions
                 IPreferences preferences = provider.GetRequiredService<IPreferences>();
                 return new ChatHub(preferences, new Uri(uri, "/chat"));
             })
+            .AddTransient<IRankingApi, RankingHub>(provider =>
+            {
+                IPreferences preferences = provider.GetRequiredService<IPreferences>();
+                return new RankingHub(preferences, new Uri(uri, "/ranking"));
+            })
             ;
     }
 }
