@@ -1,7 +1,6 @@
 param appServiceName string
 param signalrId string
 param sqldbId string
-param redisId string
 @secure()
 param sqlsrvId string
 @secure()
@@ -58,7 +57,7 @@ resource serviceLinkerSql 'Microsoft.ServiceLinker/linkers@2024-07-01-preview' =
     }
   }
 }
-
+/* 안되나? 버그임?
 resource serviceLinkerRedis 'Microsoft.ServiceLinker/linkers@2024-07-01-preview' = {
   name: 'redis_b502c'
   scope: appService
@@ -76,3 +75,4 @@ resource serviceLinkerRedis 'Microsoft.ServiceLinker/linkers@2024-07-01-preview'
     }
   }
 }
+*/

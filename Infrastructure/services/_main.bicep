@@ -66,6 +66,7 @@ module appService 'app-service.bicep' = {
     dockerUrl: dockerUrl
     dockerUserName: dockerUserName
     dockerPassword: dockerPassword
+    redisCs: redis.outputs.cs
   }
 }
 
@@ -77,7 +78,6 @@ module serviceLinker 'service-linker.bicep' = {
     sqldbId: sqlServer.outputs.sqldbId
     sqlsrvId: sqlsrvId
     sqlsrvPwd: sqlsrvPwd
-    redisId: redis.outputs.id
   }
 }
 
