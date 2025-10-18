@@ -35,4 +35,5 @@ resource serviceBus 'Microsoft.ServiceBus/namespaces@2025-05-01-preview' = {
   }
 }
 
-output cs string = serviceBus::authRules.listkeys().primaryConnectionString
+var v string = serviceBus::authRules.listKeys().primaryConnectionString
+output cs string = v

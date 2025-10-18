@@ -2,18 +2,17 @@ param env string
 param location string
 param serverNumber string
 
-param serviceBusCs string
-param sqlsrvdn string
-
 param dockerRankServerImageName string
 param dockerFuncServerImageName string
 param dockerUrl string
 param dockerUserName string
 
 @secure()
-param sqlsrvId string
+param redisCs string
 @secure()
-param sqlsrvPwd string
+param serviceBusCs string
+@secure()
+param sqlsrvCs string
 @secure()
 param dockerPassword string
 
@@ -46,6 +45,14 @@ resource caFunc 'Microsoft.App/containerApps@2025-02-02-preview' = {
           name: 'docker-password'
           value: dockerPassword
         }
+        {
+          name: 'service-bus'
+          value: serviceBusCs
+        }
+        {
+          name: 'sqlsrv'
+          value: sqlsrvCs
+        }
       ]
       registries: [
         {
@@ -72,11 +79,11 @@ resource caFunc 'Microsoft.App/containerApps@2025-02-02-preview' = {
             }
             {
               name: 'ServiceBus'
-              value: serviceBusCs
+              secretRef: 'service-bus'
             }
             {
               name: 'ConnectionStrings__TradingKing'
-              value: 'Data Source=${sqlsrvdn};Initial Catalog=TradingKing;User ID=${sqlsrvId};Password=${sqlsrvPwd};'
+              secretRef: 'sqlsrv'
             }
           ]
           resources: {
@@ -102,6 +109,18 @@ resource caRanking 'Microsoft.App/containerApps@2025-02-02-preview' = {
         {
           name: 'docker-password'
           value: dockerPassword
+        }
+        {
+          name: 'service-bus'
+          value: serviceBusCs
+        }
+        {
+          name: 'sqlsrv'
+          value: sqlsrvCs
+        }
+        {
+          name: 'redis'
+          value: redisCs
         }
       ]
       registries: [
@@ -129,11 +148,15 @@ resource caRanking 'Microsoft.App/containerApps@2025-02-02-preview' = {
             }
             {
               name: 'ServiceBus'
-              value: serviceBusCs
+              secretRef: 'service-bus'
             }
             {
               name: 'ConnectionStrings__TradingKing'
-              value: 'Data Source=${sqlsrvdn};Initial Catalog=TradingKing;User ID=${sqlsrvId};Password=${sqlsrvPwd};'
+              secretRef: 'sqlsrv'
+            }
+            {
+              name: 'redis'
+              secretRef: 'redis'
             }
           ]
           resources: {

@@ -41,5 +41,6 @@ resource sqlServer 'Microsoft.Sql/servers@2024-11-01-preview' = {
   }
 }
 
+var v string = 'Data Source=${sqlServer.properties.fullyQualifiedDomainName};Initial Catalog=TradingKing;User ID=${sqlsrvId};Password=${sqlsrvPwd};'
+output cs string = v
 output sqldbId string = sqlServer::sqlDB.id
-output domainName string = sqlServer.properties.fullyQualifiedDomainName
