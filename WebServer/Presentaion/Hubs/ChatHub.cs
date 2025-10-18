@@ -19,8 +19,7 @@ public class ChatHub : Hub<IChatClient>, IChatHub
 
     public override Task OnConnectedAsync()
     {
-        int userSeq = int.Parse(Context.UserIdentifier!);
-        _logger.LogInformation("{seq} 입장", userSeq);
+        _logger.LogInformation("{seq} 입장", Context.UserIdentifier);
         return base.OnConnectedAsync();
     }
 
@@ -36,11 +35,10 @@ public class ChatHub : Hub<IChatClient>, IChatHub
 
     public override Task OnDisconnectedAsync(Exception? exception)
     {
-        int userSeq = int.Parse(Context.UserIdentifier!);
         if (exception == null)
-            _logger.LogInformation("{seq} 퇴장", userSeq);
+            _logger.LogInformation("{seq} 퇴장", Context.UserIdentifier);
         else
-            _logger.LogError(exception, "{seq} 퇴장", userSeq);
+            _logger.LogError(exception, "{seq} 퇴장", Context.UserIdentifier);
         return base.OnDisconnectedAsync(exception);
     }
 }

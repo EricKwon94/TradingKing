@@ -99,8 +99,12 @@ public class Program
             });
         });
 
-        builder.Services.AddApplication()
-            .AddInfrastructure(builder.Environment.IsDevelopment(), builder.Configuration.GetConnectionString("TradingKing")!);
+        string sqlServerCs = builder.Configuration.GetConnectionString("TradingKing")!;
+        string redisCs = builder.Configuration["REDIS"]!;
+        bool isDevelopment = builder.Environment.IsDevelopment();
+        builder.Services
+            .AddApplication()
+            .AddInfrastructure(isDevelopment, sqlServerCs, redisCs);
 
         var app = builder.Build();
 
@@ -113,6 +117,9 @@ public class Program
         app.UseAuthentication().UseAuthorization();
 
         app.MapHub<ChatHub>("/chat")
+            .RequireRateLimiting(RATE_LIMIT_POLICY);
+
+        app.MapHub<RankingHub>("/ranking")
             .RequireRateLimiting(RATE_LIMIT_POLICY);
 
         app.MapControllers()
