@@ -10,7 +10,7 @@ namespace RankingServer;
 internal class Worker : BackgroundService
 {
     private const string DEFAULT_CASH = "KRW-CASH";
-    private const int REFRESH_DELAY = 1000;
+    private const int REFRESH_DELAY_SECOND = 1;
 
     private readonly ILogger<Worker> _logger;
     private readonly TradingKingContext _context;
@@ -41,78 +41,10 @@ internal class Worker : BackgroundService
     {
         await InitAsync(ct);
 
-        Timer timer = new(TimerElapsed, ct, 0, REFRESH_DELAY);
+        Task task1 = AggregateRankAsync(ct);
+        Task task2 = ReceiveOrderMessageAsync(ct);
 
-        await foreach (ServiceBusReceivedMessage item in _orderReceiver.ReceiveMessagesAsync(ct))
-        {
-            await _orderReceiver.CompleteMessageAsync(item, ct);
-
-            var order = JsonSerializer.Deserialize<OrderModel>(item.Body)!;
-
-            if (_orders.Add(order))
-            {
-                _logger.LogInformation("{order}", order);
-
-                if (order.Code != DEFAULT_CASH)
-                    _codes.Add(order.Code);
-
-                string key = $"{order.UserId}|{order.Code}";
-                _userAssets.AddOrUpdate(key, order.Quantity, (key, prev) =>
-                {
-                    return prev + order.Quantity;
-                });
-            }
-        }
-    }
-
-    private async void TimerElapsed(object? state)
-    {
-        CancellationToken ct = (CancellationToken)state!;
-        IEnumerable<IExchangeApi.TickerRes> tickers;
-        try
-        {
-            tickers = await _exchangeApi.GetTickerAsync(_codes, ct);
-            _logger.LogInformation("Called upbit ticker");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "");
-            return;
-        }
-
-        Dictionary<string, double> totalAssets = [];
-        foreach (var item in _userAssets)
-        {
-            string[] split = item.Key.Split('|');
-            string userId = split[0];
-            string code = split[1];
-            double price = 0;
-
-            if (code == DEFAULT_CASH)
-            {
-                price = item.Value;
-            }
-            else
-            {
-                var ticker = tickers.Single(e => e.market == code);
-                price = item.Value * ticker.trade_price;
-            }
-
-            if (!totalAssets.TryAdd(userId, price))
-            {
-                double money = totalAssets[userId];
-                totalAssets[userId] = money + price;
-            }
-        }
-
-        int i = 0;
-        SortedSetEntry[] entries = new SortedSetEntry[totalAssets.Count];
-        foreach (var asset in totalAssets)
-        {
-            entries[i++] = new SortedSetEntry(asset.Key, asset.Value);
-        }
-        long addedCount = await _redis.SortedSetAddAsync("ranking", entries);
-        _logger.LogInformation("유저 {count}명 추가됨", addedCount);
+        await Task.WhenAll(task1, task2);
     }
 
     private async Task InitAsync(CancellationToken ct)
@@ -139,5 +71,86 @@ internal class Worker : BackgroundService
             elementSelector: g => g.Quantity);
 
         _userAssets = new ConcurrentDictionary<string, double>(userAssets);
+    }
+
+    private async Task ReceiveOrderMessageAsync(CancellationToken ct)
+    {
+        await foreach (ServiceBusReceivedMessage item in _orderReceiver.ReceiveMessagesAsync(ct))
+        {
+            await _orderReceiver.CompleteMessageAsync(item, ct);
+
+            var order = JsonSerializer.Deserialize<OrderModel>(item.Body)!;
+
+            if (_orders.Add(order))
+            {
+                _logger.LogInformation("{order}", order);
+
+                if (order.Code != DEFAULT_CASH)
+                    _codes.Add(order.Code);
+
+                string key = $"{order.UserId}|{order.Code}";
+                _userAssets.AddOrUpdate(key, order.Quantity, (key, prev) =>
+                {
+                    return prev + order.Quantity;
+                });
+            }
+        }
+    }
+
+    private async Task AggregateRankAsync(CancellationToken ct)
+    {
+        var timer = new PeriodicTimer(TimeSpan.FromSeconds(REFRESH_DELAY_SECOND));
+        while (await timer.WaitForNextTickAsync(ct))
+        {
+            IEnumerable<IExchangeApi.TickerRes> tickers;
+            try
+            {
+                tickers = await _exchangeApi.GetTickerAsync(_codes, ct);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "");
+                continue;
+            }
+
+            Dictionary<string, double> totalAssets = CalculaterTotalAsset(tickers);
+
+            int i = 0;
+            SortedSetEntry[] entries = new SortedSetEntry[totalAssets.Count];
+            foreach (var asset in totalAssets)
+            {
+                entries[i++] = new SortedSetEntry(asset.Key, asset.Value);
+            }
+            await _redis.SortedSetAddAsync("ranking", entries);
+        }
+    }
+
+    private Dictionary<string, double> CalculaterTotalAsset(IEnumerable<IExchangeApi.TickerRes> tickers)
+    {
+        Dictionary<string, double> totalAssets = [];
+        foreach (var item in _userAssets)
+        {
+            string[] split = item.Key.Split('|');
+            string userId = split[0];
+            string code = split[1];
+            double price = 0;
+
+            if (code == DEFAULT_CASH)
+            {
+                price = item.Value;
+            }
+            else
+            {
+                var ticker = tickers.Single(e => e.market == code);
+                price = item.Value * ticker.trade_price;
+            }
+
+            if (!totalAssets.TryAdd(userId, price))
+            {
+                double money = totalAssets[userId];
+                totalAssets[userId] = money + price;
+            }
+        }
+        return totalAssets;
     }
 }
