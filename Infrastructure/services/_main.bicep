@@ -83,6 +83,15 @@ module serviceBus 'servicebus.bicep' = {
   }
 }
 
+module redis 'redis.bicep' = {
+  name: 'dp-redis'
+  params: {
+    env: env
+    location: location
+    serverNumber: serverNumber
+  }
+}
+
 module ca 'container-apps.bicep' = {
   name: 'dp-ca'
   params: {
@@ -90,9 +99,8 @@ module ca 'container-apps.bicep' = {
     location: location
     serverNumber: serverNumber
     serviceBusCs: serviceBus.outputs.cs
-    sqlsrvdn: sqlServer.outputs.domainName
-    sqlsrvId: sqlsrvId
-    sqlsrvPwd: sqlsrvPwd
+    redisCs: redis.outputs.cs
+    sqlsrvCs: sqlServer.outputs.cs
     dockerRankServerImageName: dockerRankServerImageName
     dockerFuncServerImageName: dockerFuncServerImageName
     dockerUrl: dockerUrl
@@ -100,4 +108,3 @@ module ca 'container-apps.bicep' = {
     dockerPassword: dockerPassword
   }
 }
-
