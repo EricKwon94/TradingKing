@@ -148,15 +148,15 @@ resource caRanking 'Microsoft.App/containerApps@2025-02-02-preview' = {
             }
             {
               name: 'ServiceBus'
-              value: 'service-bus'
+              secretRef: 'service-bus'
             }
             {
               name: 'ConnectionStrings__TradingKing'
-              value: 'sqlsrv'
+              secretRef: 'sqlsrv'
             }
             {
               name: 'redis'
-              value: 'redis'
+              secretRef: 'redis'
             }
           ]
           resources: {
