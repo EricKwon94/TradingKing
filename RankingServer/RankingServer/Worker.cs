@@ -83,6 +83,7 @@ internal class Worker : BackgroundService
 
             if (_orders.Add(order))
             {
+                // INSERT
                 _logger.LogInformation("{order}", order);
 
                 if (order.Code != DEFAULT_CASH)
@@ -93,6 +94,17 @@ internal class Worker : BackgroundService
                 {
                     return prev + order.Quantity;
                 });
+            }
+            else if (_orders.TryGetValue(order, out var actualOrder)
+                && string.IsNullOrEmpty(order.UserId)
+                && string.IsNullOrEmpty(order.Code))
+            {
+                // DELETE
+                string key = $"{actualOrder.UserId}|{actualOrder.Code}";
+                if (_orders.Remove(order) && _userAssets.TryGetValue(key, out double prev))
+                {
+                    _userAssets.TryUpdate(key, prev - actualOrder.Quantity, prev);
+                }
             }
         }
     }

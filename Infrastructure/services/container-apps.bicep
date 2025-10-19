@@ -87,8 +87,8 @@ resource caFunc 'Microsoft.App/containerApps@2025-02-02-preview' = {
             }
           ]
           resources: {
-            cpu: json('0.25')
-            memory: '0.5Gi'
+            cpu: json('0.5')
+            memory: '1.0Gi'
           }
         }
       ]
@@ -160,8 +160,8 @@ resource caRanking 'Microsoft.App/containerApps@2025-02-02-preview' = {
             }
           ]
           resources: {
-            cpu: json('0.25')
-            memory: '0.5Gi'
+            cpu: json('0.5')
+            memory: '1.0Gi'
           }
         }
       ]
