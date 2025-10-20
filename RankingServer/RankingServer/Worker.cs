@@ -101,7 +101,7 @@ internal class Worker : BackgroundService
             {
                 // DELETE
                 string key = $"{actualOrder.UserId}|{actualOrder.Code}";
-                if (_orders.Remove(order) && _userAssets.TryGetValue(key, out double prev))
+                if (_orders.Remove(actualOrder) && _userAssets.TryGetValue(key, out double prev))
                 {
                     _userAssets.TryUpdate(key, prev - actualOrder.Quantity, prev);
                 }

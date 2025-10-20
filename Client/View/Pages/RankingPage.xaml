@@ -6,13 +6,27 @@
                 Title="유저 자산 랭킹"
                 x:DataType="vm:RankingViewModel"
              x:Class="View.Pages.RankingPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            FontSize="Title"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+    
+    <local:BasePage.Resources>
+        <Style x:Key="Label" TargetType="Label">
+            <Setter Property="FontSize" Value="Micro" />
+            <Setter Property="HorizontalOptions" Value="Center"/>
+        </Style>
+    </local:BasePage.Resources>
 
-        <Button Text="Invoke" Command="{Binding InvokeCommand}"/>
-    </VerticalStackLayout>
+    <CollectionView ItemsSource="{Binding Ranks}" Margin="16">
+        <CollectionView.ItemsLayout>
+            <LinearItemsLayout Orientation="Vertical" ItemSpacing="8" />
+        </CollectionView.ItemsLayout>
+        
+        <CollectionView.ItemTemplate>
+            <DataTemplate x:DataType="vm:RankModel">
+                <HorizontalStackLayout Spacing="8">
+                    <Label Style="{StaticResource Label}" Text="{Binding UserId}"/>
+                    <Label Style="{StaticResource Label}" Text="{Binding Asset, StringFormat='{0:N0}'}"/>
+                </HorizontalStackLayout>
+            </DataTemplate>
+        </CollectionView.ItemTemplate>
+    </CollectionView>
+    
 </local:BasePage>

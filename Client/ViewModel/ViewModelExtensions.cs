@@ -13,6 +13,7 @@ public static class ViewModelExtensions
             .AddTransient<TradeViewModel>()
             .AddTransient<RankingViewModel>()
             .AddTransient<AssetViewModel>()
+            .AddTransient<HallOfFameViewModel>()
             ;
     }
 }
