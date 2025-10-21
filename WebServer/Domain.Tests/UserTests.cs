@@ -74,11 +74,12 @@ public class UserTests
         double expectedQuantity = 100;
         double expectedPrice = 300;
         double expectedCash = 100_000_000 - expectedQuantity * expectedPrice;
+        int expectedSeasonId = 2;
 
-        User sut = new User(1, "zxcxzs21", "asfhlkidsgvhl!");
+        User sut = new User(expectedSeasonId, "zxcxzs21", "asfhlkidsgvhl!");
 
         // act
-        sut.BuyCoin(2, expectedCode, expectedQuantity, expectedPrice);
+        sut.BuyCoin(expectedSeasonId, expectedCode, expectedQuantity, expectedPrice);
 
         // assert
         var cashes = sut.Orders.Where(e => e.Code == "KRW-CASH").ToList();
@@ -86,17 +87,25 @@ public class UserTests
         cashes.Sum(e => e.Quantity).Should().Be(expectedCash);
 
         var doge = sut.Orders.Single(e => e.Code == "KRW-DOGE");
-        doge.SeasonId.Should().Be(2);
+        doge.SeasonId.Should().Be(expectedSeasonId);
         doge.Code.Should().Be(expectedCode);
         doge.Quantity.Should().Be(expectedQuantity);
         doge.Price.Should().Be(expectedPrice);
     }
 
     [Fact]
-    public void Can_not_buy_coin_if_not_enough_cash()
+    public void Can_not_buy_coin_if_not_enough_cash_when_same_seaon()
     {
         User sut = new User(1, "zxcxzs21", "asfhlkidsgvhl!");
         Action testCode = () => sut.BuyCoin(1, "KRW-BTC", 1, 177_000_000);
+        Assert.Throws<NotEnoughCashException>(testCode);
+    }
+
+    [Fact]
+    public void Can_not_buy_coin_if_not_enough_cash_when_another_seaon()
+    {
+        User sut = new User(1, "zxcxzs21", "asfhlkidsgvhl!");
+        Action testCode = () => sut.BuyCoin(2, "KRW-BTC", 1, 10000);
         Assert.Throws<NotEnoughCashException>(testCode);
     }
 
@@ -119,7 +128,7 @@ public class UserTests
         double expectedCash = 100_000_000 - expectedRemainingQuantity * expectedPrice;
         int expectedSeasonId = 2;
 
-        User sut = new User(1, "zxcxzs21", "asfhlkidsgvhl!");
+        User sut = new User(expectedSeasonId, "zxcxzs21", "asfhlkidsgvhl!");
         sut.BuyCoin(expectedSeasonId, expectedCode, expectedQuantity + expectedRemainingQuantity, expectedPrice);
 
         // act
@@ -143,7 +152,7 @@ public class UserTests
     }
 
     [Fact]
-    public void Can_not_sell_coin_if_not_enough_coin()
+    public void Can_not_sell_coin_if_not_enough_coin_when_same_seaon()
     {
         User sut = new User(1, "zxcxzs21", "asfhlkidsgvhl!");
         Action testCode = () => sut.SellCoin(1, "KRW-BTC", 1, 177_000_000);
@@ -151,10 +160,20 @@ public class UserTests
     }
 
     [Fact]
+    public void Can_not_sell_coin_if_not_enough_coin_when_another_seaon()
+    {
+        User sut = new User(1, "zxcxzs21", "asfhlkidsgvhl!");
+        sut.BuyCoin(1, "KRW-DOGE", 100, 300);
+
+        Action testCode = () => sut.SellCoin(2, "KRW-DOGE", 50, 300);
+        Assert.Throws<NotEnoughCoinException>(testCode);
+    }
+
+    [Fact]
     public void Can_not_sell_coin_if_not_order_price_too_low()
     {
         User sut = new User(1, "zxcxzs21", "asfhlkidsgvhl!");
-        sut.BuyCoin(100, "KRW-DOGE", 100, 300);
+        sut.BuyCoin(1, "KRW-DOGE", 100, 300);
         Action testCode = () => sut.SellCoin(1, "KRW-DOGE", 1, 300);
         Assert.Throws<PriceTooLowException>(testCode);
     }
