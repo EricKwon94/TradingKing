@@ -5,10 +5,13 @@ using System;
 
 namespace Infrastructure.EFCore;
 
-internal class TradingKingContext : DbContext, IEntityTypeConfiguration<User>, IEntityTypeConfiguration<Order>
+internal class TradingKingContext : DbContext,
+    IEntityTypeConfiguration<User>, IEntityTypeConfiguration<Order>,
+    IEntityTypeConfiguration<Season>
 {
     public DbSet<User> Users { get; private set; }
     public DbSet<Order> Orders { get; private set; }
+    public DbSet<Season> Seasons { get; private set; }
 
     public TradingKingContext(DbContextOptions<TradingKingContext> options)
         : base(options)
@@ -19,6 +22,7 @@ internal class TradingKingContext : DbContext, IEntityTypeConfiguration<User>, I
     {
         modelBuilder.ApplyConfiguration<User>(this);
         modelBuilder.ApplyConfiguration<Order>(this);
+        modelBuilder.ApplyConfiguration<Season>(this);
     }
 
     public void Configure(EntityTypeBuilder<User> builder)
@@ -55,11 +59,23 @@ internal class TradingKingContext : DbContext, IEntityTypeConfiguration<User>, I
         builder.Property(e => e.Quantity);
         builder.Property(e => e.Price);
 
-        builder.HasOne(oder => oder.User)
+        builder.HasOne(order => order.User)
             .WithMany(user => user.Orders)
-            .HasForeignKey(oder => oder.UserId);
+            .HasForeignKey(order => order.UserId);
+
+        builder.HasOne(order => order.Season)
+            .WithMany(season => season.Orders)
+            .HasForeignKey(order => order.SeasonId);
 
         builder.Property<DateTime>("CreatedAt")
+            .HasDefaultValueSql("getutcdate()");
+    }
+
+    public void Configure(EntityTypeBuilder<Season> builder)
+    {
+        builder.HasKey(e => e.Id);
+
+        builder.Property(e => e.StartedAt)
             .HasDefaultValueSql("getutcdate()");
     }
 }

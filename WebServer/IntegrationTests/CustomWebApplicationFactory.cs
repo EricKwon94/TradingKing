@@ -42,6 +42,7 @@ public class CustomWebApplicationFactory<TProgram>
         using var context = CreateContext();
         context.Database.EnsureDeleted();
         context.Database.EnsureCreated();
+        context.Database.ExecuteSqlRaw("Insert into Seasons DEFAULT VALUES", []);
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)

@@ -40,6 +40,7 @@ public class AccountServiceTests : IClassFixture<TestDatabaseFixture>
         user.Jwt.Should().BeNull();
 
         var order = await context.Orders.AsNoTracking().SingleAsync(e => e.UserId == user.Id);
+        order.SeasonId.Should().Be(_fixture.ExpectedLastSeasonId);
         order.Code.Should().Be("KRW-CASH");
         order.Quantity.Should().Be(100_000_000);
         order.Price.Should().Be(1);
@@ -109,6 +110,7 @@ public class AccountServiceTests : IClassFixture<TestDatabaseFixture>
     {
         var transaction = new Transaction(context);
         var repo = new UserRepository(context);
-        return new AccountService(transaction, repo);
+        var repo2 = new SeasonRepo(context);
+        return new AccountService(transaction, repo, repo2);
     }
 }

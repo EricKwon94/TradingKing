@@ -30,6 +30,7 @@ public static class InfrastructureExtensions
             .AddSingleton(p => ConnectionMultiplexer.Connect(redisCs))
             .AddTransient<IUserRepository, UserRepository>()
             .AddTransient<IOrderRepo, OrderRepo>()
+            .AddTransient<ISeasonRepo, SeasonRepo>()
             .AddTransient<Domain.Persistences.ITransaction, Transaction>()
             .AddTransient<ICacheService, CacheService>()
         ;

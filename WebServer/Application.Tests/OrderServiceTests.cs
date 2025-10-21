@@ -45,6 +45,7 @@ public class OrderServiceTests : IClassFixture<TestDatabaseFixture>
         cashes.Sum(e => e.Quantity).Should().Be(expectedCash);
 
         var doge = await context.Orders.AsNoTracking().SingleAsync(e => e.UserId == user.Id && e.Code == expectedCode);
+        doge.SeasonId.Should().Be(_fixture.ExpectedLastSeasonId);
         doge.Code.Should().Be(expectedCode);
         doge.Quantity.Should().Be(expectedQuantity);
         doge.Price.Should().Be(expectedPrice);
@@ -90,7 +91,8 @@ public class OrderServiceTests : IClassFixture<TestDatabaseFixture>
     {
         var transaction = new Transaction(context);
         var repo = new UserRepository(context);
-        var service = new AccountService(transaction, repo);
+        var seasonRepo = new SeasonRepo(context);
+        var service = new AccountService(transaction, repo, seasonRepo);
         var result = await service.RegisterAsync(id, "xcvjkl;asdfjk;l@@", default);
         Assert.True(result);
         context.ChangeTracker.Clear();
@@ -102,11 +104,12 @@ public class OrderServiceTests : IClassFixture<TestDatabaseFixture>
         var transaction = new Transaction(context);
         var repo = new OrderRepo(context);
         var userRepo = new UserRepository(context);
+        var seasonRepo = new SeasonRepo(context);
 
         var mock = new Mock<IExchangeApi>();
         mock.Setup(c => c.GetTickerAsync(code, default))
             .ReturnsAsync([new IExchangeApi.TickerRes(code, price)]);
 
-        return new OrderService(transaction, repo, userRepo, mock.Object);
+        return new OrderService(transaction, repo, userRepo, seasonRepo, mock.Object);
     }
 }

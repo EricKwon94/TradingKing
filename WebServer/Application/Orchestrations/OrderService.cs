@@ -14,13 +14,15 @@ public class OrderService
     private readonly ITransaction _transaction;
     private readonly IOrderRepo _orderRepo;
     private readonly IUserRepository _userRepo;
+    private readonly ISeasonRepo _seasonRepo;
     private readonly IExchangeApi _exchangeApi;
 
-    public OrderService(ITransaction transaction, IOrderRepo orderRepo, IUserRepository userRepo, IExchangeApi exchangeApi)
+    public OrderService(ITransaction transaction, IOrderRepo orderRepo, IUserRepository userRepo, ISeasonRepo seasonRepo, IExchangeApi exchangeApi)
     {
         _transaction = transaction;
         _orderRepo = orderRepo;
         _userRepo = userRepo;
+        _seasonRepo = seasonRepo;
         _exchangeApi = exchangeApi;
     }
 
@@ -42,8 +44,9 @@ public class OrderService
         var tickers = await _exchangeApi.GetTickerAsync(req.Code, ct);
         var ticker = tickers.Single();
 
+        int seasonId = await _seasonRepo.GetLastSeasonIdAsync(ct);
         User user = await _userRepo.GetUserWithOrderAsync(userId, Order.DEFAULT_CODE, ct);
-        user.BuyCoin(req.Code, req.Quantity, ticker.trade_price);
+        user.BuyCoin(seasonId, req.Code, req.Quantity, ticker.trade_price);
 
         await _transaction.SaveChangesAsync(ct);
     }
@@ -55,8 +58,9 @@ public class OrderService
         var tickers = await _exchangeApi.GetTickerAsync(req.Code, ct);
         var ticker = tickers.Single();
 
+        int seasonId = await _seasonRepo.GetLastSeasonIdAsync(ct);
         User user = await _userRepo.GetUserWithOrderAsync(userId, req.Code, ct);
-        user.SellCoin(req.Code, req.Quantity, ticker.trade_price);
+        user.SellCoin(seasonId, req.Code, req.Quantity, ticker.trade_price);
 
         await _transaction.SaveChangesAsync(ct);
     }

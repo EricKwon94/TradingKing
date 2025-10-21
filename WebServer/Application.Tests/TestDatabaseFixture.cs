@@ -19,6 +19,7 @@ public class TestDatabaseFixture
     private static bool _databaseInitialized;
 
     public string IndependentId => _ids.TryDequeue(out var r) ? r : throw new Exception("큐없음");
+    public int ExpectedLastSeasonId { get; } = 2;
 
     public TestDatabaseFixture()
     {
@@ -37,7 +38,11 @@ public class TestDatabaseFixture
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
 
-                var user = new User(IndependentId, "jkansklfndlk2048@");
+                for (int i = 0; i < 2; i++)
+                {
+                    context.Database.ExecuteSqlRaw("Insert into Seasons DEFAULT VALUES", []);
+                }
+                var user = new User(1, IndependentId, "jkansklfndlk2048@");
                 context.Users.Add(user);
                 context.SaveChanges();
 
