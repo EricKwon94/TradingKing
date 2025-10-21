@@ -54,7 +54,9 @@ public class User : IEntity<string>
         if (price < Order.MIN_ORDER_PRICE)
             throw new PriceTooLowException();
 
-        double availableCash = Orders.Where(e => e.Code == Order.DEFAULT_CODE).Sum(e => e.Quantity);
+        double availableCash = Orders
+            .Where(e => e.Code == Order.DEFAULT_CODE && e.SeasonId == seasonId)
+            .Sum(e => e.Quantity);
         if (availableCash < price)
             throw new NotEnoughCashException();
 
@@ -67,7 +69,9 @@ public class User : IEntity<string>
     /// <exception cref="NotEnoughCoinException"></exception>
     public void SellCoin(int seasonId, string code, double sellQuantity, double tickerPrice)
     {
-        double quantity = Orders.Where(e => e.Code == code).Sum(e => e.Quantity);
+        double quantity = Orders
+            .Where(e => e.Code == code && e.SeasonId == seasonId)
+            .Sum(e => e.Quantity);
         if (sellQuantity > quantity)
             throw new NotEnoughCoinException();
 

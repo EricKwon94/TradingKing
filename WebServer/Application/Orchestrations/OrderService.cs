@@ -33,7 +33,8 @@ public class OrderService
 
     public async Task<IEnumerable<OrderRes>> GetAllAsync(string userId, CancellationToken ct)
     {
-        var orders = await _orderRepo.GetAllAsync(userId, ct);
+        int seasonId = await _seasonRepo.GetLastSeasonIdAsync(ct);
+        var orders = await _orderRepo.GetAllAsync(seasonId, userId, ct);
         return orders.Select(e => new OrderRes(e.Code, e.Quantity, e.Price));
     }
 
