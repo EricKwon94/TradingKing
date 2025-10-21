@@ -46,7 +46,7 @@ public class OrderService
         var ticker = tickers.Single();
 
         int seasonId = await _seasonRepo.GetLastSeasonIdAsync(ct);
-        User user = await _userRepo.GetUserWithOrderAsync(userId, Order.DEFAULT_CODE, ct);
+        User user = await _userRepo.GetUserWithOrderAsync(seasonId, userId, Order.DEFAULT_CODE, ct);
         user.BuyCoin(seasonId, req.Code, req.Quantity, ticker.trade_price);
 
         await _transaction.SaveChangesAsync(ct);
@@ -60,7 +60,7 @@ public class OrderService
         var ticker = tickers.Single();
 
         int seasonId = await _seasonRepo.GetLastSeasonIdAsync(ct);
-        User user = await _userRepo.GetUserWithOrderAsync(userId, req.Code, ct);
+        User user = await _userRepo.GetUserWithOrderAsync(seasonId, userId, req.Code, ct);
         user.SellCoin(seasonId, req.Code, req.Quantity, ticker.trade_price);
 
         await _transaction.SaveChangesAsync(ct);
