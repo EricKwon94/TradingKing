@@ -27,7 +27,7 @@ public class User : IEntity<string>
 
     /// <exception cref="InvalidIdException"></exception>
     /// <exception cref="InvalidPasswordException"></exception>
-    public User(string id, string password)
+    public User(int seasonId, string id, string password)
     {
         string idPattern = $@"^[가-힣A-Za-z0-9]{{{MIN_ID_LENGTH},{MAX_ID_LENGTH}}}$";
         bool idValid = Regex.IsMatch(id, idPattern);
@@ -43,31 +43,35 @@ public class User : IEntity<string>
         Id = id;
         Password = password;
 
-        _orders.Add(new Order(Id, Order.DEFAULT_CODE, Order.DEFAULT_PRICE, 1));
+        _orders.Add(new Order(seasonId, Id, Order.DEFAULT_CODE, Order.DEFAULT_PRICE, 1));
     }
 
     /// <exception cref="PriceTooLowException"></exception>
     /// <exception cref="NotEnoughCashException"></exception>
-    public void BuyCoin(string code, double buyQuantity, double tickerPrice)
+    public void BuyCoin(int seasonId, string code, double buyQuantity, double tickerPrice)
     {
         double price = buyQuantity * tickerPrice;
         if (price < Order.MIN_ORDER_PRICE)
             throw new PriceTooLowException();
 
-        double availableCash = Orders.Where(e => e.Code == Order.DEFAULT_CODE).Sum(e => e.Quantity);
+        double availableCash = Orders
+            .Where(e => e.Code == Order.DEFAULT_CODE && e.SeasonId == seasonId)
+            .Sum(e => e.Quantity);
         if (availableCash < price)
             throw new NotEnoughCashException();
 
-        var cryto = new Order(Id, code, buyQuantity, tickerPrice);
-        var cash = new Order(Id, Order.DEFAULT_CODE, price * -1, 1);
+        var cryto = new Order(seasonId, Id, code, buyQuantity, tickerPrice);
+        var cash = new Order(seasonId, Id, Order.DEFAULT_CODE, price * -1, 1);
         _orders.AddRange(cryto, cash);
     }
 
     /// <exception cref="PriceTooLowException"></exception>
     /// <exception cref="NotEnoughCoinException"></exception>
-    public void SellCoin(string code, double sellQuantity, double tickerPrice)
+    public void SellCoin(int seasonId, string code, double sellQuantity, double tickerPrice)
     {
-        double quantity = Orders.Where(e => e.Code == code).Sum(e => e.Quantity);
+        double quantity = Orders
+            .Where(e => e.Code == code && e.SeasonId == seasonId)
+            .Sum(e => e.Quantity);
         if (sellQuantity > quantity)
             throw new NotEnoughCoinException();
 
@@ -75,8 +79,8 @@ public class User : IEntity<string>
         if (price < Order.MIN_ORDER_PRICE)
             throw new PriceTooLowException();
 
-        var cryto = new Order(Id, code, sellQuantity * -1, tickerPrice);
-        var cash = new Order(Id, Order.DEFAULT_CODE, price, 1);
+        var cryto = new Order(seasonId, Id, code, sellQuantity * -1, tickerPrice);
+        var cash = new Order(seasonId, Id, Order.DEFAULT_CODE, price, 1);
         _orders.AddRange(cryto, cash);
     }
 }

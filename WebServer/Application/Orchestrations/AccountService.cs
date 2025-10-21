@@ -12,13 +12,15 @@ public class AccountService
 {
     private readonly ITransaction _transaction;
     private readonly IUserRepository _userRepository;
+    private readonly ISeasonRepo _seasonRepo;
     private readonly TokenGenerator _tokenGenerator = new();
     private readonly Encryptor _encryptor = new();
 
-    public AccountService(ITransaction transaction, IUserRepository userRepository)
+    public AccountService(ITransaction transaction, IUserRepository userRepository, ISeasonRepo seasonRepo)
     {
         _transaction = transaction;
         _userRepository = userRepository;
+        _seasonRepo = seasonRepo;
     }
 
     public FormRes GetForm()
@@ -31,8 +33,9 @@ public class AccountService
     /// <exception cref="InvalidPasswordException"></exception>
     public async Task<bool> RegisterAsync(string id, string password, CancellationToken ct)
     {
+        int seasonId = await _seasonRepo.GetLastSeasonIdAsync(ct);
         string encrypted = _encryptor.Encrypt(password);
-        var user = new User(id, encrypted);
+        var user = new User(seasonId, id, encrypted);
 
         await _userRepository.AddAsync(user, ct);
         try

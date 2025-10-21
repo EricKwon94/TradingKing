@@ -9,16 +9,19 @@ public class Order : IEntity<Guid>
     public const int MIN_ORDER_PRICE = 10_000;
 
     public Guid Id { get; }
+    public int SeasonId { get; }
     public string UserId { get; }
     public string Code { get; }
     public double Quantity { get; }
     public double Price { get; }
 
     public User? User { get; }
+    public Season? Season { get; }
 
-    public Order(string userId, string code, double quantity, double price)
+    public Order(int seasonId, string userId, string code, double quantity, double price)
     {
         UserId = userId;
+        SeasonId = seasonId;
         Code = code;
         Quantity = quantity;
         Price = price;

@@ -46,15 +46,38 @@ namespace Infrastructure.Migrations
                     b.Property<double>("Quantity")
                         .HasColumnType("float");
 
+                    b.Property<int>("SeasonId")
+                        .HasColumnType("int");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(10)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("SeasonId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("Domain.Season", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("StartedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getutcdate()");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Seasons");
                 });
 
             modelBuilder.Entity("Domain.User", b =>
@@ -87,13 +110,26 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Order", b =>
                 {
+                    b.HasOne("Domain.Season", "Season")
+                        .WithMany("Orders")
+                        .HasForeignKey("SeasonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Domain.User", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Season");
+
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.Season", b =>
+                {
+                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("Domain.User", b =>
