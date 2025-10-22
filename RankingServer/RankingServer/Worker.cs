@@ -139,7 +139,13 @@ internal class Worker : BackgroundService
             await InitAsync(ct);
             SortedSetEntry[] entries = await _redis.SortedSetRangeByRankWithScoresAsync(RANKING_KEY, 0, -1, Order.Descending);
             await _redis.KeyDeleteAsync(RANKING_KEY);
-            // TODO: 명예의전당등록
+
+            // 명예의전당등록
+            foreach (var entry in entries)
+            {
+                var rank = new RankModel(_seasonId, entry.Element.ToString(), entry.Score);
+                await _context.Ranks.AddAsync(rank, ct);
+            }
 
             // 모든 유저 1억 지급
             List<string> users = await _context.Users
