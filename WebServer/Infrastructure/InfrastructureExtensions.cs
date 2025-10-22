@@ -31,6 +31,7 @@ public static class InfrastructureExtensions
             .AddTransient<IUserRepository, UserRepository>()
             .AddTransient<IOrderRepo, OrderRepo>()
             .AddTransient<ISeasonRepo, SeasonRepo>()
+            .AddTransient<IRankRepo, RankRepo>()
             .AddTransient<Domain.Persistences.ITransaction, Transaction>()
             .AddTransient<ICacheService, CacheService>()
         ;

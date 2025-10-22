@@ -17,6 +17,7 @@ public static class ApplicationExtensions
         return builder
             .AddTransient<AccountService>()
             .AddTransient<OrderService>()
+            .AddTransient<SeasonService>()
             ;
     }
 }
