@@ -9,4 +9,5 @@ public class Season : IEntity<int>
     public DateTime StartedAt { get; }
 
     public ICollection<Order> Orders { get; } = [];
+    public ICollection<Rank> Ranks { get; } = [];
 }

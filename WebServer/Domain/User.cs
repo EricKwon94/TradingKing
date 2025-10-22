@@ -17,6 +17,7 @@ public class User : IEntity<string>
 
     private readonly List<Order> _orders = [];
     public IReadOnlyList<Order> Orders => _orders;
+    public ICollection<Rank> Ranks { get; } = [];
 
 #pragma warning disable CS8618
     private User()

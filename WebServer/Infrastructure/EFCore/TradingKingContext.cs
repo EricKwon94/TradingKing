@@ -7,11 +7,12 @@ namespace Infrastructure.EFCore;
 
 internal class TradingKingContext : DbContext,
     IEntityTypeConfiguration<User>, IEntityTypeConfiguration<Order>,
-    IEntityTypeConfiguration<Season>
+    IEntityTypeConfiguration<Season>, IEntityTypeConfiguration<Rank>
 {
     public DbSet<User> Users { get; private set; }
     public DbSet<Order> Orders { get; private set; }
     public DbSet<Season> Seasons { get; private set; }
+    public DbSet<Rank> Ranks { get; private set; }
 
     public TradingKingContext(DbContextOptions<TradingKingContext> options)
         : base(options)
@@ -23,6 +24,7 @@ internal class TradingKingContext : DbContext,
         modelBuilder.ApplyConfiguration<User>(this);
         modelBuilder.ApplyConfiguration<Order>(this);
         modelBuilder.ApplyConfiguration<Season>(this);
+        modelBuilder.ApplyConfiguration<Rank>(this);
     }
 
     public void Configure(EntityTypeBuilder<User> builder)
@@ -77,5 +79,25 @@ internal class TradingKingContext : DbContext,
 
         builder.Property(e => e.StartedAt)
             .HasDefaultValueSql("getutcdate()");
+    }
+
+    public void Configure(EntityTypeBuilder<Rank> builder)
+    {
+        builder.HasKey(e => new { e.SeasonId, e.UserId });
+
+        builder.Property(e => e.UserId)
+            .HasMaxLength(User.MAX_ID_LENGTH)
+            .IsRequired()
+            .IsUnicode(true);
+
+        builder.Property(e => e.Assets);
+
+        builder.HasOne(rank => rank.Season)
+            .WithMany(season => season.Ranks)
+            .HasForeignKey(rank => rank.SeasonId);
+
+        builder.HasOne(rank => rank.User)
+            .WithMany(user => user.Ranks)
+            .HasForeignKey(rank => rank.UserId);
     }
 }
