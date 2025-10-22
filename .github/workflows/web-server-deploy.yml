@@ -78,7 +78,7 @@ jobs:
         password: ${{ secrets.ACR_PASSWORD }}
 
     - name: Deploy migrations script
-      uses: azure/sql-action@v2.3
+      uses: azure/sql-action@v2
       with:
         path: ${{ github.workspace }}/migrations.sql
         connection-string: Data Source=${{ env.SQL_SERVER_NAME }},1433;Initial Catalog=${{ env.DBNAME }};User ID=${{ secrets.SQLSRV_ID }};Password=${{ secrets.SQLSRV_PWD }}

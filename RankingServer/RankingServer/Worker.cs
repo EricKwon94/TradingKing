@@ -9,31 +9,35 @@ namespace RankingServer;
 
 internal class Worker : BackgroundService
 {
-    private const string DEFAULT_CASH = "KRW-CASH";
+    private const string DEFAULT_CODE = "KRW-CASH";
+    private const int DEFAULT_QUANTITY = 100_000_000;
     private const int REFRESH_DELAY_SECOND = 1;
+    private const string RANKING_KEY = "ranking";
 
     private readonly ILogger<Worker> _logger;
     private readonly TradingKingContext _context;
     private readonly IDatabase _redis;
     private readonly ServiceBusReceiver _orderReceiver;
-    private readonly ServiceBusReceiver _rankReceiver;
+    private readonly ServiceBusReceiver _seasonReceiver;
     private readonly IExchangeApi _exchangeApi;
 
-    private ConcurrentDictionary<string, double> _userAssets = null!;
-    private HashSet<OrderModel> _orders = null!;
+    private readonly ConcurrentDictionary<string, double> _userAssets = [];
+    private readonly ConcurrentDictionary<Guid, OrderModel> _orders = [];
+
+    private int _seasonId = 1;
     private HashSet<string> _codes = null!;
 
     public Worker(
         ILogger<Worker> logger, TradingKingContext context, IDatabase redis,
         [FromKeyedServices("order")] ServiceBusReceiver orderReceiver,
-        [FromKeyedServices("rank")] ServiceBusReceiver rankReceiver,
+        [FromKeyedServices("rank")] ServiceBusReceiver seasonReceiver,
         IExchangeApi exchangeApi)
     {
         _logger = logger;
         _context = context;
         _redis = redis;
         _orderReceiver = orderReceiver;
-        _rankReceiver = rankReceiver;
+        _seasonReceiver = seasonReceiver;
         _exchangeApi = exchangeApi;
     }
 
@@ -43,34 +47,50 @@ internal class Worker : BackgroundService
 
         Task task1 = AggregateRankAsync(ct);
         Task task2 = ReceiveOrderMessageAsync(ct);
+        Task task3 = ReceiveSeasonMessageAsync(ct);
 
-        await Task.WhenAll(task1, task2);
+        await Task.WhenAll(task1, task2, task3);
     }
 
     private async Task InitAsync(CancellationToken ct)
     {
-        _orders = await _context.Orders
+        _seasonId = await _context.Seasons
             .AsNoTracking()
-            .ToHashSetAsync(new OrderModel.Comparer(), ct);
+            .MaxAsync(x => x.Id, ct);
 
-        _codes = _orders
+        var orders = await _context.Orders
+            .AsNoTracking()
+            .Where(e => e.SeasonId == _seasonId)
+            .ToListAsync(ct);
+
+        _codes = orders
             .Select(o => o.Code)
             .ToHashSet();
-        _codes.Remove(DEFAULT_CASH);
+        _codes.Remove(DEFAULT_CODE);
+
+        _orders.Clear();
+        foreach (var order in orders)
+        {
+            _orders.TryAdd(order.Id, order);
+        }
 
         Dictionary<string, double> userAssets = _orders
-            .GroupBy(e => new { e.UserId, e.Code })
+            .GroupBy(e => new { e.Value.UserId, e.Value.Code })
             .Select(g => new
             {
                 g.Key.UserId,
                 g.Key.Code,
-                Quantity = g.Sum(g => g.Quantity)
+                Quantity = g.Sum(g => g.Value.Quantity)
             })
             .ToDictionary(
             keySelector: g => $"{g.UserId}|{g.Code}",
             elementSelector: g => g.Quantity);
 
-        _userAssets = new ConcurrentDictionary<string, double>(userAssets);
+        _userAssets.Clear();
+        foreach (var asset in userAssets)
+        {
+            _userAssets.TryAdd(asset.Key, asset.Value);
+        }
     }
 
     private async Task ReceiveOrderMessageAsync(CancellationToken ct)
@@ -79,33 +99,58 @@ internal class Worker : BackgroundService
         {
             await _orderReceiver.CompleteMessageAsync(item, ct);
 
-            var order = JsonSerializer.Deserialize<OrderModel>(item.Body)!;
+            var orderModel = JsonSerializer.Deserialize<OrderModel>(item.Body)!;
 
-            if (_orders.Add(order))
+            if (orderModel.SeasonId == _seasonId && _orders.TryAdd(orderModel.Id, orderModel))
             {
                 // INSERT
-                _logger.LogInformation("{order}", order);
+                _logger.LogInformation("{order}", orderModel);
 
-                if (order.Code != DEFAULT_CASH)
-                    _codes.Add(order.Code);
+                if (orderModel.Code != DEFAULT_CODE)
+                    _codes.Add(orderModel.Code);
 
-                string key = $"{order.UserId}|{order.Code}";
-                _userAssets.AddOrUpdate(key, order.Quantity, (key, prev) =>
+                string key = $"{orderModel.UserId}|{orderModel.Code}";
+                _userAssets.AddOrUpdate(key, orderModel.Quantity, (key, prev) =>
                 {
-                    return prev + order.Quantity;
+                    return prev + orderModel.Quantity;
                 });
             }
-            else if (_orders.TryGetValue(order, out var actualOrder)
-                && string.IsNullOrEmpty(order.UserId)
-                && string.IsNullOrEmpty(order.Code))
+            else if (_orders.TryGetValue(orderModel.Id, out var order)
+                && string.IsNullOrEmpty(orderModel.UserId) && string.IsNullOrEmpty(orderModel.Code))
             {
                 // DELETE
-                string key = $"{actualOrder.UserId}|{actualOrder.Code}";
-                if (_orders.Remove(actualOrder) && _userAssets.TryGetValue(key, out double prev))
+                string key = $"{order.UserId}|{order.Code}";
+                if (_orders.TryRemove(order.Id, out var _) && _userAssets.TryGetValue(key, out double prev))
                 {
-                    _userAssets.TryUpdate(key, prev - actualOrder.Quantity, prev);
+                    _userAssets.TryUpdate(key, prev - order.Quantity, prev);
                 }
             }
+        }
+    }
+
+    private async Task ReceiveSeasonMessageAsync(CancellationToken ct)
+    {
+        await foreach (ServiceBusReceivedMessage item in _seasonReceiver.ReceiveMessagesAsync(ct))
+        {
+            await _seasonReceiver.CompleteMessageAsync(item, ct);
+            var season = JsonSerializer.Deserialize<SeasonModel>(item.Body)!;
+            _logger.LogInformation("Season Changed {id}", season.Id);
+
+            await InitAsync(ct);
+            SortedSetEntry[] entries = await _redis.SortedSetRangeByRankWithScoresAsync(RANKING_KEY, 0, -1, Order.Descending);
+            await _redis.KeyDeleteAsync(RANKING_KEY);
+            // TODO: 명예의전당등록
+
+            // 모든 유저 1억 지급
+            List<string> users = await _context.Users
+                .AsNoTracking().Select(e => e.Id).ToListAsync(ct);
+
+            foreach (var user in users)
+            {
+                var order = new OrderModel(Guid.NewGuid(), _seasonId, user, DEFAULT_CODE, DEFAULT_QUANTITY, 1);
+                await _context.Orders.AddAsync(order, ct);
+            }
+            await _context.SaveChangesAsync(ct);
         }
     }
 
@@ -114,10 +159,11 @@ internal class Worker : BackgroundService
         var timer = new PeriodicTimer(TimeSpan.FromSeconds(REFRESH_DELAY_SECOND));
         while (await timer.WaitForNextTickAsync(ct))
         {
-            IEnumerable<IExchangeApi.TickerRes> tickers;
+            IEnumerable<IExchangeApi.TickerRes> tickers = [];
             try
             {
-                tickers = await _exchangeApi.GetTickerAsync(_codes, ct);
+                if (_codes.Count > 0)
+                    tickers = await _exchangeApi.GetTickerAsync(_codes, ct);
             }
             catch (Exception ex)
             {
@@ -133,7 +179,7 @@ internal class Worker : BackgroundService
             {
                 entries[i++] = new SortedSetEntry(asset.Key, asset.Value);
             }
-            await _redis.SortedSetAddAsync("ranking", entries);
+            await _redis.SortedSetAddAsync(RANKING_KEY, entries);
         }
     }
 
@@ -147,7 +193,7 @@ internal class Worker : BackgroundService
             string code = split[1];
             double price = 0;
 
-            if (code == DEFAULT_CASH)
+            if (code == DEFAULT_CODE)
             {
                 price = item.Value;
             }
