@@ -136,6 +136,7 @@ internal class Worker : BackgroundService
             var season = JsonSerializer.Deserialize<SeasonModel>(item.Body)!;
             _logger.LogInformation("Season Changed {id}", season.Id);
 
+            int prevSeasonId = _seasonId;
             await InitAsync(ct);
             SortedSetEntry[] entries = await _redis.SortedSetRangeByRankWithScoresAsync(RANKING_KEY, 0, -1, Order.Descending);
             await _redis.KeyDeleteAsync(RANKING_KEY);
@@ -143,7 +144,7 @@ internal class Worker : BackgroundService
             // 명예의전당등록
             foreach (var entry in entries)
             {
-                var rank = new RankModel(_seasonId, entry.Element.ToString(), entry.Score);
+                var rank = new RankModel(prevSeasonId, entry.Element.ToString(), entry.Score);
                 await _context.Ranks.AddAsync(rank, ct);
             }
 
