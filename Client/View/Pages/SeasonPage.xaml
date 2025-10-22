@@ -6,10 +6,33 @@
              xmlns:local ="clr-namespace:View.Pages"
                 x:DataType="vm:SeasonViewModel"
              Title="명예의 전당">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+
+    <local:BasePage.Resources>
+        <Style x:Key="Label" TargetType="Label">
+            <Setter Property="FontSize" Value="Small" />
+            <Setter Property="HorizontalOptions" Value="Center"/>
+        </Style>
+    </local:BasePage.Resources>
+
+    <CollectionView ItemsSource="{Binding Seasons}" Margin="16">
+        <CollectionView.ItemsLayout>
+            <LinearItemsLayout Orientation="Vertical" ItemSpacing="8" />
+        </CollectionView.ItemsLayout>
+        
+        <CollectionView.ItemTemplate>
+            <DataTemplate x:DataType="vm:SeasonModel">
+                <HorizontalStackLayout Spacing="8">
+                    <Button Command="{Binding ClickCommand}">
+                        <Button.Text>
+                            <MultiBinding StringFormat="{}시즌: {0}   시작: {1}">
+                                <Binding Path="Seq"/>
+                                <Binding Path="StartedAt"/>
+                            </MultiBinding>
+                        </Button.Text>
+                    </Button>
+                </HorizontalStackLayout>                
+            </DataTemplate>
+        </CollectionView.ItemTemplate>
+    </CollectionView>
+    
 </local:BasePage>
