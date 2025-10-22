@@ -3,6 +3,7 @@ using Domain.Persistences;
 using Infrastructure.EFCore;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,6 +16,11 @@ internal class SeasonRepo : ISeasonRepo
     public SeasonRepo(TradingKingContext context)
     {
         _seasons = context.Seasons;
+    }
+
+    public Task<List<Season>> GetSeasonsAsync(CancellationToken ct)
+    {
+        return _seasons.AsNoTracking().ToListAsync(ct);
     }
 
     public async Task<int> GetLastSeasonIdAsync(CancellationToken ct)
