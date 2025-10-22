@@ -7,10 +7,26 @@
                 x:DataType="vm:Season2ViewModel"
                 Shell.TabBarIsVisible="False"
              Title="명예의 전당">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+
+    <local:BasePage.Resources>
+        <Style x:Key="Label" TargetType="Label">
+            <Setter Property="FontSize" Value="Small" />
+            <Setter Property="HorizontalOptions" Value="Center"/>
+        </Style>
+    </local:BasePage.Resources>
+
+    <CollectionView ItemsSource="{Binding Ranks}" Margin="16">
+        <CollectionView.ItemsLayout>
+            <LinearItemsLayout Orientation="Vertical" ItemSpacing="8" />
+        </CollectionView.ItemsLayout>
+
+        <CollectionView.ItemTemplate>
+            <DataTemplate x:DataType="vm:SeasonRankModel">
+                <HorizontalStackLayout Spacing="8">
+                    <Label Style="{StaticResource Label}" Text="{Binding UserId}"/>
+                    <Label Style="{StaticResource Label}" Text="{Binding Assets, StringFormat='{0:N0}'}"/>
+                </HorizontalStackLayout>
+            </DataTemplate>
+        </CollectionView.ItemTemplate>
+    </CollectionView>
 </local:BasePage>

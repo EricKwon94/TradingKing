@@ -43,27 +43,33 @@ public partial class SeasonViewModel : BaseViewModel
 
         for (int i = 0; i < seasons.Count - 1; i++)
         {
-            var model = new SeasonModel(i + 1, seasons[i].StartedAt.ToLocalTime());
+            var model = new SeasonModel(seasons[i].Id, i + 1, seasons[i].StartedAt.ToLocalTime());
             model.OnClick += OnClick;
             Seasons.Add(model);
         }
     }
 
-    private Task OnClick(CancellationToken ct)
+    private Task OnClick(int seasonId, CancellationToken ct)
     {
-        return _navigation.GoToAsync("Season2", ct);
+        Dictionary<string, object> param = new Dictionary<string, object>
+        {
+            ["seasonId"] = seasonId
+        };
+        return _navigation.GoToAsync("Season2", param, ct);
     }
 }
 
 public partial class SeasonModel
 {
+    private int _seasonId;
     public int Seq { get; }
     public DateTime StartedAt { get; }
 
-    public event Func<CancellationToken, Task>? OnClick;
+    public event Func<int, CancellationToken, Task>? OnClick;
 
-    public SeasonModel(int seq, DateTime startedAt)
+    public SeasonModel(int seasonId, int seq, DateTime startedAt)
     {
+        _seasonId = seasonId;
         Seq = seq;
         StartedAt = startedAt;
     }
@@ -71,6 +77,6 @@ public partial class SeasonModel
     [RelayCommand]
     public Task Click(CancellationToken ct)
     {
-        return OnClick?.Invoke(ct) ?? Task.CompletedTask;
+        return OnClick?.Invoke(_seasonId, ct) ?? Task.CompletedTask;
     }
 }

@@ -7,13 +7,6 @@
                 x:DataType="vm:SeasonViewModel"
              Title="명예의 전당">
 
-    <local:BasePage.Resources>
-        <Style x:Key="Label" TargetType="Label">
-            <Setter Property="FontSize" Value="Small" />
-            <Setter Property="HorizontalOptions" Value="Center"/>
-        </Style>
-    </local:BasePage.Resources>
-
     <CollectionView ItemsSource="{Binding Seasons}" Margin="16">
         <CollectionView.ItemsLayout>
             <LinearItemsLayout Orientation="Vertical" ItemSpacing="8" />
