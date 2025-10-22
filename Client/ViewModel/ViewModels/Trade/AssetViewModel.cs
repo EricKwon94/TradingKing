@@ -126,5 +126,6 @@ public partial class AssetViewModel : BaseViewModel
     public override void OnDisappearing()
     {
         Purchases.Clear();
+        CoinCash = 0;
     }
 }
