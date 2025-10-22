@@ -29,6 +29,12 @@ public static class ApplicationExtensions
             .AddPolicyHandler(HttpPolicyExtensions.HandleTransientHttpError().WaitAndRetryAsync(4, count => TimeSpan.FromSeconds(2 * count)))
             .AddHttpMessageHandler<AuthHeaderHandler>()
             ;
+
+        builder.AddRefitClient<ISeasonApi>()
+            .ConfigureHttpClient(c => c.BaseAddress = address)
+            .AddPolicyHandler(HttpPolicyExtensions.HandleTransientHttpError().WaitAndRetryAsync(4, count => TimeSpan.FromSeconds(2 * count)))
+            .AddHttpMessageHandler<AuthHeaderHandler>()
+            ;
         return builder;
     }
 }

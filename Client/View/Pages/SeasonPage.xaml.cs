@@ -2,9 +2,9 @@ using ViewModel.ViewModels;
 
 namespace View.Pages;
 
-public partial class HallOfFamePage : BasePage
+public partial class SeasonPage : BasePage
 {
-    public HallOfFamePage(HallOfFameViewModel vm)
+    public SeasonPage(SeasonViewModel vm)
     {
         InitializeComponent();
         BindingContext = vm;

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <local:BasePage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="View.Pages.HallOfFamePage"
+             x:Class="View.Pages.SeasonPage"
                 xmlns:vm="clr-namespace:ViewModel.ViewModels;assembly=ViewModel"
              xmlns:local ="clr-namespace:View.Pages"
-                x:DataType="vm:HallOfFameViewModel"
+                x:DataType="vm:SeasonViewModel"
              Title="명예의 전당">
     <VerticalStackLayout>
         <Label 
