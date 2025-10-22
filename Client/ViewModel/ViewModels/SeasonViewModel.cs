@@ -41,7 +41,7 @@ public partial class SeasonViewModel : BaseViewModel
             return;
         }
 
-        for (int i = 0; i < seasons.Count - 1; i++)
+        for (int i = 0; i < seasons.Count; i++)
         {
             var model = new SeasonModel(seasons[i].Id, i + 1, seasons[i].StartedAt.ToLocalTime());
             model.OnClick += OnClick;

@@ -10,6 +10,11 @@
         <VerticalStackLayout HorizontalOptions="Center" WidthRequest="300" Spacing="8">
 
             <ActivityIndicator IsVisible="{Binding IsBusy}" IsRunning="True"/>
+            <Image
+                Source="pig.png"
+                HeightRequest="150"
+                Aspect="AspectFit"
+                SemanticProperties.Description="dot net bot in a hovercraft number nine" />
 
             <Label Text="회원가입" Style="{StaticResource Headline}" />
 

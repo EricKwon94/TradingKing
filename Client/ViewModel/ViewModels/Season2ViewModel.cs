@@ -14,14 +14,16 @@ public class Season2ViewModel : BaseViewModel, IQueryAttributable
     private readonly ILogger<Season2ViewModel> _logger;
     private readonly ISeasonApi _season;
     private readonly IAlertService _alert;
+    private readonly INavigationService _navigation;
 
     public ObservableCollection<SeasonRankModel> Ranks { get; } = [];
 
-    public Season2ViewModel(ILogger<Season2ViewModel> logger, ISeasonApi season, IAlertService alert)
+    public Season2ViewModel(ILogger<Season2ViewModel> logger, ISeasonApi season, IAlertService alert, INavigationService navigation)
     {
         _logger = logger;
         _season = season;
         _alert = alert;
+        _navigation = navigation;
     }
 
     public async void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -35,6 +37,13 @@ public class Season2ViewModel : BaseViewModel, IQueryAttributable
         catch (Exception ex)
         {
             await _alert.DisplayAlertAsync("error", ex.Message, "ok", default);
+            return;
+        }
+
+        if (!ranks.Any())
+        {
+            await _alert.DisplayAlertAsync("시즌", "시즌이 아직 안 끝났어.", "ok", default);
+            await _navigation.GoToAsync("..", default);
             return;
         }
 

@@ -4,7 +4,7 @@
 시즌은 운영자가 원하는 시간에 종료됩니다.
 
 ## 설치하는 법 (Windows Only)
-Releases -> 1.0.0 -> Host.exe
+Releases -> 1.0.1 -> Host.exe
 
 # 인프라
 ![구조](image.png)
