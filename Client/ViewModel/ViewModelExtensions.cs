@@ -14,6 +14,7 @@ public static class ViewModelExtensions
             .AddTransient<RankingViewModel>()
             .AddTransient<AssetViewModel>()
             .AddTransient<SeasonViewModel>()
+            .AddTransient<Season2ViewModel>()
             ;
     }
 }

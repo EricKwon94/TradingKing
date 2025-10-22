@@ -10,6 +10,7 @@ public partial class AppShell : Shell
     {
         InitializeComponent();
         Routing.RegisterRoute("login/register", typeof(RegisterPage));
+        Routing.RegisterRoute("Season2", typeof(Season2Page));
     }
 
     protected override void OnNavigating(ShellNavigatingEventArgs args)

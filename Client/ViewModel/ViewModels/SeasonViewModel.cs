@@ -14,14 +14,17 @@ public partial class SeasonViewModel : BaseViewModel
 {
     private readonly ILogger<SeasonViewModel> _logger;
     private readonly IAlertService _alert;
+    private readonly INavigationService _navigation;
     private readonly ISeasonApi _season;
 
     public ObservableCollection<SeasonModel> Seasons { get; } = [];
 
-    public SeasonViewModel(ILogger<SeasonViewModel> logger, IAlertService alert, ISeasonApi season)
+    public SeasonViewModel(
+        ILogger<SeasonViewModel> logger, IAlertService alert, INavigationService navigation, ISeasonApi season)
     {
         _logger = logger;
         _alert = alert;
+        _navigation = navigation;
         _season = season;
     }
 
@@ -40,8 +43,15 @@ public partial class SeasonViewModel : BaseViewModel
 
         for (int i = 0; i < seasons.Count - 1; i++)
         {
-            Seasons.Add(new SeasonModel(i + 1, seasons[i].StartedAt.ToLocalTime()));
+            var model = new SeasonModel(i + 1, seasons[i].StartedAt.ToLocalTime());
+            model.OnClick += OnClick;
+            Seasons.Add(model);
         }
+    }
+
+    private Task OnClick(CancellationToken ct)
+    {
+        return _navigation.GoToAsync("Season2", ct);
     }
 }
 
@@ -50,6 +60,8 @@ public partial class SeasonModel
     public int Seq { get; }
     public DateTime StartedAt { get; }
 
+    public event Func<CancellationToken, Task>? OnClick;
+
     public SeasonModel(int seq, DateTime startedAt)
     {
         Seq = seq;
@@ -57,8 +69,8 @@ public partial class SeasonModel
     }
 
     [RelayCommand]
-    public async Task Click(CancellationToken ct)
+    public Task Click(CancellationToken ct)
     {
-
+        return OnClick?.Invoke(ct) ?? Task.CompletedTask;
     }
 }
