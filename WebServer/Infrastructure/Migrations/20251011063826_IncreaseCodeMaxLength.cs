@@ -12,7 +12,7 @@ namespace Infrastructure.Migrations
         {
             migrationBuilder.AlterColumn<string>(
                 name: "Code",
-                table: "Purchases",
+                table: "Orders",
                 type: "varchar(20)",
                 unicode: false,
                 maxLength: 20,
@@ -28,7 +28,7 @@ namespace Infrastructure.Migrations
         {
             migrationBuilder.AlterColumn<string>(
                 name: "Code",
-                table: "Purchases",
+                table: "Orders",
                 type: "varchar(10)",
                 unicode: false,
                 maxLength: 10,

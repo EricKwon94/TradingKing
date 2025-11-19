@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(TradingKingContext))]
-    [Migration("20251011062746_AddPurchase")]
-    partial class AddPurchase
+    [Migration("20251011062746_AddOrders")]
+    partial class AddOrders
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Domain.Purchase", b =>
+            modelBuilder.Entity("Domain.Order", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -56,7 +56,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserSeq");
 
-                    b.ToTable("Purchases");
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("Domain.User", b =>
@@ -97,10 +97,10 @@ namespace Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Domain.Purchase", b =>
+            modelBuilder.Entity("Domain.Order", b =>
                 {
                     b.HasOne("Domain.User", "User")
-                        .WithMany("Purchases")
+                        .WithMany("Orders")
                         .HasForeignKey("UserSeq")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -110,7 +110,7 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.User", b =>
                 {
-                    b.Navigation("Purchases");
+                    b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618
         }

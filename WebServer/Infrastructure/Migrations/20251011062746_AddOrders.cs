@@ -6,7 +6,7 @@ using System;
 namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class AddPurchase : Migration
+    public partial class AddOrders : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -35,7 +35,7 @@ namespace Infrastructure.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_UserSeq",
-                table: "Purchases",
+                table: "Orders",
                 column: "UserSeq");
         }
 
