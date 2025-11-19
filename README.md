@@ -1,3 +1,6 @@
+# 실행방법
+https://github.com/EricKwon94/TradingKing/releases/tag/1.0.1
+
 # 오늘의 단타 왕
 ASP.NET Core, SignalR, EFCore, CleanArchitecture, EventSourcing
 
