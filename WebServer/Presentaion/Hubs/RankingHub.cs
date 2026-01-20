@@ -1,9 +1,11 @@
-﻿using Application.Services;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,9 +17,9 @@ namespace Presentaion.Hubs;
 public class RankingHub : Hub
 {
     private readonly ILogger<RankingHub> _logger;
-    private readonly ICacheService _cache;
+    private readonly ConcurrentDictionary<string, double> _cache;
 
-    public RankingHub(ILogger<RankingHub> logger, ICacheService cache)
+    public RankingHub(ILogger<RankingHub> logger, [FromKeyedServices(Constant.CACHE_KEY)] ConcurrentDictionary<string, double> cache)
     {
         _logger = logger;
         _cache = cache;
@@ -33,7 +35,7 @@ public class RankingHub : Hub
     {
         while (!ct.IsCancellationRequested)
         {
-            var ranks = await _cache.GetRankAsync(start, stop, ct);
+            var ranks = _cache.OrderByDescending(e => e.Value);
             yield return ranks;
             await Task.Delay(1000, ct);
         }

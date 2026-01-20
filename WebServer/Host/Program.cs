@@ -10,7 +10,9 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Presentaion.Hubs;
 using System;
+using System.Collections.Concurrent;
 using System.Text;
+using System.Threading.Channels;
 using System.Threading.RateLimiting;
 
 namespace Host;
@@ -100,11 +102,16 @@ public class Program
         });
 
         string sqlServerCs = builder.Configuration.GetConnectionString("TradingKing")!;
-        string redisCs = builder.Configuration["REDIS"]!;
         bool isDevelopment = builder.Environment.IsDevelopment();
         builder.Services
             .AddApplication()
-            .AddInfrastructure(isDevelopment, sqlServerCs, redisCs);
+            .AddInfrastructure(isDevelopment, sqlServerCs);
+
+        Channel<Domain.Order> channel = Channel.CreateUnbounded<Domain.Order>();
+        builder.Services.AddSingleton(p => channel.Reader);
+        builder.Services.AddSingleton(p => channel.Writer);
+        builder.Services.AddKeyedSingleton<ConcurrentDictionary<string, double>>(Presentaion.Constant.CACHE_KEY);
+        builder.Services.AddHostedService<Worker>();
 
         var app = builder.Build();
 

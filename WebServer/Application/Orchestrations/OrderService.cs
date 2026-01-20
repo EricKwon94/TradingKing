@@ -5,6 +5,7 @@ using Domain.Persistences;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace Application.Orchestrations;
@@ -16,14 +17,17 @@ public class OrderService
     private readonly IUserRepository _userRepo;
     private readonly ISeasonRepo _seasonRepo;
     private readonly IExchangeApi _exchangeApi;
+    private readonly ChannelWriter<Order> _writer;
 
-    public OrderService(ITransaction transaction, IOrderRepo orderRepo, IUserRepository userRepo, ISeasonRepo seasonRepo, IExchangeApi exchangeApi)
+    public OrderService(ITransaction transaction, IOrderRepo orderRepo, IUserRepository userRepo, ISeasonRepo seasonRepo, IExchangeApi exchangeApi,
+        ChannelWriter<Order> writer)
     {
         _transaction = transaction;
         _orderRepo = orderRepo;
         _userRepo = userRepo;
         _seasonRepo = seasonRepo;
         _exchangeApi = exchangeApi;
+        _writer = writer;
     }
 
     public int GetPolicy()
@@ -47,9 +51,10 @@ public class OrderService
 
         int seasonId = await _seasonRepo.GetLastSeasonIdAsync(ct);
         User user = await _userRepo.GetUserWithOrderAsync(seasonId, userId, Order.DEFAULT_CODE, ct);
-        user.BuyCoin(seasonId, req.Code, req.Quantity, ticker.trade_price);
+        Order ordered = user.BuyCoin(seasonId, req.Code, req.Quantity, ticker.trade_price);
 
         await _transaction.SaveChangesAsync(ct);
+        await _writer.WriteAsync(ordered, ct);
     }
 
     /// <exception cref="PriceTooLowException"></exception>

@@ -49,7 +49,7 @@ public class User : IEntity<string>
 
     /// <exception cref="PriceTooLowException"></exception>
     /// <exception cref="NotEnoughCashException"></exception>
-    public void BuyCoin(int seasonId, string code, double buyQuantity, double tickerPrice)
+    public Order BuyCoin(int seasonId, string code, double buyQuantity, double tickerPrice)
     {
         double price = buyQuantity * tickerPrice;
         if (price < Order.MIN_ORDER_PRICE)
@@ -64,6 +64,7 @@ public class User : IEntity<string>
         var cryto = new Order(seasonId, Id, code, buyQuantity, tickerPrice);
         var cash = new Order(seasonId, Id, Order.DEFAULT_CODE, price * -1, 1);
         _orders.AddRange(cryto, cash);
+        return cryto;
     }
 
     /// <exception cref="PriceTooLowException"></exception>

@@ -5,7 +5,7 @@ using System;
 
 namespace Infrastructure.EFCore;
 
-internal class TradingKingContext : DbContext,
+public class TradingKingContext : DbContext,
     IEntityTypeConfiguration<User>, IEntityTypeConfiguration<Order>,
     IEntityTypeConfiguration<Season>, IEntityTypeConfiguration<Rank>
 {
