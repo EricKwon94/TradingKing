@@ -111,7 +111,8 @@ public class Program
         builder.Services.AddSingleton(p => channel.Reader);
         builder.Services.AddSingleton(p => channel.Writer);
         builder.Services.AddKeyedSingleton<ConcurrentDictionary<string, double>>(Presentaion.Constant.CACHE_KEY);
-        builder.Services.AddHostedService<Worker>();
+        if (!builder.Environment.IsEnvironment("Test"))
+            builder.Services.AddHostedService<Worker>();
 
         var app = builder.Build();
 
