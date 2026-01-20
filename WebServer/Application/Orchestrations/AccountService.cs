@@ -3,7 +3,9 @@ using Domain;
 using Domain.Exceptions;
 using Domain.Persistences;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace Application.Orchestrations;
@@ -15,12 +17,14 @@ public class AccountService
     private readonly ISeasonRepo _seasonRepo;
     private readonly TokenGenerator _tokenGenerator = new();
     private readonly Encryptor _encryptor = new();
+    private readonly ChannelWriter<Order> _writer;
 
-    public AccountService(ITransaction transaction, IUserRepository userRepository, ISeasonRepo seasonRepo)
+    public AccountService(ITransaction transaction, IUserRepository userRepository, ISeasonRepo seasonRepo, ChannelWriter<Order> writer)
     {
         _transaction = transaction;
         _userRepository = userRepository;
         _seasonRepo = seasonRepo;
+        _writer = writer;
     }
 
     public FormRes GetForm()
@@ -47,6 +51,8 @@ public class AccountService
             return false;
         }
 
+        var order = user.Orders.Last();
+        await _writer.WriteAsync(order, ct);
         return true;
     }
 

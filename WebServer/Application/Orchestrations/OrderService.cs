@@ -51,10 +51,13 @@ public class OrderService
 
         int seasonId = await _seasonRepo.GetLastSeasonIdAsync(ct);
         User user = await _userRepo.GetUserWithOrderAsync(seasonId, userId, Order.DEFAULT_CODE, ct);
-        Order ordered = user.BuyCoin(seasonId, req.Code, req.Quantity, ticker.trade_price);
+        user.BuyCoin(seasonId, req.Code, req.Quantity, ticker.trade_price);
 
         await _transaction.SaveChangesAsync(ct);
-        await _writer.WriteAsync(ordered, ct);
+        foreach (var order in user.Orders.TakeLast(2))
+        {
+            await _writer.WriteAsync(order, ct);
+        }
     }
 
     /// <exception cref="PriceTooLowException"></exception>

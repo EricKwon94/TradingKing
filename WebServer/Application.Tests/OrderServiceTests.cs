@@ -93,7 +93,8 @@ public class OrderServiceTests : IClassFixture<TestDatabaseFixture>
         var transaction = new Transaction(context);
         var repo = new UserRepository(context);
         var seasonRepo = new SeasonRepo(context);
-        var service = new AccountService(transaction, repo, seasonRepo);
+        var channel = Channel.CreateUnbounded<Domain.Order>();
+        var service = new AccountService(transaction, repo, seasonRepo, channel.Writer);
         var result = await service.RegisterAsync(id, "xcvjkl;asdfjk;l@@", default);
         Assert.True(result);
         context.ChangeTracker.Clear();

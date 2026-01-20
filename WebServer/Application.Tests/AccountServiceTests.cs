@@ -4,6 +4,7 @@ using FluentAssertions;
 using Infrastructure.EFCore;
 using Infrastructure.Persistences;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace Application.Tests;
@@ -111,6 +112,8 @@ public class AccountServiceTests : IClassFixture<TestDatabaseFixture>
         var transaction = new Transaction(context);
         var repo = new UserRepository(context);
         var repo2 = new SeasonRepo(context);
-        return new AccountService(transaction, repo, repo2);
+
+        var channel = Channel.CreateUnbounded<Domain.Order>();
+        return new AccountService(transaction, repo, repo2, channel.Writer);
     }
 }
