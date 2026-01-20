@@ -7,6 +7,7 @@ using Infrastructure.Persistences;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using System.Linq;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace Application.Tests;
@@ -109,7 +110,7 @@ public class OrderServiceTests : IClassFixture<TestDatabaseFixture>
         var mock = new Mock<IExchangeApi>();
         mock.Setup(c => c.GetTickerAsync(code, default))
             .ReturnsAsync([new IExchangeApi.TickerRes(code, price)]);
-
-        return new OrderService(transaction, repo, userRepo, seasonRepo, mock.Object);
+        var channel = Channel.CreateUnbounded<Domain.Order>();
+        return new OrderService(transaction, repo, userRepo, seasonRepo, mock.Object, channel.Writer);
     }
 }
