@@ -35,7 +35,7 @@ public class RankingHub : Hub
     {
         while (!ct.IsCancellationRequested)
         {
-            var ranks = _cache.OrderByDescending(e => e.Value);
+            var ranks = _cache.OrderByDescending(e => e.Value).ToDictionary();
             yield return ranks;
             await Task.Delay(1000, ct);
         }

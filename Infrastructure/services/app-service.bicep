@@ -7,8 +7,6 @@ param dockerUrl string
 param dockerUserName string
 
 @secure()
-param redisCs string
-@secure()
 param issKey string
 @secure()
 param dockerPassword string
@@ -50,10 +48,6 @@ resource appService 'Microsoft.Web/sites@2024-11-01' = {
         {
           name: 'DOCKER_ENABLE_CI'
           value: 'true'
-        }
-        {
-          name: 'REDIS'
-          value: redisCs
         }
       ]
     }

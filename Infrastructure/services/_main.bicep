@@ -16,7 +16,7 @@ param dockerPassword string
 param sqlsrvId string
 @secure()
 param sqlsrvPwd string
-
+/*
 module serviceBus 'servicebus.bicep' = {
   name: 'dp-serviceBus'
   params: {
@@ -34,7 +34,7 @@ module redis 'redis.bicep' = {
     serverNumber: serverNumber
   }
 }
-
+*/
 module signalR 'signalr.bicep' = {
   name: 'dp-signalR'
   params: {
@@ -66,7 +66,6 @@ module appService 'app-service.bicep' = {
     dockerUrl: dockerUrl
     dockerUserName: dockerUserName
     dockerPassword: dockerPassword
-    redisCs: redis.outputs.cs
   }
 }
 
@@ -91,7 +90,7 @@ module sa 'storage.bicep' = {
     deploymentStorageContainerName: deploymentStorageContainerName
   }
 }
-*/
+
 
 module ca 'container-apps.bicep' = {
   name: 'dp-ca'
@@ -109,3 +108,4 @@ module ca 'container-apps.bicep' = {
     dockerPassword: dockerPassword
   }
 }
+*/
